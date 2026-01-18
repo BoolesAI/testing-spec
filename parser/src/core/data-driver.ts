@@ -1,26 +1,28 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
+import type { TSpec } from './parser.js';
 
-/**
- * Parse CSV string into array of objects
- * @param {string} content - CSV content
- * @returns {object[]} Array of row objects
- */
-export function parseCSV(content) {
+export type DataFormat = 'csv' | 'json' | 'yaml' | 'yml';
+export type DataRow = Record<string, string>;
+
+export interface ParameterizedSpec extends TSpec {
+  _dataRowIndex?: number;
+  _dataRow?: DataRow;
+}
+
+export function parseCSV(content: string): DataRow[] {
   const lines = content.trim().split('\n');
   if (lines.length === 0) {
     return [];
   }
   
-  // Parse header
   const headers = parseCSVLine(lines[0]);
   
-  // Parse data rows
-  const rows = [];
+  const rows: DataRow[] = [];
   for (let i = 1; i < lines.length; i++) {
     const values = parseCSVLine(lines[i]);
-    const row = {};
+    const row: DataRow = {};
     for (let j = 0; j < headers.length; j++) {
       row[headers[j]] = values[j] ?? '';
     }
@@ -30,13 +32,8 @@ export function parseCSV(content) {
   return rows;
 }
 
-/**
- * Parse a single CSV line handling quoted values
- * @param {string} line - CSV line
- * @returns {string[]} Array of values
- */
-function parseCSVLine(line) {
-  const values = [];
+function parseCSVLine(line: string): string[] {
+  const values: string[] = [];
   let current = '';
   let inQuotes = false;
   
@@ -62,33 +59,17 @@ function parseCSVLine(line) {
   return values;
 }
 
-/**
- * Parse JSON data file
- * @param {string} content - JSON content
- * @returns {object[]} Array of data objects
- */
-export function parseJSON(content) {
-  const data = JSON.parse(content);
+export function parseJSON(content: string): DataRow[] {
+  const data = JSON.parse(content) as DataRow | DataRow[];
   return Array.isArray(data) ? data : [data];
 }
 
-/**
- * Parse YAML data file
- * @param {string} content - YAML content
- * @returns {object[]} Array of data objects
- */
-export function parseYAML(content) {
-  const data = yaml.load(content);
+export function parseYAML(content: string): DataRow[] {
+  const data = yaml.load(content) as DataRow | DataRow[];
   return Array.isArray(data) ? data : [data];
 }
 
-/**
- * Load data from file
- * @param {string} filePath - Path to data file
- * @param {string} format - File format (csv, json, yaml)
- * @returns {object[]} Array of data objects
- */
-export function loadDataFile(filePath, format) {
+export function loadDataFile(filePath: string, format: string): DataRow[] {
   const content = fs.readFileSync(filePath, 'utf-8');
   
   switch (format.toLowerCase()) {
@@ -104,12 +85,7 @@ export function loadDataFile(filePath, format) {
   }
 }
 
-/**
- * Detect format from file extension
- * @param {string} filePath 
- * @returns {string}
- */
-export function detectFormat(filePath) {
+export function detectFormat(filePath: string): DataFormat {
   const ext = path.extname(filePath).toLowerCase();
   switch (ext) {
     case '.csv':
@@ -124,45 +100,33 @@ export function detectFormat(filePath) {
   }
 }
 
-/**
- * Generate parameterized test cases from data source
- * @param {object} spec - Parsed spec object
- * @param {string} baseDir - Base directory for resolving data file paths
- * @returns {object[]} Array of spec objects with data applied
- */
-export function generateParameterizedCases(spec, baseDir) {
+export function generateParameterizedCases(spec: TSpec, baseDir: string): ParameterizedSpec[] {
   const dataConfig = spec.data;
   
-  // If no data config or no source, return single spec
   if (!dataConfig || !dataConfig.source) {
-    return [spec];
+    return [spec as ParameterizedSpec];
   }
   
   const sourcePath = path.resolve(baseDir, dataConfig.source);
   const format = dataConfig.format || detectFormat(sourcePath);
   
-  // Load data file
   const dataRows = loadDataFile(sourcePath, format);
   
   if (dataRows.length === 0) {
-    return [spec];
+    return [spec as ParameterizedSpec];
   }
   
-  // Check driver mode
   const driver = dataConfig.driver || 'parameterized';
   
   if (driver === 'parameterized') {
-    // Generate one test case per data row
     return dataRows.map((row, index) => {
-      const caseSpec = JSON.parse(JSON.stringify(spec)); // Deep clone
+      const caseSpec = JSON.parse(JSON.stringify(spec)) as ParameterizedSpec;
       
-      // Merge data row into variables
       caseSpec.variables = {
         ...caseSpec.variables,
         ...row
       };
       
-      // Add row index info
       caseSpec._dataRowIndex = index;
       caseSpec._dataRow = row;
       
@@ -170,10 +134,9 @@ export function generateParameterizedCases(spec, baseDir) {
     });
   }
   
-  // Single row mode (current_row)
   const rowIndex = dataConfig.current_row || 0;
   if (rowIndex >= 0 && rowIndex < dataRows.length) {
-    const caseSpec = JSON.parse(JSON.stringify(spec));
+    const caseSpec = JSON.parse(JSON.stringify(spec)) as ParameterizedSpec;
     caseSpec.variables = {
       ...caseSpec.variables,
       ...dataRows[rowIndex]
@@ -183,17 +146,10 @@ export function generateParameterizedCases(spec, baseDir) {
     return [caseSpec];
   }
   
-  return [spec];
+  return [spec as ParameterizedSpec];
 }
 
-/**
- * Get data preview (first N rows)
- * @param {string} filePath - Path to data file
- * @param {string} format - File format
- * @param {number} limit - Max rows to return
- * @returns {object[]}
- */
-export function getDataPreview(filePath, format, limit = 5) {
+export function getDataPreview(filePath: string, format: string, limit = 5): DataRow[] {
   const data = loadDataFile(filePath, format);
   return data.slice(0, limit);
 }

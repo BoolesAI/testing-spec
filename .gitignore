@@ -52,6 +52,7 @@ Temporary Items
 .apdisk
 
 # IDE
+.qoder/
 .idea/
 *.swp
 *.swo
