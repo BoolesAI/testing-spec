@@ -1,4 +1,4 @@
-import { generateTestCases, generateTestCasesFromString, type TestCase, type TSpecMetadata, type Assertion, type DataRow } from '../../core/index.js';
+import { generateTestCases, generateTestCasesFromString, type TestCase, type TSpecMetadata, type Assertion, type DataRow } from '../../parser/index.js';
 import fs from 'fs';
 
 export interface GenerateTestsParams {

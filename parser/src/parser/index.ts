@@ -1,10 +1,12 @@
-import { parseYamlFile, parseYamlString, validateTspec, getProtocolType, getBaseDir } from './parser.js';
-import type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, EnvironmentConfig } from './parser.js';
-import { applyTemplateInheritance } from './template.js';
-import { replaceVariables, buildVariableContext } from './variables.js';
-import { generateParameterizedCases, type ParameterizedSpec, type DataRow } from './data-driver.js';
-import { runAssertions, extractVariables, getAssertionSummary, extractJsonPath, type AssertionResult, type AssertionSummary, type Response } from './assertions.js';
 import path from 'path';
+import { parseYamlFile, parseYamlString, getProtocolType, getBaseDir } from './yaml-parser.js';
+import { validateTspec, validateDslFormat } from './schema.js';
+import { applyTemplateInheritance, deepMerge } from './template.js';
+import { replaceVariables, buildVariableContext, getBuiltinFunctions } from './variables.js';
+import { generateParameterizedCases, loadDataFile, parseCSV } from './data-driver.js';
+import type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, ValidationResult, EnvironmentConfig, DataConfig, OutputConfig, LifecycleConfig } from './types.js';
+import type { VariableContext } from './variables.js';
+import type { DataFormat, DataRow, ParameterizedSpec } from './data-driver.js';
 
 export interface TestCase {
   id: string;
@@ -28,18 +30,6 @@ export interface GenerateOptions {
 }
 
 export interface GenerateFromStringOptions extends GenerateOptions {
-  baseDir?: string;
-}
-
-export interface TestResult {
-  testCaseId: string;
-  passed: boolean;
-  assertions: AssertionResult[];
-  summary: AssertionSummary;
-  extracted: Record<string, unknown>;
-}
-
-export interface AssertOptions {
   baseDir?: string;
 }
 
@@ -143,33 +133,6 @@ export function generateTestCasesFromString(content: string, options: GenerateFr
   return testCases;
 }
 
-export function assertResults(response: Response, testCase: TestCase, options: AssertOptions = {}): TestResult {
-  const { baseDir = process.cwd() } = options;
-  
-  const assertionResults = runAssertions(response, testCase.assertions, baseDir);
-  
-  const extracted = testCase.extract ? extractVariables(response, testCase.extract) : {};
-  
-  const summary = getAssertionSummary(assertionResults);
-  
-  const passed = assertionResults.every(r => r.passed);
-  
-  return {
-    testCaseId: testCase.id,
-    passed,
-    assertions: assertionResults,
-    summary,
-    extracted
-  };
-}
-
-export function assertMultipleResults(
-  results: Array<{ response: Response; testCase: TestCase }>,
-  options: AssertOptions = {}
-): TestResult[] {
-  return results.map(({ response, testCase }) => assertResults(response, testCase, options));
-}
-
 function buildBaseUrl(envConfig: EnvironmentConfig): string {
   const scheme = envConfig.scheme || 'https';
   const host = envConfig.host || 'localhost';
@@ -192,13 +155,14 @@ function generateTestCaseId(filePath: string, index: number, suffix = ''): strin
   return `${cleanName}${suffix}`;
 }
 
-// Re-export utilities for advanced usage
-export { parseYamlFile, parseYamlString, validateTspec } from './parser.js';
-export type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, ValidationResult, EnvironmentConfig, DataConfig, OutputConfig, LifecycleConfig } from './parser.js';
+// Re-exports
+export { parseYamlFile, parseYamlString, getProtocolType, getBaseDir } from './yaml-parser.js';
+export { validateTspec, validateDslFormat } from './schema.js';
 export { deepMerge, applyTemplateInheritance } from './template.js';
 export { replaceVariables, buildVariableContext, getBuiltinFunctions } from './variables.js';
-export type { VariableContext } from './variables.js';
 export { generateParameterizedCases, loadDataFile, parseCSV } from './data-driver.js';
+
+// Type exports
+export type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, ValidationResult, EnvironmentConfig, DataConfig, OutputConfig, LifecycleConfig } from './types.js';
+export type { VariableContext } from './variables.js';
 export type { DataFormat, DataRow, ParameterizedSpec } from './data-driver.js';
-export { runAssertions, runAssertion, extractJsonPath, extractVariables, getAssertionSummary } from './assertions.js';
-export type { AssertionResult, AssertionSummary, Response } from './assertions.js';

@@ -1,14 +1,14 @@
+// Main API - backward compatible exports
 export {
-  // Main API
+  // Test case generation
   generateTestCases,
   generateTestCasesFromString,
-  assertResults,
-  assertMultipleResults,
   
   // Parser utilities
   parseYamlFile,
   parseYamlString,
   validateTspec,
+  validateDslFormat,
   
   // Template utilities
   deepMerge,
@@ -22,23 +22,32 @@ export {
   // Data-driven utilities
   generateParameterizedCases,
   loadDataFile,
-  parseCSV,
-  
-  // Assertion utilities
+  parseCSV
+} from './parser/index.js';
+
+// Assertion exports
+export {
   runAssertions,
   runAssertion,
   extractJsonPath,
   extractVariables,
-  getAssertionSummary
-} from './core/index.js';
+  getAssertionSummary,
+  compareValues
+} from './assertion/index.js';
 
+// Runner exports
+export {
+  createRunner,
+  executeTestCase,
+  HttpRunner
+} from './runner/index.js';
+
+// Type exports
 export type {
-  // Types
+  // Parser types
   TestCase,
-  TestResult,
   GenerateOptions,
   GenerateFromStringOptions,
-  AssertOptions,
   TSpec,
   TSpecMetadata,
   ProtocolType,
@@ -55,8 +64,26 @@ export type {
   VariableContext,
   DataFormat,
   DataRow,
-  ParameterizedSpec,
+  ParameterizedSpec
+} from './parser/index.js';
+
+export type {
+  // Assertion types
+  Response,
   AssertionResult,
   AssertionSummary,
-  Response
-} from './core/index.js';
+  ComparisonOperator
+} from './assertion/index.js';
+
+export type {
+  // Runner types
+  TestRunner,
+  TestResult,
+  RunnerOptions,
+  HttpRunnerOptions
+} from './runner/index.js';
+
+// Module namespaces for advanced usage
+export * as parser from './parser/index.js';
+export * as assertion from './assertion/index.js';
+export * as runner from './runner/index.js';

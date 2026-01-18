@@ -1,137 +1,13 @@
-import { JSONPath } from 'jsonpath-plus';
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
-import type { Assertion } from './parser.js';
-
-export interface Response {
-  statusCode?: number;
-  status?: number;
-  grpcCode?: number;
-  code?: number;
-  body: unknown;
-  headers?: Record<string, string>;
-  responseTime?: number;
-  duration?: number;
-}
-
-export interface AssertionResult {
-  passed: boolean;
-  type: string;
-  expected?: unknown;
-  actual?: unknown;
-  message: string;
-  expression?: string;
-  operator?: string;
-  path?: string;
-  name?: string;
-}
-
-export interface AssertionSummary {
-  total: number;
-  passed: number;
-  failed: number;
-  passRate: number;
-}
+import type { Assertion } from '../parser/types.js';
+import type { Response, AssertionResult, AssertionSummary, ComparisonOperator } from './types.js';
+import { compareValues } from './operators.js';
+import { extractJsonPath, extractByPath } from './extractors.js';
 
 interface AssertionLibrary {
   definitions: Array<{ id: string; [key: string]: unknown }>;
-}
-
-type ComparisonOperator = 
-  | 'equals' | 'eq'
-  | 'not_equals' | 'neq'
-  | 'exists' | 'not_exists'
-  | 'not_empty'
-  | 'contains' | 'not_contains'
-  | 'matches'
-  | 'gt' | 'gte' | 'lt' | 'lte'
-  | 'type' | 'length';
-
-export function extractJsonPath(data: unknown, expression: string): unknown {
-  try {
-    const result = JSONPath({ path: expression, json: data });
-    return result.length === 1 ? result[0] : result;
-  } catch (error) {
-    const err = error as Error;
-    throw new Error(`JSONPath extraction failed: ${expression} - ${err.message}`);
-  }
-}
-
-export function extractByPath(data: unknown, pathStr: string): unknown {
-  const parts = pathStr.split('.');
-  let current: unknown = data;
-  
-  for (const part of parts) {
-    if (current === null || current === undefined) {
-      return undefined;
-    }
-    current = (current as Record<string, unknown>)[part];
-  }
-  
-  return current;
-}
-
-function compareValues(actual: unknown, operator: ComparisonOperator, expected: unknown): boolean {
-  switch (operator) {
-    case 'equals':
-    case 'eq':
-      return actual === expected || JSON.stringify(actual) === JSON.stringify(expected);
-    
-    case 'not_equals':
-    case 'neq':
-      return actual !== expected;
-    
-    case 'exists':
-      return actual !== undefined && actual !== null;
-    
-    case 'not_exists':
-      return actual === undefined || actual === null;
-    
-    case 'not_empty':
-      if (typeof actual === 'string') return actual.length > 0;
-      if (Array.isArray(actual)) return actual.length > 0;
-      return actual !== undefined && actual !== null;
-    
-    case 'contains':
-      if (typeof actual === 'string') return actual.includes(expected as string);
-      if (Array.isArray(actual)) return actual.includes(expected);
-      return false;
-    
-    case 'not_contains':
-      if (typeof actual === 'string') return !actual.includes(expected as string);
-      if (Array.isArray(actual)) return !actual.includes(expected);
-      return true;
-    
-    case 'matches':
-      if (typeof actual !== 'string') return false;
-      const regex = new RegExp(expected as string);
-      return regex.test(actual);
-    
-    case 'gt':
-      return Number(actual) > Number(expected);
-    
-    case 'gte':
-      return Number(actual) >= Number(expected);
-    
-    case 'lt':
-      return Number(actual) < Number(expected);
-    
-    case 'lte':
-      return Number(actual) <= Number(expected);
-    
-    case 'type':
-      return typeof actual === expected;
-    
-    case 'length':
-      if (typeof actual === 'string' || Array.isArray(actual)) {
-        return actual.length === Number(expected);
-      }
-      return false;
-    
-    default:
-      throw new Error(`Unknown operator: ${operator}`);
-  }
 }
 
 function assertStatusCode(response: Response, assertion: Assertion): AssertionResult {
@@ -361,25 +237,6 @@ export function runAssertion(response: Response, assertion: Assertion, baseDir =
 
 export function runAssertions(response: Response, assertions: Assertion[], baseDir = '.'): AssertionResult[] {
   return assertions.map(assertion => runAssertion(response, assertion, baseDir));
-}
-
-export function extractVariables(response: Response, extractConfig: Record<string, string>): Record<string, unknown> {
-  if (!extractConfig) {
-    return {};
-  }
-  
-  const body = typeof response.body === 'string' ? JSON.parse(response.body) : response.body;
-  const extracted: Record<string, unknown> = {};
-  
-  for (const [varName, expression] of Object.entries(extractConfig)) {
-    try {
-      extracted[varName] = extractJsonPath(body, expression);
-    } catch {
-      extracted[varName] = undefined;
-    }
-  }
-  
-  return extracted;
 }
 
 export function getAssertionSummary(results: AssertionResult[]): AssertionSummary {

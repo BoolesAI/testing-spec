@@ -2,6 +2,7 @@ import * as readline from 'readline';
 import { tool as parseTspecTool } from './tools/parse-tspec.js';
 import { tool as generateTestsTool } from './tools/generate-tests.js';
 import { tool as assertResultsTool } from './tools/assert-results.js';
+import { tool as runTestTool } from './tools/run-test.js';
 
 const PROTOCOL_VERSION = '2024-11-05';
 const SERVER_NAME = 'tspec-parser';
@@ -64,7 +65,8 @@ interface ToolsCallResult {
 const tools: MCPTool[] = [
   parseTspecTool as MCPTool,
   generateTestsTool as MCPTool,
-  assertResultsTool as MCPTool
+  assertResultsTool as MCPTool,
+  runTestTool as MCPTool
 ];
 
 const toolMap = new Map<string, MCPTool>(tools.map(t => [t.name, t]));

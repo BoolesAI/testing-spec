@@ -1,4 +1,4 @@
-import { parseYamlFile, parseYamlString, validateTspec, type TSpec, type ValidationResult } from '../../core/index.js';
+import { parseYamlFile, parseYamlString, validateTspec, type TSpec, type ValidationResult } from '../../parser/index.js';
 import fs from 'fs';
 
 export interface ParseTspecParams {

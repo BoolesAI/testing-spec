@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
-import type { TSpec } from './parser.js';
+import type { TSpec } from './types.js';
 
 export type DataFormat = 'csv' | 'json' | 'yaml' | 'yml';
 export type DataRow = Record<string, string>;

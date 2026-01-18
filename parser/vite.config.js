@@ -9,6 +9,9 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
+        'parser/index': resolve(__dirname, 'src/parser/index.ts'),
+        'assertion/index': resolve(__dirname, 'src/assertion/index.ts'),
+        'runner/index': resolve(__dirname, 'src/runner/index.ts'),
         'mcp-server': resolve(__dirname, 'src/mcp/server.ts')
       },
       formats: ['es', 'cjs'],
@@ -19,6 +22,7 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
+        'axios',
         'js-yaml',
         'jsonpath-plus',
         'fs',

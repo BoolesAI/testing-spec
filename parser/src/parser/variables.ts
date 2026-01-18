@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import type { TSpec } from './parser.js';
+import type { TSpec } from './types.js';
 
 export interface VariableContext {
   variables: Record<string, unknown>;

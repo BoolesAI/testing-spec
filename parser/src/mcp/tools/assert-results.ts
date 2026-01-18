@@ -1,4 +1,5 @@
-import { assertResults, type Response, type Assertion, type AssertionResult, type AssertionSummary } from '../../core/index.js';
+import { runAssertions, extractVariables, getAssertionSummary, type Response, type AssertionResult, type AssertionSummary } from '../../assertion/index.js';
+import type { Assertion } from '../../parser/types.js';
 
 export interface AssertResultsParams {
   response: Response;
@@ -75,25 +76,17 @@ export const tool: MCPTool<AssertResultsParams, AssertResultsResult> = {
   async handler(params: AssertResultsParams): Promise<AssertResultsResult> {
     const { response, test_case, base_dir = process.cwd() } = params;
     
-    const testCase = {
-      id: test_case.id,
-      assertions: test_case.assertions,
-      extract: test_case.extract,
-      description: '',
-      metadata: {} as never,
-      protocol: null,
-      request: undefined,
-      _raw: {} as never
-    };
-    
-    const result = assertResults(response, testCase, { baseDir: base_dir });
+    const assertionResults = runAssertions(response, test_case.assertions, base_dir);
+    const extracted = test_case.extract ? extractVariables(response, test_case.extract) : {};
+    const summary = getAssertionSummary(assertionResults);
+    const passed = assertionResults.every(r => r.passed);
     
     return {
-      testCaseId: result.testCaseId,
-      passed: result.passed,
-      summary: result.summary,
-      assertions: result.assertions,
-      extracted: result.extracted
+      testCaseId: test_case.id,
+      passed,
+      summary,
+      assertions: assertionResults,
+      extracted
     };
   }
 };

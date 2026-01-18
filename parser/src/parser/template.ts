@@ -1,5 +1,6 @@
 import path from 'path';
-import { parseYamlFile, type TSpec } from './parser.js';
+import { parseYamlFile } from './yaml-parser.js';
+import type { TSpec } from './types.js';
 
 interface MergeableObject {
   $replace?: boolean;
