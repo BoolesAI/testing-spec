@@ -34,7 +34,19 @@ export interface GenerateFromStringOptions extends GenerateOptions {
   baseDir?: string;
 }
 
-export function generateTestCases(filePath: string, options: GenerateOptions = {}): TestCase[] {
+export function validateTestCase(filePath: string): ValidationResult {
+  try {
+    const spec = parseYamlFile(filePath);
+    return validateTspec(spec);
+  } catch (error) {
+    return {
+      valid: false,
+      errors: [error instanceof Error ? error.message : String(error)]
+    };
+  }
+}
+
+export function parseTestCases(filePath: string, options: GenerateOptions = {}): TestCase[] {
   const { params = {}, env = {}, extracted = {}, typeFilter = '*' } = options;
   
   // Extract type from file extension and check filter
@@ -92,7 +104,7 @@ export function generateTestCases(filePath: string, options: GenerateOptions = {
   return testCases;
 }
 
-export function generateTestCasesFromString(content: string, options: GenerateFromStringOptions = {}): TestCase[] {
+export function parseTestCasesFromString(content: string, options: GenerateFromStringOptions = {}): TestCase[] {
   const { baseDir = process.cwd(), params = {}, env = {}, extracted = {} } = options;
   
   let spec = parseYamlString(content);

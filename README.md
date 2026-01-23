@@ -66,7 +66,7 @@ extract:
 ## Installation
 
 ```bash
-npm install @boolesai/tspec-parser
+npm install @boolesai/tspec
 ```
 
 ## Usage
@@ -74,10 +74,10 @@ npm install @boolesai/tspec-parser
 ### As a Library
 
 ```javascript
-import { generateTestCases, assertResults } from '@boolesai/tspec-parser';
+import { parseTestCases, assertResults } from '@boolesai/tspec';
 
-// Generate test cases from a .tspec file
-const testCases = generateTestCases('./tests/login.http.tspec', {
+// Parse test cases from a .tspec file
+const testCases = parseTestCases('./tests/login.http.tspec', {
   params: { username: 'testuser' },
   env: { API_HOST: 'api.example.com' }
 });

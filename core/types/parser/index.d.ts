@@ -1,4 +1,4 @@
-import type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, EnvironmentConfig } from './types.js';
+import type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, EnvironmentConfig, ValidationResult } from './types.js';
 import type { DataRow } from './data-driver.js';
 export interface TestCase {
     id: string;
@@ -23,8 +23,9 @@ export interface GenerateOptions {
 export interface GenerateFromStringOptions extends GenerateOptions {
     baseDir?: string;
 }
-export declare function generateTestCases(filePath: string, options?: GenerateOptions): TestCase[];
-export declare function generateTestCasesFromString(content: string, options?: GenerateFromStringOptions): TestCase[];
+export declare function validateTestCase(filePath: string): ValidationResult;
+export declare function parseTestCases(filePath: string, options?: GenerateOptions): TestCase[];
+export declare function parseTestCasesFromString(content: string, options?: GenerateFromStringOptions): TestCase[];
 export declare function getTypeFromFilePath(filePath: string): string | null;
 export { parseYamlFile, parseYamlString, getProtocolType, getBaseDir } from './yaml-parser.js';
 export { validateTspec, validateDslFormat } from './schema.js';
