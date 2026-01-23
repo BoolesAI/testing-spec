@@ -89,57 +89,7 @@ const result = assertResults(response, testCases[0]);
 console.log(result.passed); // true/false
 console.log(result.summary); // { total: 4, passed: 4, failed: 0, passRate: 100 }
 ```
-
-### As MCP Server
-
-TSpec Parser can be used as a local MCP (Model Context Protocol) server, enabling AI agents to parse test specifications and run assertions.
-
-#### Configuration
-
-Add to your MCP client config (e.g., Claude Desktop `claude_desktop_config.json`):
-
-```json
-{
-  "mcpServers": {
-    "tspec-parser": {
-      "command": "npx",
-      "args": ["@boolesai/tspec-parser", "mcp"]
-    }
-  }
-}
-```
-
-Or run directly:
-
-```bash
-npx tspec-mcp-server
-```
-
-#### Available MCP Tools
-
-| Tool | Description |
-|------|-------------|
-| `parse_tspec` | Parse a .tspec file and return structured data |
-| `generate_test_cases` | Generate test cases with variable substitution |
-| `assert_results` | Run assertions against test responses |
-
-#### Example MCP Workflow
-
-1. **Parse a spec file:**
-   ```json
-   { "name": "parse_tspec", "arguments": { "file_path": "/path/to/test.http.tspec" } }
-   ```
-
-2. **Generate test cases:**
-   ```json
-   { "name": "generate_test_cases", "arguments": { "file_path": "/path/to/test.http.tspec", "env": { "API_HOST": "localhost:3000" } } }
-   ```
-
-3. **Assert results:**
-   ```json
-   { "name": "assert_results", "arguments": { "response": { "statusCode": 200, "body": { "success": true } }, "test_case": { "id": "login_success", "assertions": [...] } } }
-   ```
-
+    
 ## Documentation
 
 For complete documentation, see the [docs](./doc) directory:
