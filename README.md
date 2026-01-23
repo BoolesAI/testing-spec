@@ -10,15 +10,63 @@ TSpec (Test Specification) is a YAML-based domain-specific language for defining
 
 ### Key Features
 
-- 🤖 **AI-Optimized**: Clear structure and metadata designed for accurate LLM-based test generation
-- 🔌 **Multi-Protocol**: HTTP, gRPC support with extensibility for WebSocket and GraphQL
-- 🔄 **Template Inheritance**: Reuse test configurations across multiple test cases
-- 📊 **Data-Driven Testing**: Parameterized testing with multiple data sources
-- 🔧 **Variable System**: Built-in functions and dynamic variable substitution
-- ✅ **Comprehensive Assertions**: Rich set of assertion types for thorough validation
-- 🎯 **Lifecycle Hooks**: Setup and teardown for test isolation
+- **AI-Optimized**: Clear structure and metadata designed for accurate LLM-based test generation
+- **Multi-Protocol**: HTTP, gRPC support with extensibility for WebSocket and GraphQL
+- **Template Inheritance**: Reuse test configurations across multiple test cases
+- **Data-Driven Testing**: Parameterized testing with multiple data sources
+- **Variable System**: Built-in functions and dynamic variable substitution
+- **Comprehensive Assertions**: Rich set of assertion types for thorough validation
+- **Lifecycle Hooks**: Setup and teardown for test isolation
 
-## Quick Example
+## Packages
+
+This monorepo contains the following packages:
+
+| Package | Description | Documentation |
+|---------|-------------|---------------|
+| [@boolesai/tspec](./core) | Core library for parsing, running, and asserting TSpec files | [README](./core/README.md) |
+| [@boolesai/tspec-cli](./cli) | Command-line interface for TSpec | [README](./cli/README.md) |
+
+## Quick Start
+
+### Using the CLI
+
+```bash
+# Install CLI globally
+npm install -g @boolesai/tspec-cli
+
+# Validate test files
+tspec validate tests/*.tspec
+
+# Run tests
+tspec run tests/*.http.tspec
+
+# Parse and inspect test cases
+tspec parse tests/login.http.tspec --output json
+```
+
+### Using the Library
+
+```bash
+npm install @boolesai/tspec
+```
+
+```javascript
+import { parseTestCases, scheduler } from '@boolesai/tspec';
+
+// Parse test cases from a .tspec file
+const testCases = parseTestCases('./tests/login.http.tspec', {
+  params: { username: 'testuser' },
+  env: { API_HOST: 'api.example.com' }
+});
+
+// Execute tests with concurrency
+const result = await scheduler.schedule(testCases, { concurrency: 5 });
+
+console.log(result.summary); // { total: 4, passed: 4, failed: 0, passRate: 100 }
+```
+
+## Example TSpec File
 
 ```yaml
 version: "1.0"
@@ -63,33 +111,17 @@ extract:
   user_id: "$.data.user.id"
 ```
 
-## Installation
+## File Extensions
 
-```bash
-npm install @boolesai/tspec
-```
+TSpec uses protocol-specific file extensions:
 
-## Usage
+| Extension | Protocol |
+|-----------|----------|
+| `.http.tspec` | HTTP/HTTPS |
+| `.grpc.tspec` | gRPC |
+| `.graphql.tspec` | GraphQL (reserved) |
+| `.ws.tspec` | WebSocket (reserved) |
 
-### As a Library
-
-```javascript
-import { parseTestCases, assertResults } from '@boolesai/tspec';
-
-// Parse test cases from a .tspec file
-const testCases = parseTestCases('./tests/login.http.tspec', {
-  params: { username: 'testuser' },
-  env: { API_HOST: 'api.example.com' }
-});
-
-// Execute tests and assert results
-const response = await executeRequest(testCases[0]);
-const result = assertResults(response, testCases[0]);
-
-console.log(result.passed); // true/false
-console.log(result.summary); // { total: 4, passed: 4, failed: 0, passRate: 100 }
-```
-    
 ## Documentation
 
 For complete documentation, see the [docs](./doc) directory:
@@ -107,17 +139,6 @@ For complete documentation, see the [docs](./doc) directory:
 - [API Reference](./doc/11-api-reference.md) - Parser API documentation
 - [Examples](./doc/12-examples.md) - Real-world examples
 
-📖 **[View Full Documentation](./doc/README.md)**
-
-## File Extensions
-
-TSpec uses protocol-specific file extensions:
-
-- `.http.tspec` - HTTP/HTTPS tests
-- `.grpc.tspec` - gRPC tests
-- `.graphql.tspec` - GraphQL tests (reserved)
-- `.ws.tspec` - WebSocket tests (reserved)
-
 ## Why TSpec?
 
 ### For AI Systems
@@ -131,6 +152,19 @@ TSpec uses protocol-specific file extensions:
 - Version control friendly (YAML format)
 - Co-locate tests with source code
 - Unified structure across protocols
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Build all packages
+npm run build
+
+# Run tests
+npm test
+```
 
 ## License
 

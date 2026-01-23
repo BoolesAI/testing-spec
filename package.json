@@ -1,0 +1,9 @@
+{
+  "name": "testing-spec",
+  "private": true,
+  "workspaces": ["core", "cli"],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces"
+  }
+}

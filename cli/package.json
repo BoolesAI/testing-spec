@@ -1,0 +1,50 @@
+{
+  "name": "@boolesai/tspec-cli",
+  "version": "1.0.0",
+  "description": "CLI for @boolesai/tspec testing framework",
+  "type": "module",
+  "bin": {
+    "tspec": "./bin/tspec.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./types/index.d.ts",
+  "files": [
+    "dist",
+    "types",
+    "bin"
+  ],
+  "scripts": {
+    "build": "vite build && npm run types",
+    "types": "tsc --emitDeclarationOnly",
+    "dev": "vite build --watch",
+    "test": "node --test test/**/*.js"
+  },
+  "dependencies": {
+    "@boolesai/tspec": "*",
+    "commander": "^12.0.0",
+    "chalk": "^5.0.0",
+    "glob": "^11.0.0",
+    "ora": "^8.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vite": "^7.0.0",
+    "@types/node": "^22.0.0"
+  },
+  "keywords": [
+    "testing",
+    "cli",
+    "tspec",
+    "specification",
+    "api-testing"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/boolesai/testing-spec.git",
+    "directory": "cli"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

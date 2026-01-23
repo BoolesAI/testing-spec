@@ -51,26 +51,25 @@ TSpec (Test Specification) is a YAML-based domain-specific language for defining
 ## Installation
 
 ```bash
-npm install tspec-parser
+npm install @boolesai/tspec
 ```
 
 ## Basic Usage
 
 ```javascript
-import { generateTestCases, assertResults } from 'tspec-parser';
+import { parseTestCases, scheduler } from '@boolesai/tspec';
 
-// Generate test cases from a .tspec file
-const testCases = generateTestCases('./tests/login.http.tspec', {
+// Parse test cases from a .tspec file
+const testCases = parseTestCases('./tests/login.http.tspec', {
   params: { username: 'testuser' },
   env: { API_HOST: 'api.example.com' }
 });
 
-// Execute tests and assert results
-const response = await executeRequest(testCases[0]);
-const result = assertResults(response, testCases[0]);
+// Execute tests and get results
+const result = await scheduler.schedule(testCases);
 
-console.log(result.passed); // true/false
-console.log(result.summary); // { total: 4, passed: 4, failed: 0, passRate: 100 }
+console.log(result.summary.passed); // number of passed tests
+console.log(result.summary.passRate); // pass rate percentage
 ```
 
 ---
