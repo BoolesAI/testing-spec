@@ -33,12 +33,6 @@
         "extensions": [
           ".tspec"
         ],
-        "filenamePatterns": [
-          "*.http.tspec",
-          "*.grpc.tspec",
-          "*.graphql.tspec",
-          "*.websocket.tspec"
-        ],
         "configuration": "./language-configuration.json"
       }
     ],
@@ -73,9 +67,11 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "lint": "eslint src --ext ts"
+    "compile": "vite build",
+    "watch": "vite build --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package"
   },
   "dependencies": {
     "js-yaml": "^4.1.0"
@@ -84,6 +80,8 @@
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.75.0",
-    "typescript": "^5.0.0"
+    "@vscode/vsce": "^3.7.1",
+    "typescript": "^5.0.0",
+    "vite": "^7.3.1"
   }
 }
