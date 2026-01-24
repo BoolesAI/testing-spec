@@ -12,12 +12,102 @@ interface ParseOptions {
   quiet?: boolean;
 }
 
+export interface ParseParams {
+  files: string[];
+  output?: OutputFormat;
+  verbose?: boolean;
+  env?: Record<string, string>;
+  params?: Record<string, string>;
+}
+
+export interface ParseExecutionResult {
+  success: boolean;
+  output: string;
+  data: {
+    testCases: unknown[];
+    parseErrors: Array<{ file: string; error: string }>;
+    summary: { totalFiles: number; totalTestCases: number; parseErrors: number };
+  };
+}
+
 function parseKeyValue(value: string, previous: Record<string, string> = {}): Record<string, string> {
   const [key, val] = value.split('=');
   if (key && val !== undefined) {
     previous[key] = val;
   }
   return previous;
+}
+
+/**
+ * Parse test cases - core logic extracted for MCP integration
+ */
+export async function executeParse(params: ParseParams): Promise<ParseExecutionResult> {
+  clearTemplateCache();
+  
+  const output = params.output ?? 'text';
+  const verbose = params.verbose ?? false;
+  const env = params.env ?? {};
+  const paramValues = params.params ?? {};
+  
+  // Discover files
+  const { files: fileDescriptors } = await discoverTSpecFiles(params.files);
+  
+  if (fileDescriptors.length === 0) {
+    return {
+      success: false,
+      output: 'No .tspec files found',
+      data: {
+        testCases: [],
+        parseErrors: [],
+        summary: { totalFiles: 0, totalTestCases: 0, parseErrors: 0 }
+      }
+    };
+  }
+  
+  const allTestCases: unknown[] = [];
+  const parseErrors: Array<{ file: string; error: string }> = [];
+  
+  // Parse each file
+  for (const descriptor of fileDescriptors) {
+    try {
+      const testCases = parseTestCases(descriptor.path, { env, params: paramValues });
+      allTestCases.push(...testCases);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      parseErrors.push({ file: descriptor.path, error: message });
+    }
+  }
+  
+  const summary = {
+    totalFiles: fileDescriptors.length,
+    totalTestCases: allTestCases.length,
+    parseErrors: parseErrors.length
+  };
+  
+  // Generate output
+  let outputStr: string;
+  if (output === 'json') {
+    outputStr = formatJson({ testCases: allTestCases, errors: parseErrors, summary });
+  } else {
+    const parts: string[] = [];
+    parts.push(`Parsed ${allTestCases.length} test case(s) from ${fileDescriptors.length} file(s)`);
+    parts.push('');
+    for (const testCase of allTestCases) {
+      parts.push(formatParsedTestCase(testCase, { format: output, verbose }));
+      parts.push('');
+    }
+    if (parseErrors.length > 0) {
+      parts.push(`${parseErrors.length} file(s) failed to parse:`);
+      parseErrors.forEach(({ file, error }) => parts.push(`  ${file}: ${error}`));
+    }
+    outputStr = parts.join('\n');
+  }
+  
+  return {
+    success: parseErrors.length === 0,
+    output: outputStr,
+    data: { testCases: allTestCases, parseErrors, summary }
+  };
 }
 
 export const parseCommand = new Command('parse')
@@ -31,74 +121,20 @@ export const parseCommand = new Command('parse')
   .action(async (files: string[], options: ParseOptions & { env: Record<string, string>; params: Record<string, string> }) => {
     setLoggerOptions({ verbose: options.verbose, quiet: options.quiet });
     
-    // Clear template cache to ensure fresh reads for this parse
-    clearTemplateCache();
-    
-    const spinner = options.quiet ? null : ora('Discovering files...').start();
+    const spinner = options.quiet ? null : ora('Parsing...').start();
     
     try {
-      // Discover files without loading content
-      const { files: fileDescriptors, errors: resolveErrors } = await discoverTSpecFiles(files);
-      
-      if (resolveErrors.length > 0 && !options.quiet) {
-        resolveErrors.forEach(err => logger.warn(err));
-      }
-      
-      if (fileDescriptors.length === 0) {
-        spinner?.fail('No .tspec files found');
-        process.exit(2);
-      }
-      
-      if (spinner) spinner.text = `Parsing ${fileDescriptors.length} file(s)...`;
-      
-      const allTestCases: unknown[] = [];
-      const parseErrors: Array<{ file: string; error: string }> = [];
-      
-      // Parse each file individually (lazy loading - content read on-demand)
-      for (const descriptor of fileDescriptors) {
-        try {
-          const testCases = parseTestCases(descriptor.path, {
-            env: options.env,
-            params: options.params
-          });
-          allTestCases.push(...testCases);
-        } catch (err) {
-          const message = err instanceof Error ? err.message : String(err);
-          parseErrors.push({ file: descriptor.path, error: message });
-        }
-      }
+      const result = await executeParse({
+        files,
+        output: options.output,
+        verbose: options.verbose,
+        env: options.env,
+        params: options.params
+      });
       
       spinner?.stop();
-      
-      if (options.output === 'json') {
-        logger.log(formatJson({
-          testCases: allTestCases,
-          errors: parseErrors,
-          summary: {
-            totalFiles: fileDescriptors.length,
-            totalTestCases: allTestCases.length,
-            parseErrors: parseErrors.length
-          }
-        }));
-      } else {
-        logger.info(`Parsed ${allTestCases.length} test case(s) from ${fileDescriptors.length} file(s)`);
-        logger.newline();
-        
-        for (const testCase of allTestCases) {
-          logger.log(formatParsedTestCase(testCase, { format: options.output, verbose: options.verbose }));
-          logger.newline();
-        }
-        
-        if (parseErrors.length > 0) {
-          logger.newline();
-          logger.warn(`${parseErrors.length} file(s) failed to parse:`);
-          for (const { file, error } of parseErrors) {
-            logger.error(`  ${file}: ${error}`);
-          }
-        }
-      }
-      
-      process.exit(parseErrors.length > 0 ? 1 : 0);
+      logger.log(result.output);
+      process.exit(result.success ? 0 : 1);
     } catch (err) {
       spinner?.fail('Parse failed');
       const message = err instanceof Error ? err.message : String(err);

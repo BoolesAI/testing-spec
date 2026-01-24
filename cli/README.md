@@ -131,6 +131,104 @@ tspec list
 tspec list --output json
 ```
 
+### `tspec mcp`
+
+Start MCP (Model Context Protocol) server for AI tool integration.
+
+```bash
+tspec mcp
+```
+
+This starts an MCP server over stdio that exposes TSpec commands as tools for AI assistants like Claude.
+
+## MCP Integration
+
+TSpec CLI can run as an MCP server, exposing all commands as tools for AI assistants.
+
+### Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `tspec_run` | Execute test cases and report results |
+| `tspec_validate` | Validate .tspec files for schema correctness |
+| `tspec_parse` | Parse and display test case information |
+| `tspec_list` | List supported protocols |
+
+### Claude Desktop Configuration
+
+Add the following to your Claude Desktop configuration file:
+
+**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "tspec": {
+      "command": "npx",
+      "args": ["-y", "@boolesai/tspec-cli", "mcp"]
+    }
+  }
+}
+```
+
+Or if installed globally:
+
+```json
+{
+  "mcpServers": {
+    "tspec": {
+      "command": "tspec",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+### Tool Parameters
+
+#### tspec_run
+
+```json
+{
+  "files": ["tests/*.tspec"],
+  "concurrency": 5,
+  "env": { "API_HOST": "localhost" },
+  "params": { "timeout": "5000" },
+  "failFast": false,
+  "output": "text"
+}
+```
+
+#### tspec_validate
+
+```json
+{
+  "files": ["tests/*.tspec"],
+  "output": "text"
+}
+```
+
+#### tspec_parse
+
+```json
+{
+  "files": ["tests/*.tspec"],
+  "env": { "API_HOST": "localhost" },
+  "params": { "timeout": "5000" },
+  "verbose": true,
+  "output": "text"
+}
+```
+
+#### tspec_list
+
+```json
+{
+  "output": "text"
+}
+```
+
 ## Exit Codes
 
 | Code | Description |
