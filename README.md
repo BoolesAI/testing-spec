@@ -45,6 +45,31 @@ tspec run tests/*.http.tspec
 tspec parse tests/login.http.tspec --output json
 ```
 
+### Using the VSCode Extension
+
+The [vscode-tspec](./vscode-extension/README.md) extension provides a seamless testing experience directly within Visual Studio Code.
+
+**Installation:**
+```bash
+# From VS Code Marketplace
+code --install-extension boolesai.vscode-tspec
+```
+
+**Running Tests:**
+1. Open the Testing view in VS Code (beaker icon in sidebar)
+2. All `.tspec` files will be automatically discovered
+3. Click the play button next to any test to run it
+4. View real-time results with detailed assertion feedback
+
+**Features:**
+- Integrated test explorer with one-click test execution
+- Syntax highlighting and IntelliSense support
+- Real-time validation and diagnostics
+- CodeLens integration for in-editor test running
+- Automatic test discovery and file watching
+
+See the [VSCode Extension README](./vscode-extension/README.md) for detailed setup and troubleshooting.
+
 ### Using the Library
 
 ```bash

@@ -12,6 +12,7 @@ Visual Studio Code extension providing language support for TSpec test specifica
 - **Validation**: Real-time validation with error diagnostics
 - **Auto-completion**: IntelliSense support for TSpec fields and values
 - **Language Configuration**: Smart bracket matching, auto-indentation, and comment toggling
+- **Test Runner**: Run TSpec test cases directly from VS Code with integrated test explorer
 
 ## Installation
 
@@ -50,6 +51,38 @@ Type the following prefixes and press `Tab` to expand:
 | `tspec-assertion` | Assertion block |
 | `tspec-data` | Data-driven test template |
 
+### Running Tests
+
+The extension integrates with VS Code's native testing UI to run TSpec test cases directly from the editor.
+
+**Prerequisites:**
+- TSpec CLI must be installed (globally or in your workspace)
+- Install globally: `npm install -g @boolesai/tspec-cli`
+- Or install locally in your project: `npm install --save-dev @boolesai/tspec-cli`
+
+**Running tests:**
+
+1. **Via Test Explorer**
+   - Open the Testing view in VS Code sidebar (beaker icon)
+   - All `.tspec` files in your workspace will be automatically discovered
+   - Click the play button next to any test to run it
+   - View results in real-time with detailed assertion feedback
+
+2. **Via CodeLens**
+   - Open any `.tspec` file
+   - Click the "▶ Run Test" link that appears above the test
+
+3. **Via Command Palette**
+   - Press `Cmd+Shift+P` (macOS) or `Ctrl+Shift+P` (Windows/Linux)
+   - Type "Test: Run All Tests" to run all tests
+   - Or "Test: Run Test at Cursor" when cursor is in a test file
+
+**Test Output:**
+- View detailed test results in the Test Results panel
+- Check the "TSpec Tests" output channel for execution logs
+- Failed assertions show expected vs actual values
+- Response time and status code validation results
+
 ### Configuration
 
 The extension can be configured through VS Code settings:
@@ -57,13 +90,29 @@ The extension can be configured through VS Code settings:
 ```json
 {
   "tspec.validation.enabled": true,
-  "tspec.validation.strictMode": false
+  "tspec.validation.strictMode": false,
+  "tspec.testing.enabled": true,
+  "tspec.testing.cliPath": "",
+  "tspec.testing.concurrency": 5,
+  "tspec.testing.defaultTimeout": 30,
+  "tspec.testing.watchMode": true,
+  "tspec.testing.envVars": {}
 }
 ```
 
 **Settings:**
+
+*Validation:*
 - `tspec.validation.enabled` - Enable/disable TSpec validation (default: `true`)
 - `tspec.validation.strictMode` - Enable strict validation mode (default: `false`)
+
+*Testing:*
+- `tspec.testing.enabled` - Enable/disable test runner integration (default: `true`)
+- `tspec.testing.cliPath` - Custom path to TSpec CLI executable (default: auto-detect)
+- `tspec.testing.concurrency` - Number of concurrent tests to run (default: `5`)
+- `tspec.testing.defaultTimeout` - Default timeout in seconds for test execution (default: `30`)
+- `tspec.testing.watchMode` - Auto-refresh tests when files change (default: `true`)
+- `tspec.testing.envVars` - Environment variables to pass to tests (default: `{}`)
 
 ## Build from Source
 
@@ -136,6 +185,63 @@ vscode-extension/
 │   └── tspec.json            # Code snippet definitions
 ├── language-configuration.json # Language features config
 └── package.json              # Extension manifest
+```
+
+## Troubleshooting
+
+### TSpec CLI Not Found
+
+If you see the error "TSpec CLI not found" when trying to run tests:
+
+**Solution 1: Install the CLI globally**
+```bash
+npm install -g @boolesai/tspec-cli
+```
+
+**Solution 2: Install locally in your workspace**
+```bash
+cd your-project
+npm install --save-dev @boolesai/tspec-cli
+```
+
+**Solution 3: Specify custom CLI path**
+If you have TSpec CLI installed in a custom location:
+1. Open VS Code Settings (`Cmd+,` or `Ctrl+,`)
+2. Search for "tspec.testing.cliPath"
+3. Set the absolute path to your `tspec` executable
+
+**Verify installation:**
+```bash
+# Check if CLI is in PATH
+tspec --version
+
+# Or check workspace installation
+npx tspec --version
+```
+
+### Tests Not Appearing in Test Explorer
+
+1. Ensure `tspec.testing.enabled` is set to `true` in settings
+2. Check that your test files have the correct extension (e.g., `.http.tspec`)
+3. Try refreshing: Click the refresh button in the Test Explorer
+4. Check the "TSpec Tests" output channel for errors
+
+### Test Execution Timeout
+
+If tests are timing out:
+1. Increase the timeout value in settings: `tspec.testing.defaultTimeout`
+2. Default is 30 seconds - adjust based on your API response times
+
+### Environment Variables Not Working
+
+To pass environment variables to your tests:
+```json
+{
+  "tspec.testing.envVars": {
+    "API_HOST": "localhost:3000",
+    "TEST_PASSWORD": "secret123"
+  }
+}
 ```
 
 ## Documentation
