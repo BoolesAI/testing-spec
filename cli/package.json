@@ -18,7 +18,8 @@
     "types": "tsc --emitDeclarationOnly",
     "dev": "vite build --watch",
     "test": "node --test test/**/*.js",
-    "package": "npm run build && npm pack"
+    "package": "npm run build && npm pack",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@boolesai/tspec": "^0.0.1",
@@ -47,5 +48,13 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "author": "Booles AI",
+  "homepage": "https://github.com/boolesai/testing-spec#readme",
+  "bugs": {
+    "url": "https://github.com/boolesai/testing-spec/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
