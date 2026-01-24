@@ -1,0 +1,277 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "TSpec",
+  "scopeName": "source.tspec",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#variable-interpolation" },
+    { "include": "#top-level-keys" },
+    { "include": "#protocol-blocks" },
+    { "include": "#metadata-keys" },
+    { "include": "#assertion-keys" },
+    { "include": "#http-methods" },
+    { "include": "#enum-values" },
+    { "include": "#operators" },
+    { "include": "#jsonpath" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#booleans" },
+    { "include": "#keys" },
+    { "include": "#punctuation" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.number-sign.tspec",
+          "match": "#.*$"
+        }
+      ]
+    },
+    "top-level-keys": {
+      "patterns": [
+        {
+          "match": "^(version|description|metadata|environment|variables|data|extends|lifecycle|assertions|extract|output)(:)",
+          "captures": {
+            "1": { "name": "keyword.control.tspec" },
+            "2": { "name": "punctuation.separator.key-value.tspec" }
+          }
+        }
+      ]
+    },
+    "protocol-blocks": {
+      "patterns": [
+        {
+          "match": "^(http|grpc|graphql|websocket)(:)",
+          "captures": {
+            "1": { "name": "entity.name.type.protocol.tspec" },
+            "2": { "name": "punctuation.separator.key-value.tspec" }
+          }
+        }
+      ]
+    },
+    "metadata-keys": {
+      "patterns": [
+        {
+          "match": "^\\s+(ai_prompt|related_code|test_category|risk_level|tags|priority|timeout|business_rule)(:)",
+          "captures": {
+            "1": { "name": "variable.other.metadata.tspec" },
+            "2": { "name": "punctuation.separator.key-value.tspec" }
+          }
+        }
+      ]
+    },
+    "assertion-keys": {
+      "patterns": [
+        {
+          "match": "^\\s+(type|expected|expression|operator|path|name|value|pattern|max_ms|source|message|include)(:)",
+          "captures": {
+            "1": { "name": "support.type.property-name.assertion.tspec" },
+            "2": { "name": "punctuation.separator.key-value.tspec" }
+          }
+        }
+      ]
+    },
+    "http-methods": {
+      "patterns": [
+        {
+          "match": "\\b(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\\b",
+          "name": "keyword.other.http-method.tspec"
+        }
+      ]
+    },
+    "enum-values": {
+      "patterns": [
+        {
+          "comment": "test_category values",
+          "match": "(?<=[:\\s])(functional|integration|performance|security)(?=[\\s,\"']|$)",
+          "name": "constant.language.test-category.tspec"
+        },
+        {
+          "comment": "risk_level values",
+          "match": "(?<=[:\\s])(low|medium|high|critical)(?=[\\s,\"']|$)",
+          "name": "constant.language.risk-level.tspec"
+        },
+        {
+          "comment": "assertion types",
+          "match": "(?<=[:\\s\"'])(status_code|grpc_code|response_time|json_path|header|proto_field|javascript)(?=[\\s,\"']|$)",
+          "name": "support.function.assertion-type.tspec"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "(?<=[:\\s\"'])(equals|eq|not_equals|neq|exists|not_exists|not_empty|contains|not_contains|matches|gt|gte|lt|lte|type|length)(?=[\\s,\"']|$)",
+          "name": "keyword.operator.comparison.tspec"
+        }
+      ]
+    },
+    "variable-interpolation": {
+      "patterns": [
+        {
+          "name": "meta.interpolation.tspec",
+          "begin": "(\\$\\{)",
+          "beginCaptures": {
+            "1": { "name": "punctuation.definition.interpolation.begin.tspec" }
+          },
+          "end": "(\\})",
+          "endCaptures": {
+            "1": { "name": "punctuation.definition.interpolation.end.tspec" }
+          },
+          "patterns": [
+            { "include": "#variable-functions" },
+            { "include": "#variable-env" },
+            { "include": "#variable-extract" },
+            { "include": "#variable-default" },
+            { "include": "#variable-name" }
+          ]
+        }
+      ]
+    },
+    "variable-functions": {
+      "patterns": [
+        {
+          "match": "(timestamp|uuid|now|random_int)(\\([^)]*\\))?",
+          "captures": {
+            "1": { "name": "support.function.builtin.tspec" },
+            "2": { "name": "meta.function-call.arguments.tspec" }
+          }
+        }
+      ]
+    },
+    "variable-env": {
+      "patterns": [
+        {
+          "match": "(env)(\\.)(\\w+)",
+          "captures": {
+            "1": { "name": "storage.type.env.tspec" },
+            "2": { "name": "punctuation.accessor.tspec" },
+            "3": { "name": "variable.other.env.tspec" }
+          }
+        }
+      ]
+    },
+    "variable-extract": {
+      "patterns": [
+        {
+          "match": "(extract)(\\.)(\\w+)",
+          "captures": {
+            "1": { "name": "storage.type.extract.tspec" },
+            "2": { "name": "punctuation.accessor.tspec" },
+            "3": { "name": "variable.other.extracted.tspec" }
+          }
+        }
+      ]
+    },
+    "variable-default": {
+      "patterns": [
+        {
+          "match": "(\\w+)(\\|)([^}]+)",
+          "captures": {
+            "1": { "name": "variable.other.tspec" },
+            "2": { "name": "keyword.operator.default.tspec" },
+            "3": { "name": "string.unquoted.default-value.tspec" }
+          }
+        }
+      ]
+    },
+    "variable-name": {
+      "patterns": [
+        {
+          "match": "\\w+",
+          "name": "variable.other.tspec"
+        }
+      ]
+    },
+    "jsonpath": {
+      "patterns": [
+        {
+          "match": "(\\$\\.)[\\w\\.\\[\\]\\*]+",
+          "name": "string.other.jsonpath.tspec"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.tspec",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            { "include": "#variable-interpolation" },
+            { "include": "#escape-characters" }
+          ]
+        },
+        {
+          "name": "string.quoted.single.tspec",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            { "include": "#escape-characters" }
+          ]
+        },
+        {
+          "comment": "Block scalar indicator",
+          "match": "[|>][+-]?",
+          "name": "keyword.control.flow.block-scalar.tspec"
+        }
+      ]
+    },
+    "escape-characters": {
+      "patterns": [
+        {
+          "match": "\\\\[\\\\\"'nrtbf0/]",
+          "name": "constant.character.escape.tspec"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "match": "\\b[0-9]+(\\.[0-9]+)?\\b",
+          "name": "constant.numeric.tspec"
+        }
+      ]
+    },
+    "booleans": {
+      "patterns": [
+        {
+          "match": "\\b(true|false|yes|no|on|off)\\b",
+          "name": "constant.language.boolean.tspec"
+        }
+      ]
+    },
+    "keys": {
+      "patterns": [
+        {
+          "match": "^\\s*(\\w[\\w-]*)(:)",
+          "captures": {
+            "1": { "name": "entity.name.tag.tspec" },
+            "2": { "name": "punctuation.separator.key-value.tspec" }
+          }
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "match": "-(?=\\s)",
+          "name": "punctuation.definition.block.sequence.item.tspec"
+        },
+        {
+          "match": ":",
+          "name": "punctuation.separator.key-value.tspec"
+        },
+        {
+          "match": "[\\[\\]]",
+          "name": "punctuation.definition.array.tspec"
+        },
+        {
+          "match": "[\\{\\}]",
+          "name": "punctuation.definition.dictionary.tspec"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,324 @@
+{
+  "TSpec HTTP Basic Template": {
+    "prefix": "tspec-http",
+    "body": [
+      "version: \"1.0\"",
+      "description: \"${1:Test description}\"",
+      "",
+      "metadata:",
+      "  ai_prompt: |",
+      "    ${2:Describe what this test verifies}",
+      "  related_code:",
+      "    - \"${3:src/path/to/code.js}\"",
+      "  test_category: \"${4|functional,integration,performance,security|}\"",
+      "  risk_level: \"${5|low,medium,high,critical|}\"",
+      "  tags: [\"${6:tag1}\", \"${7:tag2}\"]",
+      "  priority: \"${8|low,medium,high|}\"",
+      "  timeout: \"${9:10s}\"",
+      "",
+      "http:",
+      "  method: \"${10|GET,POST,PUT,DELETE,PATCH|}\"",
+      "  path: \"${11:/api/v1/endpoint}\"",
+      "  headers:",
+      "    Content-Type: \"application/json\"",
+      "  body:",
+      "    json:",
+      "      ${12:key}: \"${13:value}\"",
+      "",
+      "assertions:",
+      "  - type: \"status_code\"",
+      "    expected: ${14:200}",
+      "  - type: \"json_path\"",
+      "    expression: \"${15:\\$.data}\"",
+      "    operator: \"${16|exists,equals,contains,matches|}\"",
+      "$0"
+    ],
+    "description": "Create a basic HTTP TSpec test file"
+  },
+  "TSpec gRPC Basic Template": {
+    "prefix": "tspec-grpc",
+    "body": [
+      "version: \"1.0\"",
+      "description: \"${1:Test description}\"",
+      "",
+      "metadata:",
+      "  ai_prompt: |",
+      "    ${2:Describe what this test verifies}",
+      "  related_code:",
+      "    - \"${3:src/path/to/code.js}\"",
+      "  test_category: \"${4|functional,integration,performance,security|}\"",
+      "  risk_level: \"${5|low,medium,high,critical|}\"",
+      "  tags: [\"${6:grpc}\"]",
+      "  priority: \"${7|low,medium,high|}\"",
+      "  timeout: \"${8:10s}\"",
+      "",
+      "grpc:",
+      "  service: \"${9:ServiceName}\"",
+      "  method: \"${10:MethodName}\"",
+      "  message:",
+      "    ${11:field}: \"${12:value}\"",
+      "",
+      "assertions:",
+      "  - type: \"grpc_code\"",
+      "    expected: \"${13:OK}\"",
+      "$0"
+    ],
+    "description": "Create a basic gRPC TSpec test file"
+  },
+  "TSpec GraphQL Basic Template": {
+    "prefix": "tspec-graphql",
+    "body": [
+      "version: \"1.0\"",
+      "description: \"${1:Test description}\"",
+      "",
+      "metadata:",
+      "  ai_prompt: |",
+      "    ${2:Describe what this test verifies}",
+      "  related_code:",
+      "    - \"${3:src/path/to/code.js}\"",
+      "  test_category: \"${4|functional,integration,performance,security|}\"",
+      "  risk_level: \"${5|low,medium,high,critical|}\"",
+      "  tags: [\"${6:graphql}\"]",
+      "  priority: \"${7|low,medium,high|}\"",
+      "  timeout: \"${8:10s}\"",
+      "",
+      "graphql:",
+      "  query: |",
+      "    ${9:query {",
+      "      users {",
+      "        id",
+      "        name",
+      "      }",
+      "    }}",
+      "  variables:",
+      "    ${10:id}: \"${11:value}\"",
+      "",
+      "assertions:",
+      "  - type: \"status_code\"",
+      "    expected: 200",
+      "  - type: \"json_path\"",
+      "    expression: \"\\$.data\"",
+      "    operator: \"exists\"",
+      "$0"
+    ],
+    "description": "Create a basic GraphQL TSpec test file"
+  },
+  "TSpec WebSocket Basic Template": {
+    "prefix": "tspec-websocket",
+    "body": [
+      "version: \"1.0\"",
+      "description: \"${1:Test description}\"",
+      "",
+      "metadata:",
+      "  ai_prompt: |",
+      "    ${2:Describe what this test verifies}",
+      "  related_code:",
+      "    - \"${3:src/path/to/code.js}\"",
+      "  test_category: \"${4|functional,integration,performance,security|}\"",
+      "  risk_level: \"${5|low,medium,high,critical|}\"",
+      "  tags: [\"${6:websocket}\"]",
+      "  priority: \"${7|low,medium,high|}\"",
+      "  timeout: \"${8:30s}\"",
+      "",
+      "websocket:",
+      "  url: \"${9:wss://example.com/ws}\"",
+      "  messages:",
+      "    - ${10:message}",
+      "",
+      "assertions:",
+      "  - type: \"status_code\"",
+      "    expected: 101",
+      "$0"
+    ],
+    "description": "Create a basic WebSocket TSpec test file"
+  },
+  "Metadata Block": {
+    "prefix": "sec-metadata",
+    "body": [
+      "metadata:",
+      "  ai_prompt: |",
+      "    ${1:Describe what this test verifies}",
+      "  related_code:",
+      "    - \"${2:src/path/to/code.js}\"",
+      "  test_category: \"${3|functional,integration,performance,security|}\"",
+      "  risk_level: \"${4|low,medium,high,critical|}\"",
+      "  tags: [\"${5:tag1}\"]",
+      "  priority: \"${6|low,medium,high|}\"",
+      "  timeout: \"${7:10s}\"$0"
+    ],
+    "description": "Insert metadata block"
+  },
+  "Environment Block": {
+    "prefix": "sec-environment",
+    "body": [
+      "environment:",
+      "  name: \"\\${ENV_NAME|${1:staging}}\"",
+      "  host: \"\\${API_HOST|${2:api.example.com}}\"",
+      "  scheme: \"${3|https,http|}\"$0"
+    ],
+    "description": "Insert environment configuration block"
+  },
+  "Variables Block": {
+    "prefix": "sec-variables",
+    "body": [
+      "variables:",
+      "  ${1:key}: \"${2:value}\"",
+      "  request_id: \"\\${uuid}\"$0"
+    ],
+    "description": "Insert variables block"
+  },
+  "Assertions Block": {
+    "prefix": "sec-assertions",
+    "body": [
+      "assertions:",
+      "  - type: \"status_code\"",
+      "    expected: ${1:200}",
+      "  - type: \"json_path\"",
+      "    expression: \"${2:\\$.data}\"",
+      "    operator: \"${3|exists,equals,contains,matches|}\"$0"
+    ],
+    "description": "Insert assertions block"
+  },
+  "HTTP Request Block": {
+    "prefix": "http-request",
+    "body": [
+      "http:",
+      "  method: \"${1|GET,POST,PUT,DELETE,PATCH|}\"",
+      "  path: \"${2:/api/v1/endpoint}\"",
+      "  headers:",
+      "    Content-Type: \"${3:application/json}\"",
+      "  body:",
+      "    json:",
+      "      ${4:key}: \"${5:value}\"$0"
+    ],
+    "description": "Insert HTTP request block"
+  },
+  "HTTP Request with Auth": {
+    "prefix": "http-auth",
+    "body": [
+      "http:",
+      "  method: \"${1|GET,POST,PUT,DELETE,PATCH|}\"",
+      "  path: \"${2:/api/v1/endpoint}\"",
+      "  headers:",
+      "    Content-Type: \"application/json\"",
+      "    Authorization: \"Bearer \\${${3:token}}\"$0"
+    ],
+    "description": "Insert HTTP request with Bearer token"
+  },
+  "Extract Block": {
+    "prefix": "sec-extract",
+    "body": [
+      "extract:",
+      "  ${1:variable_name}: \"${2:\\$.data.field}\"$0"
+    ],
+    "description": "Insert extract block for response data"
+  },
+  "Lifecycle Block": {
+    "prefix": "sec-lifecycle",
+    "body": [
+      "lifecycle:",
+      "  setup:",
+      "    - action: \"${1:db.reset_table}\"",
+      "      params:",
+      "        ${2:table}: \"${3:users}\"",
+      "  teardown:",
+      "    - action: \"${4:cache.clear}\"$0"
+    ],
+    "description": "Insert lifecycle hooks block"
+  },
+  "Status Code Assertion": {
+    "prefix": "assert-status",
+    "body": [
+      "- type: \"status_code\"",
+      "  expected: ${1:200}$0"
+    ],
+    "description": "Insert status code assertion"
+  },
+  "JSON Path Assertion": {
+    "prefix": "assert-jsonpath",
+    "body": [
+      "- type: \"json_path\"",
+      "  expression: \"${1:\\$.data}\"",
+      "  operator: \"${2|exists,equals,contains,matches,not_empty|}\"",
+      "  ${3:expected: \"${4:value}\"}$0"
+    ],
+    "description": "Insert JSON path assertion"
+  },
+  "JSON Path Equals Assertion": {
+    "prefix": "assert-jsonpath-equals",
+    "body": [
+      "- type: \"json_path\"",
+      "  expression: \"${1:\\$.data.field}\"",
+      "  operator: \"equals\"",
+      "  expected: ${2:value}$0"
+    ],
+    "description": "Insert JSON path equals assertion"
+  },
+  "JSON Path Matches Assertion": {
+    "prefix": "assert-jsonpath-matches",
+    "body": [
+      "- type: \"json_path\"",
+      "  expression: \"${1:\\$.data.field}\"",
+      "  operator: \"matches\"",
+      "  pattern: \"${2:^[A-Za-z0-9]+$}\"$0"
+    ],
+    "description": "Insert JSON path regex matches assertion"
+  },
+  "Header Assertion": {
+    "prefix": "assert-header",
+    "body": [
+      "- type: \"header\"",
+      "  name: \"${1:Content-Type}\"",
+      "  operator: \"${2|equals,contains|}\"",
+      "  value: \"${3:application/json}\"$0"
+    ],
+    "description": "Insert header assertion"
+  },
+  "Response Time Assertion": {
+    "prefix": "assert-response-time",
+    "body": [
+      "- type: \"response_time\"",
+      "  max_ms: ${1:1000}$0"
+    ],
+    "description": "Insert response time assertion"
+  },
+  "JavaScript Assertion": {
+    "prefix": "assert-javascript",
+    "body": [
+      "- type: \"javascript\"",
+      "  source: |",
+      "    ${1:return response.body.data !== null;}$0"
+    ],
+    "description": "Insert custom JavaScript assertion"
+  },
+  "Variable - Environment": {
+    "prefix": "var-env",
+    "body": "\\${env.${1:VARIABLE_NAME}}$0",
+    "description": "Insert environment variable reference"
+  },
+  "Variable - Extract": {
+    "prefix": "var-extract",
+    "body": "\\${extract.${1:variable_name}}$0",
+    "description": "Insert extracted value reference"
+  },
+  "Variable - UUID": {
+    "prefix": "var-uuid",
+    "body": "\\${uuid}$0",
+    "description": "Insert UUID generator function"
+  },
+  "Variable - Timestamp": {
+    "prefix": "var-timestamp",
+    "body": "\\${timestamp}$0",
+    "description": "Insert timestamp function"
+  },
+  "Variable - Random Int": {
+    "prefix": "var-random",
+    "body": "\\${random_int(${1:1},${2:100})}$0",
+    "description": "Insert random integer function"
+  },
+  "Variable - With Default": {
+    "prefix": "var-default",
+    "body": "\\${${1:VARIABLE}|${2:default_value}}$0",
+    "description": "Insert variable with default value"
+  }
+}

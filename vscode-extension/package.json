@@ -1,0 +1,89 @@
+{
+  "name": "vscode-tspec",
+  "displayName": "TSpec Language Support",
+  "description": "Language support for TSpec test specification files",
+  "version": "0.1.0",
+  "publisher": "boolesai",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Linters"
+  ],
+  "keywords": [
+    "tspec",
+    "testing",
+    "api",
+    "yaml"
+  ],
+  "activationEvents": [
+    "onLanguage:tspec"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "tspec",
+        "aliases": [
+          "TSpec",
+          "tspec"
+        ],
+        "extensions": [
+          ".tspec"
+        ],
+        "filenamePatterns": [
+          "*.http.tspec",
+          "*.grpc.tspec",
+          "*.graphql.tspec",
+          "*.websocket.tspec"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "tspec",
+        "scopeName": "source.tspec",
+        "path": "./syntaxes/tspec.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "tspec",
+        "path": "./snippets/tspec.json"
+      }
+    ],
+    "configuration": {
+      "title": "TSpec",
+      "properties": {
+        "tspec.validation.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable TSpec validation"
+        },
+        "tspec.validation.strictMode": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable strict validation mode"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.75.0",
+    "typescript": "^5.0.0"
+  }
+}
