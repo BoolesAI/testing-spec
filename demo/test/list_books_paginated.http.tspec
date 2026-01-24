@@ -1,0 +1,40 @@
+version: "1.0"
+description: "List books with custom pagination and sorting"
+
+metadata:
+  test_category: "functional"
+  tags: ["books", "list", "pagination", "sorting"]
+  priority: "medium"
+  timeout: "5s"
+
+environment:
+  name: "${ENV_NAME|local}"
+  host: "${API_HOST|localhost:3000}"
+  scheme: "http"
+
+http:
+  method: "GET"
+  path: "/api/v1/books"
+  query:
+    page: 1
+    limit: 5
+    sortBy: "title"
+    order: "asc"
+  headers:
+    Accept: "application/json"
+
+assertions:
+  - type: "status_code"
+    expected: 200
+  - type: "json_path"
+    expression: "$.pagination.page"
+    expected: 1
+  - type: "json_path"
+    expression: "$.pagination.limit"
+    expected: 5
+  - type: "json_path"
+    expression: "$.data"
+    operator: "length_lte"
+    expected: 5
+  - type: "response_time"
+    max_ms: 2000

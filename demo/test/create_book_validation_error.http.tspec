@@ -1,0 +1,39 @@
+version: "1.0"
+description: "Create book with missing required fields returns 400"
+
+metadata:
+  test_category: "negative"
+  tags: ["books", "create", "validation", "error"]
+  priority: "high"
+  timeout: "5s"
+
+environment:
+  name: "${ENV_NAME|local}"
+  host: "${API_HOST|localhost:3000}"
+  scheme: "http"
+
+http:
+  method: "POST"
+  path: "/api/v1/books"
+  headers:
+    Content-Type: "application/json"
+    Accept: "application/json"
+  body:
+    json:
+      title: "Incomplete Book"
+
+assertions:
+  - type: "status_code"
+    expected: 400
+  - type: "json_path"
+    expression: "$.error"
+    expected: "Validation Error"
+  - type: "json_path"
+    expression: "$.details"
+    operator: "exists"
+  - type: "json_path"
+    expression: "$.details"
+    operator: "length_gte"
+    expected: 1
+  - type: "response_time"
+    max_ms: 1000

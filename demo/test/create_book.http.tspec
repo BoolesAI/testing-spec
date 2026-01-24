@@ -1,0 +1,60 @@
+version: "1.0"
+description: "Create a new book with valid data"
+
+metadata:
+  test_category: "functional"
+  tags: ["books", "create", "post"]
+  priority: "high"
+  timeout: "5s"
+
+environment:
+  name: "${ENV_NAME|local}"
+  host: "${API_HOST|localhost:3000}"
+  scheme: "http"
+
+variables:
+  new_isbn: "${uuid}"
+
+http:
+  method: "POST"
+  path: "/api/v1/books"
+  headers:
+    Content-Type: "application/json"
+    Accept: "application/json"
+  body:
+    json:
+      title: "Test Book ${new_isbn}"
+      author: "Test Author"
+      isbn: "${new_isbn}"
+      publicationDate: "2024-01-15"
+      price: 29.99
+      inventoryQuantity: 10
+
+assertions:
+  - type: "status_code"
+    expected: 201
+  - type: "json_path"
+    expression: "$.id"
+    operator: "exists"
+  - type: "json_path"
+    expression: "$.title"
+    operator: "contains"
+    expected: "Test Book"
+  - type: "json_path"
+    expression: "$.author"
+    expected: "Test Author"
+  - type: "json_path"
+    expression: "$.price"
+    expected: 29.99
+  - type: "json_path"
+    expression: "$.inventoryQuantity"
+    expected: 10
+  - type: "header"
+    name: "Location"
+    operator: "matches"
+    pattern: "^/api/v1/books/\\d+$"
+  - type: "response_time"
+    max_ms: 2000
+
+extract:
+  created_book_id: "$.id"

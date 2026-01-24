@@ -1,0 +1,34 @@
+version: "1.0"
+description: "Delete a non-existent book returns 404"
+
+metadata:
+  test_category: "negative"
+  tags: ["books", "delete", "error", "404"]
+  priority: "medium"
+  timeout: "5s"
+
+environment:
+  name: "${ENV_NAME|local}"
+  host: "${API_HOST|localhost:3000}"
+  scheme: "http"
+
+variables:
+  book_id: 99999
+
+http:
+  method: "DELETE"
+  path: "/api/v1/books/${book_id}"
+  headers:
+    Accept: "application/json"
+
+assertions:
+  - type: "status_code"
+    expected: 404
+  - type: "json_path"
+    expression: "$.error"
+    expected: "Not Found"
+  - type: "json_path"
+    expression: "$.message"
+    operator: "exists"
+  - type: "response_time"
+    max_ms: 1000

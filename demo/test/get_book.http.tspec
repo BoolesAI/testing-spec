@@ -1,0 +1,52 @@
+version: "1.0"
+description: "Get a single book by ID"
+
+metadata:
+  test_category: "functional"
+  tags: ["books", "get", "single"]
+  priority: "high"
+  timeout: "5s"
+
+environment:
+  name: "${ENV_NAME|local}"
+  host: "${API_HOST|localhost:3000}"
+  scheme: "http"
+
+variables:
+  book_id: 1
+
+http:
+  method: "GET"
+  path: "/api/v1/books/${book_id}"
+  headers:
+    Accept: "application/json"
+
+assertions:
+  - type: "status_code"
+    expected: 200
+  - type: "json_path"
+    expression: "$.id"
+    expected: 1
+  - type: "json_path"
+    expression: "$.title"
+    operator: "exists"
+  - type: "json_path"
+    expression: "$.author"
+    operator: "exists"
+  - type: "json_path"
+    expression: "$.isbn"
+    operator: "exists"
+  - type: "json_path"
+    expression: "$.price"
+    operator: "gte"
+    expected: 0
+  - type: "json_path"
+    expression: "$.inventoryQuantity"
+    operator: "gte"
+    expected: 0
+  - type: "response_time"
+    max_ms: 1000
+
+extract:
+  book_title: "$.title"
+  book_author: "$.author"

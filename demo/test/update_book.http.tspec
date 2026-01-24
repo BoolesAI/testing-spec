@@ -1,0 +1,48 @@
+version: "1.0"
+description: "Update an existing book with partial data"
+
+metadata:
+  test_category: "functional"
+  tags: ["books", "update", "put"]
+  priority: "high"
+  timeout: "5s"
+
+environment:
+  name: "${ENV_NAME|local}"
+  host: "${API_HOST|localhost:3000}"
+  scheme: "http"
+
+variables:
+  book_id: 1
+
+http:
+  method: "PUT"
+  path: "/api/v1/books/${book_id}"
+  headers:
+    Content-Type: "application/json"
+    Accept: "application/json"
+  body:
+    json:
+      price: 59.99
+      inventoryQuantity: 50
+
+assertions:
+  - type: "status_code"
+    expected: 200
+  - type: "json_path"
+    expression: "$.id"
+    expected: 1
+  - type: "json_path"
+    expression: "$.price"
+    expected: 59.99
+  - type: "json_path"
+    expression: "$.inventoryQuantity"
+    expected: 50
+  - type: "json_path"
+    expression: "$.title"
+    operator: "exists"
+  - type: "json_path"
+    expression: "$.author"
+    operator: "exists"
+  - type: "response_time"
+    max_ms: 2000

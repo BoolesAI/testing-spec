@@ -1,0 +1,38 @@
+version: "1.0"
+description: "List all books with default pagination"
+
+metadata:
+  test_category: "functional"
+  tags: ["books", "list", "pagination"]
+  priority: "high"
+  timeout: "5s"
+
+environment:
+  name: "${ENV_NAME|local}"
+  host: "${API_HOST|localhost:3000}"
+  scheme: "http"
+
+http:
+  method: "GET"
+  path: "/api/v1/books"
+  headers:
+    Accept: "application/json"
+
+assertions:
+  - type: "status_code"
+    expected: 200
+  - type: "json_path"
+    expression: "$.data"
+    operator: "exists"
+  - type: "json_path"
+    expression: "$.pagination.page"
+    expected: 1
+  - type: "json_path"
+    expression: "$.pagination.limit"
+    expected: 10
+  - type: "json_path"
+    expression: "$.pagination.total"
+    operator: "gte"
+    expected: 0
+  - type: "response_time"
+    max_ms: 2000

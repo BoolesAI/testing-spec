@@ -1,0 +1,28 @@
+version: "1.0"
+description: "Delete an existing book"
+
+metadata:
+  test_category: "functional"
+  tags: ["books", "delete"]
+  priority: "high"
+  timeout: "5s"
+
+environment:
+  name: "${ENV_NAME|local}"
+  host: "${API_HOST|localhost:3000}"
+  scheme: "http"
+
+variables:
+  book_id: 10
+
+http:
+  method: "DELETE"
+  path: "/api/v1/books/${book_id}"
+  headers:
+    Accept: "application/json"
+
+assertions:
+  - type: "status_code"
+    expected: 204
+  - type: "response_time"
+    max_ms: 2000

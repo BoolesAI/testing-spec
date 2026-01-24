@@ -1,0 +1,39 @@
+version: "1.0"
+description: "Update book with invalid data returns 400"
+
+metadata:
+  test_category: "negative"
+  tags: ["books", "update", "validation", "error"]
+  priority: "medium"
+  timeout: "5s"
+
+environment:
+  name: "${ENV_NAME|local}"
+  host: "${API_HOST|localhost:3000}"
+  scheme: "http"
+
+variables:
+  book_id: 1
+
+http:
+  method: "PUT"
+  path: "/api/v1/books/${book_id}"
+  headers:
+    Content-Type: "application/json"
+    Accept: "application/json"
+  body:
+    json:
+      price: -10
+      inventoryQuantity: -5
+
+assertions:
+  - type: "status_code"
+    expected: 400
+  - type: "json_path"
+    expression: "$.error"
+    expected: "Validation Error"
+  - type: "json_path"
+    expression: "$.details"
+    operator: "exists"
+  - type: "response_time"
+    max_ms: 1000

@@ -1,0 +1,43 @@
+{
+  "name": "@boolesai/tspec-demo",
+  "version": "0.0.1",
+  "description": "Demo bookstore API for TSpec functionality demonstration",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./types/index.d.ts",
+  "files": [
+    "dist",
+    "types"
+  ],
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "vite build && tsc --emitDeclarationOnly",
+    "start": "node dist/index.js",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:reset": "prisma migrate reset --force && npm run db:seed",
+    "db:studio": "prisma studio"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.0.0",
+    "dotenv": "^16.4.0",
+    "koa": "^2.15.0",
+    "@koa/router": "^13.0.0",
+    "koa-bodyparser": "^4.4.0"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.15.0",
+    "@types/koa__router": "^12.0.0",
+    "@types/koa-bodyparser": "^4.3.0",
+    "@types/node": "^22.0.0",
+    "prisma": "^6.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^7.0.0"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,40 @@
+version: "1.0"
+description: "Create book with invalid ISBN format returns 400"
+
+metadata:
+  test_category: "negative"
+  tags: ["books", "create", "validation", "isbn"]
+  priority: "medium"
+  timeout: "5s"
+
+environment:
+  name: "${ENV_NAME|local}"
+  host: "${API_HOST|localhost:3000}"
+  scheme: "http"
+
+http:
+  method: "POST"
+  path: "/api/v1/books"
+  headers:
+    Content-Type: "application/json"
+    Accept: "application/json"
+  body:
+    json:
+      title: "Test Book"
+      author: "Test Author"
+      isbn: "invalid-isbn"
+      publicationDate: "2024-01-15"
+      price: 29.99
+
+assertions:
+  - type: "status_code"
+    expected: 400
+  - type: "json_path"
+    expression: "$.error"
+    expected: "Validation Error"
+  - type: "json_path"
+    expression: "$.details[*].field"
+    operator: "contains"
+    expected: "isbn"
+  - type: "response_time"
+    max_ms: 1000
