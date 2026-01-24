@@ -41,8 +41,9 @@
     "build": "vite build",
     "dev": "vite build --watch",
     "types": "tsc --emitDeclarationOnly",
+    "package": "npm run types && npm run build",
     "test": "node --test test/**/*.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run package"
   },
   "keywords": [
     "testing",

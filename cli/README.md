@@ -163,6 +163,64 @@ test:
       junit: results.json
 ```
 
+## Build from Source
+
+Prerequisites:
+- Node.js >= 18.0.0
+- npm >= 9.0.0
+
+```bash
+# Clone the repository
+git clone https://github.com/boolesai/testing-spec.git
+cd testing-spec
+
+# Build core package first (required dependency)
+cd core
+npm install
+npm run package
+npm link
+
+# Build CLI package
+cd ../cli
+npm install
+npm link @boolesai/tspec
+npm run build
+```
+
+### Build Output
+
+- `dist/` - Compiled JavaScript
+- `types/` - TypeScript type definitions
+- `bin/` - Executable entry point
+
+### Install Built CLI Globally
+
+```bash
+# From the cli directory
+npm install -g .
+
+# Or link for development
+npm link
+```
+
+### Create Distribution Package
+
+```bash
+# Create a tarball for distribution
+npm run package
+
+# This generates @boolesai-tspec-cli-0.0.1.tgz
+# Install from tarball:
+npm install -g ./boolesai-tspec-cli-0.0.1.tgz
+```
+
+### Development Mode
+
+```bash
+# Watch mode for development
+npm run dev
+```
+
 ## Documentation
 
 For complete TSpec DSL documentation, see the [docs](../doc) directory.

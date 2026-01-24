@@ -118,6 +118,52 @@ import { scheduler, TestScheduler } from '@boolesai/tspec/scheduler';
 - `grpc_code` - gRPC status code (planned)
 - `proto_field` - Protocol buffer field (planned)
 
+## Build from Source
+
+Prerequisites:
+- Node.js >= 18.0.0
+- npm >= 9.0.0
+
+```bash
+# Clone the repository
+git clone https://github.com/boolesai/testing-spec.git
+cd testing-spec/core
+
+# Install dependencies
+npm install
+
+# Build the package
+npm run build
+
+# Generate TypeScript declarations
+npm run types
+
+# Build with types (recommended)
+npm run package
+```
+
+### Build Output
+
+- `dist/` - Compiled JavaScript (ESM and CJS)
+- `types/` - TypeScript type definitions
+
+### Development Mode
+
+```bash
+# Watch mode for development
+npm run dev
+```
+
+### Link for Local Development
+
+```bash
+# In the core directory
+npm link
+
+# In your project directory
+npm link @boolesai/tspec
+```
+
 ## Documentation
 
 For complete TSpec DSL documentation, see the [docs](../doc) directory.
