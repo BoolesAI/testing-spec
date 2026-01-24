@@ -18,4 +18,4 @@ program.addCommand(parseCommand);
 program.addCommand(listCommand);
 program.addCommand(mcpCommand);
 
-program.parse();
+await program.parseAsync();

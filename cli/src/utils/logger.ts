@@ -15,19 +15,19 @@ export function setLoggerOptions(options: LoggerOptions): void {
 
 export function debug(message: string, ...args: unknown[]): void {
   if (globalOptions.verbose && !globalOptions.quiet) {
-    console.log(chalk.gray(`[debug] ${message}`), ...args);
+    console.error(chalk.gray(`[debug] ${message}`), ...args);
   }
 }
 
 export function info(message: string, ...args: unknown[]): void {
   if (!globalOptions.quiet) {
-    console.log(chalk.blue(message), ...args);
+    console.error(chalk.blue(message), ...args);
   }
 }
 
 export function success(message: string, ...args: unknown[]): void {
   if (!globalOptions.quiet) {
-    console.log(chalk.green(message), ...args);
+    console.error(chalk.green(message), ...args);
   }
 }
 
@@ -40,12 +40,12 @@ export function error(message: string, ...args: unknown[]): void {
 }
 
 export function log(message: string, ...args: unknown[]): void {
-  console.log(message, ...args);
+  console.error(message, ...args);
 }
 
 export function newline(): void {
   if (!globalOptions.quiet) {
-    console.log();
+    console.error();
   }
 }
 

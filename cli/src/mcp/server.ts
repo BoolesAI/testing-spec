@@ -212,6 +212,11 @@ export async function startMcpServer(): Promise<void> {
     }
   });
 
+  // Handle server errors - log to stderr to avoid polluting MCP stdout
+  server.onerror = (error) => {
+    console.error('[MCP Error]', error);
+  };
+
   // Start server with stdio transport
   const transport = new StdioServerTransport();
   await server.connect(transport);
