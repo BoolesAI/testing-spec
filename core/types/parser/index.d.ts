@@ -1,4 +1,4 @@
-import type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, EnvironmentConfig, ValidationResult } from './types.js';
+import type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, ValidationResult, EnvironmentConfig } from './types.js';
 import type { DataRow } from './data-driver.js';
 export interface TestCase {
     id: string;
