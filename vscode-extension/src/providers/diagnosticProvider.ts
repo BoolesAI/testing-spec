@@ -9,7 +9,7 @@ const VALID_PRIORITIES = ['low', 'medium', 'high'];
 const PROTOCOL_BLOCKS = ['http', 'grpc', 'graphql', 'websocket'];
 const VALID_HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
 const VALID_ASSERTION_TYPES = ['status_code', 'grpc_code', 'response_time', 'json_path', 'header', 'proto_field', 'javascript', 'include'];
-const VALID_OPERATORS = ['equals', 'eq', 'not_equals', 'neq', 'exists', 'not_exists', 'not_empty', 'contains', 'not_contains', 'matches', 'gt', 'gte', 'lt', 'lte', 'type', 'length'];
+const VALID_OPERATORS = ['equals', 'eq', 'not_equals', 'neq', 'exists', 'not_exists', 'not_empty', 'contains', 'not_contains', 'matches', 'gt', 'gte', 'lt', 'lte', 'type', 'length', 'length_gt', 'length_gte', 'length_lt', 'length_lte'];
 const VALID_DATA_FORMATS = ['csv', 'json', 'yaml', 'yml'];
 
 interface TSpecDocument {

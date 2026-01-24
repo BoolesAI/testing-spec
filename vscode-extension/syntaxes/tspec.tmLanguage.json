@@ -102,7 +102,7 @@
     "operators": {
       "patterns": [
         {
-          "match": "(?<=[:\\s\"'])(equals|eq|not_equals|neq|exists|not_exists|not_empty|contains|not_contains|matches|gt|gte|lt|lte|type|length)(?=[\\s,\"']|$)",
+          "match": "(?<=[:\\s\"'])(equals|eq|not_equals|neq|exists|not_exists|not_empty|contains|not_contains|matches|gt|gte|lt|lte|type|length|length_gt|length_gte|length_lt|length_lte)(?=[\\s,\"']|$)",
           "name": "keyword.operator.comparison.tspec"
         }
       ]

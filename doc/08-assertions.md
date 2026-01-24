@@ -115,6 +115,12 @@ assertions:
     expression: "$.data.count"
     operator: "gt"
     expected: 0
+
+  # Check array/string length
+  - type: "json_path"
+    expression: "$.data.items"
+    operator: "length_gte"
+    expected: 1
 ```
 
 #### JSONPath Expression Examples
@@ -223,7 +229,11 @@ assertions:
 | `lt` | Less than | `expected: 100` |
 | `lte` | Less than or equal | `expected: 99` |
 | `type` | Type check | `expected: "string"` |
-| `length` | Array/string length | `expected: 5` |
+| `length` | Array/string length equals | `expected: 5` |
+| `length_gt` | Array/string length greater than | `expected: 0` |
+| `length_gte` | Array/string length greater than or equal | `expected: 1` |
+| `length_lt` | Array/string length less than | `expected: 100` |
+| `length_lte` | Array/string length less than or equal | `expected: 10` |
 
 ## Assertion Include (Reuse)
 
