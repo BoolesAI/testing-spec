@@ -74,7 +74,7 @@ const yaml = `
 version: "1.0"
 description: "Inline test"
 metadata:
-  ai_prompt: "Test something"
+  prompt: "Test something"
   related_code: ["src/test.js"]
   test_category: "functional"
   risk_level: "low"

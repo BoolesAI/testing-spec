@@ -10,7 +10,7 @@ version: "1.0"
 description: "API health check endpoint"
 
 metadata:
-  ai_prompt: "Verify the health check endpoint returns 200 OK"
+  prompt: "Verify the health check endpoint returns 200 OK"
   related_code: ["src/routes/health.js"]
   test_category: "functional"
   risk_level: "low"
@@ -49,7 +49,7 @@ version: "1.0"
 description: "User login with valid credentials"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test successful user authentication:
     - Valid username and password
     - Should return JWT token
@@ -116,7 +116,7 @@ version: "1.0"
 description: "Login fails with invalid password"
 
 metadata:
-  ai_prompt: "Test that invalid password returns 401 Unauthorized"
+  prompt: "Test that invalid password returns 401 Unauthorized"
   related_code: ["src/controllers/auth.controller.js"]
   test_category: "security"
   risk_level: "high"
@@ -160,7 +160,7 @@ version: "1.0"
 description: "Login scenarios - data driven"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test various login scenarios using data-driven approach.
     Covers: valid credentials, invalid password, missing fields, locked account.
   related_code: ["src/controllers/auth.controller.js"]
@@ -257,7 +257,7 @@ version: "1.0"
 description: "Get current user profile"
 
 metadata:
-  ai_prompt: "Fetch authenticated user's profile data"
+  prompt: "Fetch authenticated user's profile data"
   related_code: ["src/controllers/user.controller.js"]
   test_category: "functional"
   risk_level: "medium"
@@ -299,7 +299,7 @@ version: "1.0"
 description: "Create new product"
 
 metadata:
-  ai_prompt: "Test product creation with valid data"
+  prompt: "Test product creation with valid data"
   related_code: ["src/controllers/product.controller.js"]
   test_category: "functional"
   risk_level: "medium"
@@ -359,7 +359,7 @@ version: "1.0"
 description: "Get user profile via gRPC"
 
 metadata:
-  ai_prompt: "Test gRPC user service GetProfile method"
+  prompt: "Test gRPC user service GetProfile method"
   related_code: ["src/grpc/user_service.go"]
   test_category: "functional"
   risk_level: "medium"
@@ -416,7 +416,7 @@ version: "1.0"
 description: "Verify order total calculation"
 
 metadata:
-  ai_prompt: "Test that order total equals sum of item prices plus tax"
+  prompt: "Test that order total equals sum of item prices plus tax"
   related_code: ["src/services/order.service.js"]
   test_category: "functional"
   risk_level: "high"
@@ -489,7 +489,7 @@ version: "1.0"
 description: "Test using assertion includes"
 
 metadata:
-  ai_prompt: "Test with reusable assertions"
+  prompt: "Test with reusable assertions"
   related_code: ["src/api.js"]
   test_category: "functional"
   risk_level: "low"

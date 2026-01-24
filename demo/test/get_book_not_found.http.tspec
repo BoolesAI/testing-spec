@@ -2,7 +2,7 @@ version: "1.0"
 description: "Get a non-existent book returns 404"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test retrieving a non-existent book.
     Verify that the API returns 404 error with proper error
     message when trying to get a book that doesn't exist.

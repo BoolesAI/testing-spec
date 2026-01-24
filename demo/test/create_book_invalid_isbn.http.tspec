@@ -2,7 +2,7 @@ version: "1.0"
 description: "Create book with invalid ISBN format returns 400"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test creating a book with invalid ISBN format.
     Verify that the API returns 400 error with proper validation
     error message when ISBN format is invalid.

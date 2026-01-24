@@ -15,7 +15,7 @@ version: "1.0"
 description: "Verify successful login with valid credentials"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test that a user with valid username and password
     can successfully login and receive a JWT token.
   related_code:

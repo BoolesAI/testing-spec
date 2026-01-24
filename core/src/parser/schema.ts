@@ -29,7 +29,7 @@ export function validateTspec(spec: TSpec, options: SchemaValidationOptions = {}
 
   // Metadata validation
   if (spec.metadata) {
-    const requiredMetadata = ['ai_prompt', 'related_code', 'test_category', 'risk_level', 'tags', 'priority', 'timeout'] as const;
+    const requiredMetadata = ['prompt', 'related_code', 'test_category', 'risk_level', 'tags', 'priority', 'timeout'] as const;
     for (const field of requiredMetadata) {
       if (!(field in spec.metadata)) {
         errors.push(`Missing required metadata field: ${field}`);

@@ -233,7 +233,7 @@ version: "1.0"
 description: "Complete variable usage example"
 
 metadata:
-  ai_prompt: "Test with various variable types"
+  prompt: "Test with various variable types"
   related_code: ["src/api.js"]
   test_category: "functional"
   risk_level: "medium"

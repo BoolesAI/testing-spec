@@ -2,7 +2,7 @@ version: "1.0"
 description: "Update book with invalid data returns 400"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test updating a book with invalid data.
     Verify that the API returns 400 error with proper validation
     error messages when price or inventory quantity are negative.

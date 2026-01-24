@@ -14,7 +14,7 @@ TSpec (Test Specification) is a domain-specific language designed for writing AP
 The DSL structure, vocabulary, and metadata are designed to provide clear, unambiguous context for Large Language Models (LLMs), reducing generation errors.
 
 Key features supporting AI:
-- `ai_prompt` field for natural language test descriptions
+- `prompt` field for natural language test descriptions
 - `related_code` paths for context awareness
 - Consistent, predictable structure
 - Explicit typing and enumerations

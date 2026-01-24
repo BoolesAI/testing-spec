@@ -6,18 +6,25 @@ Detailed reference for all TSpec fields.
 
 **Required**. Contains AI generation context and test categorization.
 
+> **Important**: All 7 metadata fields listed below are **mandatory**. The parser will reject any `.tspec` file missing any of these fields.
+
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `ai_prompt` | string | Yes | Natural language description for AI generation |
-| `related_code` | list[string] | Yes | Related source code paths (relative to repo root) |
-| `business_rule` | string | No | Business rule ID or description |
-| `test_category` | enum | Yes | Test type category |
-| `risk_level` | enum | Yes | Risk level assessment |
-| `tags` | list[string] | Yes | Tags for filtering and grouping |
-| `priority` | enum | Yes | Execution priority |
-| `timeout` | duration | Yes | Maximum execution time |
+| `prompt` | string | **Yes** | Natural language description for AI generation |
+| `related_code` | list[string] | **Yes** | Related source code paths (relative to repo root) |
+| `test_category` | enum | **Yes** | Test type category |
+| `risk_level` | enum | **Yes** | Risk level assessment |
+| `tags` | list[string] | **Yes** | Tags for filtering and grouping |
+| `priority` | enum | **Yes** | Execution priority |
+| `timeout` | duration | **Yes** | Maximum execution time |
 
-### `ai_prompt`
+**Optional fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `business_rule` | string | No | Business rule ID or description |
+
+### `prompt`
 
 Natural language description guiding AI test generation. Should include:
 - Test objective
@@ -27,7 +34,7 @@ Natural language description guiding AI test generation. Should include:
 
 ```yaml
 metadata:
-  ai_prompt: |
+  prompt: |
     Verify that user login with valid credentials:
     - Username: test_user_001 (from variables)
     - Password: from environment variable TEST_PASSWORD

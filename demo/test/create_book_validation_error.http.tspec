@@ -2,7 +2,7 @@ version: "1.0"
 description: "Create book with missing required fields returns 400"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test creating a book with missing required fields.
     Verify that the API returns 400 error with proper validation
     error messages when required fields are missing.

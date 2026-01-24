@@ -98,7 +98,7 @@ version: "1.0"
 description: "Create new user"
 
 metadata:
-  ai_prompt: "Test user creation with valid data"
+  prompt: "Test user creation with valid data"
   related_code: ["src/controllers/user.controller.js"]
   test_category: "functional"
   risk_level: "high"
@@ -206,7 +206,7 @@ version: "1.0"
 description: "Get user profile via gRPC"
 
 metadata:
-  ai_prompt: "Test fetching user profile through gRPC service"
+  prompt: "Test fetching user profile through gRPC service"
   related_code: ["src/services/user_service.go"]
   test_category: "functional"
   risk_level: "medium"

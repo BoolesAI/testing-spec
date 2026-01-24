@@ -84,7 +84,7 @@ Use `|` for multi-line strings (preserves newlines):
 
 ```yaml
 metadata:
-  ai_prompt: |
+  prompt: |
     This is a multi-line prompt.
     It preserves line breaks.
     Each line is separate.
@@ -112,7 +112,7 @@ version: "1.0"
 
 metadata:
   # This prompt guides AI generation
-  ai_prompt: |
+  prompt: |
     Test the OAuth token refresh flow...
 ```
 

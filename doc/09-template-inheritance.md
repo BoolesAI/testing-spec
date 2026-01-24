@@ -232,7 +232,7 @@ version: "1.0"
 description: "Get user profile"
 
 metadata:
-  ai_prompt: "Test fetching authenticated user profile"
+  prompt: "Test fetching authenticated user profile"
   related_code: ["src/controllers/user.controller.js"]
   test_category: "functional"
   risk_level: "medium"

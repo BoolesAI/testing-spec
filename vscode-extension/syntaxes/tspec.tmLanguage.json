@@ -53,7 +53,7 @@
     "metadata-keys": {
       "patterns": [
         {
-          "match": "^\\s+(ai_prompt|related_code|test_category|risk_level|tags|priority|timeout|business_rule)(:)",
+          "match": "^\\s+(prompt|related_code|test_category|risk_level|tags|priority|timeout|business_rule)(:)",
           "captures": {
             "1": { "name": "variable.other.metadata.tspec" },
             "2": { "name": "punctuation.separator.key-value.tspec" }

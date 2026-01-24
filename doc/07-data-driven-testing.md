@@ -122,7 +122,7 @@ version: "1.0"
 description: "Login test - data driven"
 
 metadata:
-  ai_prompt: "Test login with various credentials"
+  prompt: "Test login with various credentials"
   related_code: ["src/auth/login.js"]
   test_category: "functional"
   risk_level: "high"
@@ -267,7 +267,7 @@ version: "1.0"
 description: "User registration - data driven validation"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test user registration endpoint with various input combinations.
     Validates both success and failure scenarios.
   related_code:

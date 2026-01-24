@@ -2,7 +2,7 @@ version: "1.0"
 description: "List all books with default pagination"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test listing all books with default pagination.
     Verify that the API returns paginated book list with
     correct pagination metadata (page, limit, total).

@@ -40,11 +40,11 @@ description: "Verify user login with valid credentials returns JWT token"
 
 ### `metadata`
 
-AI and collaboration metadata. See [Field Reference](./05-field-reference.md#metadata) for details.
+AI and collaboration metadata. **All 7 fields are mandatory** - the parser will reject files missing any required field. See [Field Reference](./05-field-reference.md#metadata) for details.
 
 ```yaml
 metadata:
-  ai_prompt: |
+  prompt: |
     Test successful login flow...
   related_code:
     - "src/auth/login.js"
@@ -182,7 +182,7 @@ version: "1.0"
 description: "Verify successful user registration with valid data"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test that a new user can register with valid email and password.
     Should return 201 status and user object with generated ID.
   related_code:

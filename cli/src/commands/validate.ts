@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import ora from 'ora';
 import { validateTestCase } from '@boolesai/tspec';
-import { resolveFiles, getTspecFiles } from '../utils/files.js';
+import { discoverTSpecFiles } from '../utils/files.js';
 import { formatValidationResults } from '../utils/formatter.js';
 import { logger, setLoggerOptions } from '../utils/logger.js';
 import type { OutputFormat } from '../utils/formatter.js';
@@ -19,26 +19,27 @@ export const validateCommand = new Command('validate')
   .action(async (files: string[], options: ValidateOptions) => {
     setLoggerOptions({ quiet: options.quiet });
     
-    const spinner = options.quiet ? null : ora('Resolving files...').start();
+    const spinner = options.quiet ? null : ora('Discovering files...').start();
     
     try {
-      const { files: resolvedFiles, errors: resolveErrors } = await resolveFiles(files);
-      const tspecFiles = getTspecFiles(resolvedFiles);
+      // Discover files without loading content
+      const { files: fileDescriptors, errors: resolveErrors } = await discoverTSpecFiles(files);
       
       if (resolveErrors.length > 0 && !options.quiet) {
         resolveErrors.forEach(err => logger.warn(err));
       }
       
-      if (tspecFiles.length === 0) {
+      if (fileDescriptors.length === 0) {
         spinner?.fail('No .tspec files found');
         process.exit(2);
       }
       
-      if (spinner) spinner.text = `Validating ${tspecFiles.length} file(s)...`;
+      if (spinner) spinner.text = `Validating ${fileDescriptors.length} file(s)...`;
       
-      const results = tspecFiles.map(file => ({
-        file,
-        result: validateTestCase(file)
+      // Validate each file individually (lazy loading - content read on-demand)
+      const results = fileDescriptors.map(descriptor => ({
+        file: descriptor.path,
+        result: validateTestCase(descriptor.path)
       }));
       
       spinner?.stop();

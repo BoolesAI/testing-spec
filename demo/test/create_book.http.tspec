@@ -2,7 +2,7 @@ version: "1.0"
 description: "Create a new book with valid data"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test creating a new book with valid data.
     Verify that the API accepts valid book data and returns
     the created book with a generated ID and location header.

@@ -2,7 +2,7 @@ version: "1.0"
 description: "Update an existing book with partial data"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test updating an existing book with partial data.
     Verify that the API successfully updates specified fields
     while keeping other fields unchanged.

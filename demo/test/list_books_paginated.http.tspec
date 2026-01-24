@@ -2,7 +2,7 @@ version: "1.0"
 description: "List books with custom pagination and sorting"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test listing books with custom pagination and sorting.
     Verify that the API accepts custom page size and sort parameters,
     and returns correctly paginated and sorted results.

@@ -16,7 +16,7 @@ export interface TSpec {
     lifecycle?: LifecycleConfig;
 }
 export interface TSpecMetadata {
-    ai_prompt: string;
+    prompt: string;
     related_code: string[];
     test_category: 'functional' | 'integration' | 'performance' | 'security';
     risk_level: 'low' | 'medium' | 'high' | 'critical';

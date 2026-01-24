@@ -16,13 +16,13 @@ interface TSpecDocument {
   version?: string;
   description?: string;
   metadata?: {
-    ai_prompt?: string;
-    related_code?: string[];
-    test_category?: string;
-    risk_level?: string;
-    tags?: string[];
-    priority?: string;
-    timeout?: string;
+    prompt: string;
+    related_code: string[];
+    test_category: string;
+    risk_level: string;
+    tags: string[];
+    priority: string;
+    timeout: string;
     [key: string]: unknown;
   };
   http?: {
@@ -184,7 +184,7 @@ export class TSpecDiagnosticProvider {
   private validateMetadata(document: vscode.TextDocument, metadata: TSpecDocument['metadata'], diagnostics: vscode.Diagnostic[]): void {
     if (!metadata) return;
 
-    const requiredFields = ['ai_prompt', 'related_code', 'test_category', 'risk_level', 'tags', 'priority', 'timeout'];
+    const requiredFields = ['prompt', 'related_code', 'test_category', 'risk_level', 'tags', 'priority', 'timeout'];
     for (const field of requiredFields) {
       if (!(field in metadata)) {
         this.addDiagnostic(document, 'metadata', `Missing required metadata field: ${field}`, vscode.DiagnosticSeverity.Error, diagnostics);

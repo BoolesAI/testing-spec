@@ -2,7 +2,7 @@ version: "1.0"
 description: "Delete an existing book"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test deleting an existing book.
     Verify that the API successfully deletes a book and returns
     204 No Content status.

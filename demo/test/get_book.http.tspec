@@ -2,7 +2,7 @@ version: "1.0"
 description: "Get a single book by ID"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test retrieving a single book by ID.
     Verify that the API returns complete book details including
     title, author, ISBN, price, and inventory quantity.

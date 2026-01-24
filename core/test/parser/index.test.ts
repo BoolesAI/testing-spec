@@ -39,7 +39,7 @@ describe('parser/index', () => {
 version: "1.0"
 description: Test login
 metadata:
-  ai_prompt: "test prompt"
+  prompt: "test prompt"
   related_code: []
   test_category: functional
   risk_level: low
@@ -74,7 +74,7 @@ assertions:
 version: "1.0"
 description: Test with variables
 metadata:
-  ai_prompt: "test"
+  prompt: "test"
   related_code: []
   test_category: functional
   risk_level: low
@@ -100,7 +100,7 @@ assertions:
 version: "1.0"
 description: Test
 metadata:
-  ai_prompt: "test"
+  prompt: "test"
   related_code: []
   test_category: functional
   risk_level: low
@@ -123,7 +123,7 @@ assertions:
 version: "1.0"
 description: Test with extract
 metadata:
-  ai_prompt: "test"
+  prompt: "test"
   related_code: []
   test_category: functional
   risk_level: low

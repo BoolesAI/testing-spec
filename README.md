@@ -98,10 +98,17 @@ version: "1.0"
 description: "Verify successful login with valid credentials"
 
 metadata:
-  ai_prompt: |
+  prompt: |
     Test that a user with valid credentials can successfully login
     and receive a JWT token in the response.
+  related_code:
+    - "src/controllers/auth.controller.js"
+    - "src/services/auth.service.js"
+  test_category: "functional"
+  risk_level: "high"
   tags: ["auth", "login", "smoke"]
+  priority: "high"
+  timeout: "10s"
 
 environment:
   host: "${API_HOST|api.example.com}"
@@ -167,7 +174,7 @@ For complete documentation, see the [docs](./doc) directory:
 ## Why TSpec?
 
 ### For AI Systems
-- Structured metadata with `ai_prompt` for context
+- Structured metadata with `prompt` for context
 - Clear, unambiguous field definitions
 - Predictable structure optimized for LLM generation
 

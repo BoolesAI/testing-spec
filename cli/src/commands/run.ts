@@ -3,7 +3,7 @@ import ora from 'ora';
 import chalk from 'chalk';
 import { parseTestCases, scheduler } from '@boolesai/tspec';
 import type { TestCase, TestResult, ScheduleResult } from '@boolesai/tspec';
-import { resolveFiles, getTspecFiles } from '../utils/files.js';
+import { discoverTSpecFiles } from '../utils/files.js';
 import { formatTestResults, formatJson, type FormattedTestResult, type TestResultSummary } from '../utils/formatter.js';
 import { logger, setLoggerOptions } from '../utils/logger.js';
 import type { OutputFormat } from '../utils/formatter.js';
@@ -53,38 +53,37 @@ export const runCommand = new Command('run')
     setLoggerOptions({ verbose: options.verbose, quiet: options.quiet });
     
     const concurrency = parseInt(options.concurrency || '5', 10);
-    const spinner = options.quiet ? null : ora('Resolving files...').start();
+    const spinner = options.quiet ? null : ora('Discovering files...').start();
     
     try {
-      // Resolve files
-      const { files: resolvedFiles, errors: resolveErrors } = await resolveFiles(files);
-      const tspecFiles = getTspecFiles(resolvedFiles);
+      // Discover files without loading content
+      const { files: fileDescriptors, errors: resolveErrors } = await discoverTSpecFiles(files);
       
       if (resolveErrors.length > 0 && !options.quiet) {
         resolveErrors.forEach(err => logger.warn(err));
       }
       
-      if (tspecFiles.length === 0) {
+      if (fileDescriptors.length === 0) {
         spinner?.fail('No .tspec files found');
         process.exit(2);
       }
       
-      // Parse test cases
-      if (spinner) spinner.text = `Parsing ${tspecFiles.length} file(s)...`;
+      // Parse test cases (lazy loading - content read on-demand per file)
+      if (spinner) spinner.text = `Parsing ${fileDescriptors.length} file(s)...`;
       
       const allTestCases: TestCase[] = [];
       const parseErrors: Array<{ file: string; error: string }> = [];
       
-      for (const file of tspecFiles) {
+      for (const descriptor of fileDescriptors) {
         try {
-          const testCases = parseTestCases(file, {
+          const testCases = parseTestCases(descriptor.path, {
             env: options.env,
             params: options.params
           });
           allTestCases.push(...testCases);
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err);
-          parseErrors.push({ file, error: message });
+          parseErrors.push({ file: descriptor.path, error: message });
         }
       }
       

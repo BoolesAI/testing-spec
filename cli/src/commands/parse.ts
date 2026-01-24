@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import ora from 'ora';
 import { parseTestCases } from '@boolesai/tspec';
-import { resolveFiles, getTspecFiles } from '../utils/files.js';
+import { discoverTSpecFiles } from '../utils/files.js';
 import { formatParsedTestCase, formatJson } from '../utils/formatter.js';
 import { logger, setLoggerOptions } from '../utils/logger.js';
 import type { OutputFormat } from '../utils/formatter.js';
@@ -31,36 +31,37 @@ export const parseCommand = new Command('parse')
   .action(async (files: string[], options: ParseOptions & { env: Record<string, string>; params: Record<string, string> }) => {
     setLoggerOptions({ verbose: options.verbose, quiet: options.quiet });
     
-    const spinner = options.quiet ? null : ora('Resolving files...').start();
+    const spinner = options.quiet ? null : ora('Discovering files...').start();
     
     try {
-      const { files: resolvedFiles, errors: resolveErrors } = await resolveFiles(files);
-      const tspecFiles = getTspecFiles(resolvedFiles);
+      // Discover files without loading content
+      const { files: fileDescriptors, errors: resolveErrors } = await discoverTSpecFiles(files);
       
       if (resolveErrors.length > 0 && !options.quiet) {
         resolveErrors.forEach(err => logger.warn(err));
       }
       
-      if (tspecFiles.length === 0) {
+      if (fileDescriptors.length === 0) {
         spinner?.fail('No .tspec files found');
         process.exit(2);
       }
       
-      if (spinner) spinner.text = `Parsing ${tspecFiles.length} file(s)...`;
+      if (spinner) spinner.text = `Parsing ${fileDescriptors.length} file(s)...`;
       
       const allTestCases: unknown[] = [];
       const parseErrors: Array<{ file: string; error: string }> = [];
       
-      for (const file of tspecFiles) {
+      // Parse each file individually (lazy loading - content read on-demand)
+      for (const descriptor of fileDescriptors) {
         try {
-          const testCases = parseTestCases(file, {
+          const testCases = parseTestCases(descriptor.path, {
             env: options.env,
             params: options.params
           });
           allTestCases.push(...testCases);
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err);
-          parseErrors.push({ file, error: message });
+          parseErrors.push({ file: descriptor.path, error: message });
         }
       }
       
@@ -71,13 +72,13 @@ export const parseCommand = new Command('parse')
           testCases: allTestCases,
           errors: parseErrors,
           summary: {
-            totalFiles: tspecFiles.length,
+            totalFiles: fileDescriptors.length,
             totalTestCases: allTestCases.length,
             parseErrors: parseErrors.length
           }
         }));
       } else {
-        logger.info(`Parsed ${allTestCases.length} test case(s) from ${tspecFiles.length} file(s)`);
+        logger.info(`Parsed ${allTestCases.length} test case(s) from ${fileDescriptors.length} file(s)`);
         logger.newline();
         
         for (const testCase of allTestCases) {
