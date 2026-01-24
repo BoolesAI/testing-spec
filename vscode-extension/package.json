@@ -1,9 +1,14 @@
 {
   "name": "vscode-tspec",
-  "displayName": "TSpec Language Support",
+  "displayName": "Testing Spec Framework",
   "description": "Language support and test runner for TSpec test specification files",
   "version": "0.0.1",
   "publisher": "boolesai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/boolesai/testing-spec.git",
+    "directory": "vscode-extension"
+  },
   "engines": {
     "vscode": "^1.75.0"
   },

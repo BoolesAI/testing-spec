@@ -215,4 +215,7 @@ export async function startMcpServer(): Promise<void> {
   // Start server with stdio transport
   const transport = new StdioServerTransport();
   await server.connect(transport);
+  
+  // Keep process running until explicitly terminated
+  await new Promise(() => {}); // Never resolves - server runs until killed
 }

@@ -246,7 +246,7 @@ To pass environment variables to your tests:
 
 ## Documentation
 
-For complete TSpec DSL documentation, see the [docs](../doc) directory.
+For complete TSpec DSL documentation, see the [docs](https://github.com/boolesai/testing-spec/tree/main/doc) directory.
 
 ## Related
 
