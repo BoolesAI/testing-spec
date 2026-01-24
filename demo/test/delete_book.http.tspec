@@ -21,7 +21,7 @@ environment:
   scheme: "http"
 
 variables:
-  book_id: 10
+  book_id: 1
 
 http:
   method: "DELETE"

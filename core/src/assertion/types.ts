@@ -36,4 +36,4 @@ export type ComparisonOperator =
   | 'contains' | 'not_contains'
   | 'matches'
   | 'gt' | 'gte' | 'lt' | 'lte'
-  | 'type' | 'length';
+  | 'type' | 'length' | 'length_gt' | 'length_gte' | 'length_lt' | 'length_lte';

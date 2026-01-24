@@ -21,7 +21,8 @@ environment:
   scheme: "http"
 
 variables:
-  new_isbn: "${uuid}"
+  random_suffix: "${random_int(1000000000, 9999999999)}"
+  new_isbn: "978${random_suffix}"
 
 http:
   method: "POST"
@@ -31,7 +32,7 @@ http:
     Accept: "application/json"
   body:
     json:
-      title: "Test Book ${new_isbn}"
+      title: "Test Book ${random_suffix}"
       author: "Test Author"
       isbn: "${new_isbn}"
       publicationDate: "2024-01-15"

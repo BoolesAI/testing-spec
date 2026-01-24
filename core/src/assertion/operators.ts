@@ -57,6 +57,30 @@ export function compareValues(actual: unknown, operator: ComparisonOperator, exp
       }
       return false;
     
+    case 'length_gt':
+      if (typeof actual === 'string' || Array.isArray(actual)) {
+        return actual.length > Number(expected);
+      }
+      return false;
+    
+    case 'length_gte':
+      if (typeof actual === 'string' || Array.isArray(actual)) {
+        return actual.length >= Number(expected);
+      }
+      return false;
+    
+    case 'length_lt':
+      if (typeof actual === 'string' || Array.isArray(actual)) {
+        return actual.length < Number(expected);
+      }
+      return false;
+    
+    case 'length_lte':
+      if (typeof actual === 'string' || Array.isArray(actual)) {
+        return actual.length <= Number(expected);
+      }
+      return false;
+    
     default:
       throw new Error(`Unknown operator: ${operator}`);
   }
