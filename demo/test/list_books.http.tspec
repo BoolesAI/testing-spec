@@ -2,7 +2,15 @@ version: "1.0"
 description: "List all books with default pagination"
 
 metadata:
+  ai_prompt: |
+    Test listing all books with default pagination.
+    Verify that the API returns paginated book list with
+    correct pagination metadata (page, limit, total).
+  related_code:
+    - "src/controllers/books.ts"
+    - "src/services/bookService.ts"
   test_category: "functional"
+  risk_level: "high"
   tags: ["books", "list", "pagination"]
   priority: "high"
   timeout: "5s"

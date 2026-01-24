@@ -2,7 +2,15 @@ version: "1.0"
 description: "Create a new book with valid data"
 
 metadata:
+  ai_prompt: |
+    Test creating a new book with valid data.
+    Verify that the API accepts valid book data and returns
+    the created book with a generated ID and location header.
+  related_code:
+    - "src/controllers/books.ts"
+    - "src/services/bookService.ts"
   test_category: "functional"
+  risk_level: "high"
   tags: ["books", "create", "post"]
   priority: "high"
   timeout: "5s"

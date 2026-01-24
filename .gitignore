@@ -67,3 +67,7 @@ Temporary Items
 .coverage
 vscode-extension/out/
 
+# Sqlite
+*.db
+*.sqlite
+*.sqlite3

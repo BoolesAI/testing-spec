@@ -2,7 +2,15 @@ version: "1.0"
 description: "Delete an existing book"
 
 metadata:
+  ai_prompt: |
+    Test deleting an existing book.
+    Verify that the API successfully deletes a book and returns
+    204 No Content status.
+  related_code:
+    - "src/controllers/books.ts"
+    - "src/services/bookService.ts"
   test_category: "functional"
+  risk_level: "high"
   tags: ["books", "delete"]
   priority: "high"
   timeout: "5s"

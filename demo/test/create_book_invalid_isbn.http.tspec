@@ -2,7 +2,15 @@ version: "1.0"
 description: "Create book with invalid ISBN format returns 400"
 
 metadata:
-  test_category: "negative"
+  ai_prompt: |
+    Test creating a book with invalid ISBN format.
+    Verify that the API returns 400 error with proper validation
+    error message when ISBN format is invalid.
+  related_code:
+    - "src/controllers/books.ts"
+    - "src/utils/validator.ts"
+  test_category: "functional"
+  risk_level: "medium"
   tags: ["books", "create", "validation", "isbn"]
   priority: "medium"
   timeout: "5s"

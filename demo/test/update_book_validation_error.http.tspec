@@ -2,7 +2,15 @@ version: "1.0"
 description: "Update book with invalid data returns 400"
 
 metadata:
-  test_category: "negative"
+  ai_prompt: |
+    Test updating a book with invalid data.
+    Verify that the API returns 400 error with proper validation
+    error messages when price or inventory quantity are negative.
+  related_code:
+    - "src/controllers/books.ts"
+    - "src/utils/validator.ts"
+  test_category: "functional"
+  risk_level: "medium"
   tags: ["books", "update", "validation", "error"]
   priority: "medium"
   timeout: "5s"

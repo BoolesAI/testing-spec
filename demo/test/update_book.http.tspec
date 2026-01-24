@@ -2,7 +2,15 @@ version: "1.0"
 description: "Update an existing book with partial data"
 
 metadata:
+  ai_prompt: |
+    Test updating an existing book with partial data.
+    Verify that the API successfully updates specified fields
+    while keeping other fields unchanged.
+  related_code:
+    - "src/controllers/books.ts"
+    - "src/services/bookService.ts"
   test_category: "functional"
+  risk_level: "high"
   tags: ["books", "update", "put"]
   priority: "high"
   timeout: "5s"

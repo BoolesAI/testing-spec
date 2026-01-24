@@ -2,7 +2,15 @@ version: "1.0"
 description: "Update a non-existent book returns 404"
 
 metadata:
-  test_category: "negative"
+  ai_prompt: |
+    Test updating a non-existent book.
+    Verify that the API returns 404 error with proper error
+    message when trying to update a book that doesn't exist.
+  related_code:
+    - "src/controllers/books.ts"
+    - "src/services/bookService.ts"
+  test_category: "functional"
+  risk_level: "medium"
   tags: ["books", "update", "error", "404"]
   priority: "medium"
   timeout: "5s"
