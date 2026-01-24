@@ -1,8 +1,11 @@
 import * as vscode from 'vscode';
 import { TSpecCompletionProvider } from './providers/completionProvider';
 import { TSpecDiagnosticProvider } from './providers/diagnosticProvider';
+import { TSpecTestProvider } from './test/testProvider';
+import { registerCodeLens } from './test/codeLensProvider';
 
 let diagnosticProvider: TSpecDiagnosticProvider;
+let testProvider: TSpecTestProvider | undefined;
 
 export function activate(context: vscode.ExtensionContext): void {
   console.log('TSpec extension is now active');
@@ -26,6 +29,17 @@ export function activate(context: vscode.ExtensionContext): void {
       ':', '$', '{', '.'  // Trigger characters
     )
   );
+
+  // Initialize test provider if enabled
+  const testingConfig = vscode.workspace.getConfiguration('tspec.testing');
+  if (testingConfig.get('enabled', true)) {
+    testProvider = new TSpecTestProvider(context);
+    context.subscriptions.push(testProvider);
+
+    // Register CodeLens provider and commands
+    const codeLensDisposables = registerCodeLens(context, testProvider);
+    context.subscriptions.push(...codeLensDisposables);
+  }
 
   // Validate all open TSpec documents
   vscode.workspace.textDocuments.forEach(document => {

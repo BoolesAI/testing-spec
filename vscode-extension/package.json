@@ -1,7 +1,7 @@
 {
   "name": "vscode-tspec",
   "displayName": "TSpec Language Support",
-  "description": "Language support for TSpec test specification files",
+  "description": "Language support and test runner for TSpec test specification files",
   "version": "0.0.1",
   "publisher": "boolesai",
   "engines": {
@@ -10,7 +10,8 @@
   "categories": [
     "Programming Languages",
     "Snippets",
-    "Linters"
+    "Linters",
+    "Testing"
   ],
   "keywords": [
     "tspec",
@@ -49,6 +50,23 @@
         "path": "./snippets/tspec.json"
       }
     ],
+    "commands": [
+      {
+        "command": "tspec.runTestFromCodeLens",
+        "title": "Run TSpec Test",
+        "category": "TSpec"
+      },
+      {
+        "command": "tspec.showInTestExplorer",
+        "title": "Show in Test Explorer",
+        "category": "TSpec"
+      },
+      {
+        "command": "tspec.refreshTests",
+        "title": "Refresh Tests",
+        "category": "TSpec"
+      }
+    ],
     "configuration": {
       "title": "TSpec",
       "properties": {
@@ -61,6 +79,42 @@
           "type": "boolean",
           "default": false,
           "description": "Enable strict validation mode"
+        },
+        "tspec.testing.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable TSpec test discovery and execution"
+        },
+        "tspec.testing.cliPath": {
+          "type": "string",
+          "default": "",
+          "description": "Custom path to tspec CLI executable. Leave empty to auto-detect."
+        },
+        "tspec.testing.concurrency": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "maximum": 50,
+          "description": "Maximum number of concurrent test executions"
+        },
+        "tspec.testing.defaultTimeout": {
+          "type": "number",
+          "default": 30,
+          "minimum": 1,
+          "description": "Default timeout in seconds for test execution"
+        },
+        "tspec.testing.watchMode": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically refresh tests when .tspec files change"
+        },
+        "tspec.testing.envVars": {
+          "type": "object",
+          "default": {},
+          "description": "Environment variables to pass to test execution",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     }

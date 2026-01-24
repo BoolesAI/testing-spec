@@ -16,7 +16,19 @@ export default defineConfig({
     minify: false,
     target: 'node20',
     rollupOptions: {
-      external: ['vscode'],
+      external: [
+        'vscode',
+        'path',
+        'fs',
+        'child_process',
+        'os',
+        'util',
+        'events',
+        'stream',
+        'buffer',
+        'url',
+        'crypto'
+      ],
       output: {
         format: 'cjs',
         exports: 'named'
