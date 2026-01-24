@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import ora from 'ora';
-import { parseTestCases } from '@boolesai/tspec';
+import { parseTestCases, clearTemplateCache } from '@boolesai/tspec';
 import { discoverTSpecFiles } from '../utils/files.js';
 import { formatParsedTestCase, formatJson } from '../utils/formatter.js';
 import { logger, setLoggerOptions } from '../utils/logger.js';
@@ -30,6 +30,9 @@ export const parseCommand = new Command('parse')
   .option('-p, --params <key=value>', 'Parameters', parseKeyValue, {})
   .action(async (files: string[], options: ParseOptions & { env: Record<string, string>; params: Record<string, string> }) => {
     setLoggerOptions({ verbose: options.verbose, quiet: options.quiet });
+    
+    // Clear template cache to ensure fresh reads for this parse
+    clearTemplateCache();
     
     const spinner = options.quiet ? null : ora('Discovering files...').start();
     

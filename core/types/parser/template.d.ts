@@ -1,4 +1,8 @@
 import type { TSpec } from './types.js';
+/**
+ * Clears the template cache. Call this between test runs if templates may have changed.
+ */
+export declare function clearTemplateCache(): void;
 export declare function deepMerge<T extends Record<string, unknown>>(parent: T, child: T): T;
 export declare function resolveTemplatePath(templatePath: string, baseDir: string): string;
 export declare function loadTemplateChain(templatePath: string, baseDir: string, visited?: Set<string>): TSpec;

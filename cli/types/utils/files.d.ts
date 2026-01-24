@@ -1,3 +1,4 @@
+export type ProtocolType = 'http' | 'grpc' | 'graphql' | 'websocket';
 export interface FileResolutionResult {
     files: string[];
     errors: string[];
@@ -13,6 +14,8 @@ export interface TSpecFileDescriptor {
     relativePath: string;
     /** Base filename (e.g., "login.http.tspec") */
     fileName: string;
+    /** Protocol type extracted from filename (e.g., "http" from "login.http.tspec") */
+    protocol: ProtocolType | null;
 }
 export interface DiscoveryResult {
     files: TSpecFileDescriptor[];

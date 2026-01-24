@@ -1,6 +1,9 @@
 import { glob } from 'glob';
 import { resolve, isAbsolute, relative, basename } from 'path';
 import { existsSync, statSync } from 'fs';
+import { getTypeFromFilePath } from '@boolesai/tspec';
+
+export type ProtocolType = 'http' | 'grpc' | 'graphql' | 'websocket';
 
 export interface FileResolutionResult {
   files: string[];
@@ -18,6 +21,8 @@ export interface TSpecFileDescriptor {
   relativePath: string;
   /** Base filename (e.g., "login.http.tspec") */
   fileName: string;
+  /** Protocol type extracted from filename (e.g., "http" from "login.http.tspec") */
+  protocol: ProtocolType | null;
 }
 
 export interface DiscoveryResult {
@@ -120,12 +125,13 @@ export async function discoverTSpecFiles(patterns: string[], cwd?: string): Prom
     }
   }
 
-  // Deduplicate and create descriptors
+  // Deduplicate and create descriptors with protocol classification
   const uniquePaths = [...new Set(filePaths)];
   const files: TSpecFileDescriptor[] = uniquePaths.map(filePath => ({
     path: filePath,
     relativePath: relative(workingDir, filePath),
     fileName: basename(filePath),
+    protocol: getTypeFromFilePath(filePath) as ProtocolType | null,
   }));
 
   return { files, errors };

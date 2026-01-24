@@ -1,9 +1,9 @@
 import { Command } from 'commander';
 import ora from 'ora';
 import chalk from 'chalk';
-import { parseTestCases, scheduler } from '@boolesai/tspec';
+import { parseTestCases, scheduler, clearTemplateCache } from '@boolesai/tspec';
 import type { TestCase, TestResult, ScheduleResult } from '@boolesai/tspec';
-import { discoverTSpecFiles } from '../utils/files.js';
+import { discoverTSpecFiles, type TSpecFileDescriptor } from '../utils/files.js';
 import { formatTestResults, formatJson, type FormattedTestResult, type TestResultSummary } from '../utils/formatter.js';
 import { logger, setLoggerOptions } from '../utils/logger.js';
 import type { OutputFormat } from '../utils/formatter.js';
@@ -16,6 +16,13 @@ interface RunOptions {
   failFast?: boolean;
   env: Record<string, string>;
   params: Record<string, string>;
+}
+
+interface FileRunResult {
+  file: string;
+  testCases: number;
+  results: TestResult[];
+  parseError?: string;
 }
 
 function parseKeyValue(value: string, previous: Record<string, string> = {}): Record<string, string> {
@@ -39,6 +46,61 @@ function formatResult(result: TestResult): FormattedTestResult {
   };
 }
 
+async function runFileTestCases(
+  descriptor: TSpecFileDescriptor,
+  options: RunOptions,
+  concurrency: number,
+  spinner: ReturnType<typeof ora> | null
+): Promise<FileRunResult> {
+  const result: FileRunResult = {
+    file: descriptor.path,
+    testCases: 0,
+    results: []
+  };
+
+  // Parse file on-demand
+  let testCases: TestCase[];
+  try {
+    testCases = parseTestCases(descriptor.path, {
+      env: options.env,
+      params: options.params
+    });
+    result.testCases = testCases.length;
+  } catch (err) {
+    result.parseError = err instanceof Error ? err.message : String(err);
+    return result;
+  }
+
+  if (testCases.length === 0) {
+    return result;
+  }
+
+  // Execute test cases for this file
+  if (spinner) spinner.text = `Running: ${descriptor.relativePath} (${testCases.length} test(s))...`;
+
+  if (options.failFast) {
+    // For fail-fast, execute sequentially
+    for (const testCase of testCases) {
+      try {
+        const scheduleResult = await scheduler.schedule([testCase], { concurrency: 1 });
+        result.results.push(...scheduleResult.results);
+        
+        if (!scheduleResult.results[0]?.passed) {
+          break; // Stop on first failure within file
+        }
+      } catch {
+        break;
+      }
+    }
+  } else {
+    // Execute all test cases for this file with concurrency
+    const scheduleResult = await scheduler.schedule(testCases, { concurrency });
+    result.results = scheduleResult.results;
+  }
+
+  return result;
+}
+
 export const runCommand = new Command('run')
   .description('Execute test cases and report results')
   .argument('<files...>', 'Files or glob patterns to run')
@@ -51,6 +113,9 @@ export const runCommand = new Command('run')
   .option('--fail-fast', 'Stop on first failure')
   .action(async (files: string[], options: RunOptions) => {
     setLoggerOptions({ verbose: options.verbose, quiet: options.quiet });
+    
+    // Clear template cache to ensure fresh reads for this run
+    clearTemplateCache();
     
     const concurrency = parseInt(options.concurrency || '5', 10);
     const spinner = options.quiet ? null : ora('Discovering files...').start();
@@ -68,85 +133,54 @@ export const runCommand = new Command('run')
         process.exit(2);
       }
       
-      // Parse test cases (lazy loading - content read on-demand per file)
-      if (spinner) spinner.text = `Parsing ${fileDescriptors.length} file(s)...`;
+      if (spinner) spinner.text = `Running ${fileDescriptors.length} file(s)...`;
       
-      const allTestCases: TestCase[] = [];
+      // Parse and execute one file at a time (lazy loading)
+      const allResults: TestResult[] = [];
       const parseErrors: Array<{ file: string; error: string }> = [];
+      let totalTestCases = 0;
+      let stopped = false;
       
       for (const descriptor of fileDescriptors) {
-        try {
-          const testCases = parseTestCases(descriptor.path, {
-            env: options.env,
-            params: options.params
-          });
-          allTestCases.push(...testCases);
-        } catch (err) {
-          const message = err instanceof Error ? err.message : String(err);
-          parseErrors.push({ file: descriptor.path, error: message });
-        }
-      }
-      
-      if (allTestCases.length === 0) {
-        spinner?.fail('No test cases found');
-        if (parseErrors.length > 0) {
-          parseErrors.forEach(({ file, error }) => logger.error(`  ${file}: ${error}`));
-        }
-        process.exit(2);
-      }
-      
-      // Execute tests
-      if (spinner) spinner.text = `Running ${allTestCases.length} test(s) with concurrency ${concurrency}...`;
-      
-      let scheduleResult: ScheduleResult;
-      
-      if (options.failFast) {
-        // For fail-fast, execute sequentially and stop on first failure
-        const results: TestResult[] = [];
-        let stopped = false;
+        if (stopped) break;
         
-        for (const testCase of allTestCases) {
-          if (stopped) break;
-          
-          if (spinner) spinner.text = `Running: ${testCase.id}...`;
-          
-          try {
-            const result = await scheduler.schedule([testCase], { concurrency: 1 });
-            results.push(...result.results);
-            
-            if (!result.results[0]?.passed) {
-              stopped = true;
-            }
-          } catch (err) {
-            stopped = true;
-          }
+        const fileResult = await runFileTestCases(descriptor, options, concurrency, spinner);
+        
+        if (fileResult.parseError) {
+          parseErrors.push({ file: fileResult.file, error: fileResult.parseError });
+          continue;
         }
         
-        const passed = results.filter(r => r.passed).length;
-        const failed = results.length - passed;
+        totalTestCases += fileResult.testCases;
+        allResults.push(...fileResult.results);
         
-        scheduleResult = {
-          results,
-          duration: 0,
-          summary: {
-            total: results.length,
-            passed,
-            failed,
-            passRate: results.length > 0 ? (passed / results.length) * 100 : 0
-          }
-        };
-      } else {
-        scheduleResult = await scheduler.schedule(allTestCases, { concurrency });
+        // Check fail-fast across files
+        if (options.failFast && fileResult.results.some(r => !r.passed)) {
+          stopped = true;
+        }
       }
       
       spinner?.stop();
       
-      // Format and output results
-      const formattedResults = scheduleResult.results.map(formatResult);
+      if (totalTestCases === 0 && parseErrors.length === fileDescriptors.length) {
+        logger.error('No test cases found - all files failed to parse');
+        parseErrors.forEach(({ file, error }) => logger.error(`  ${file}: ${error}`));
+        process.exit(2);
+      }
+      
+      // Calculate summary
+      const passed = allResults.filter(r => r.passed).length;
+      const failed = allResults.length - passed;
       const summary: TestResultSummary = {
-        ...scheduleResult.summary,
-        duration: scheduleResult.duration
+        total: allResults.length,
+        passed,
+        failed,
+        passRate: allResults.length > 0 ? (passed / allResults.length) * 100 : 0,
+        duration: 0
       };
+      
+      // Format and output results
+      const formattedResults = allResults.map(formatResult);
       
       if (options.output === 'json') {
         logger.log(formatJson({
@@ -177,7 +211,7 @@ export const runCommand = new Command('run')
       }
       
       // Exit code: 0 if all passed, 1 if any failed
-      process.exit(scheduleResult.summary.failed > 0 ? 1 : 0);
+      process.exit(failed > 0 ? 1 : 0);
     } catch (err) {
       spinner?.fail('Execution failed');
       const message = err instanceof Error ? err.message : String(err);

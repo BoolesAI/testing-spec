@@ -182,7 +182,7 @@ export function getTypeFromFilePath(filePath: string): string | null {
 // Re-exports
 export { parseYamlFile, parseYamlString, getProtocolType, getBaseDir } from './yaml-parser.js';
 export { validateTspec, validateDslFormat } from './schema.js';
-export { deepMerge, applyTemplateInheritance } from './template.js';
+export { deepMerge, applyTemplateInheritance, clearTemplateCache } from './template.js';
 export { replaceVariables, buildVariableContext, getBuiltinFunctions } from './variables.js';
 export { generateParameterizedCases, loadDataFile, parseCSV } from './data-driver.js';
 

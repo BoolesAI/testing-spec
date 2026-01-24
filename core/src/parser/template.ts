@@ -7,6 +7,44 @@ interface MergeableObject {
   [key: string]: unknown;
 }
 
+/**
+ * Cache for loaded template files to avoid redundant file reads.
+ * Templates are cached by their resolved absolute path.
+ */
+class TemplateCache {
+  private cache: Map<string, TSpec> = new Map();
+
+  get(resolvedPath: string): TSpec | undefined {
+    return this.cache.get(resolvedPath);
+  }
+
+  set(resolvedPath: string, template: TSpec): void {
+    this.cache.set(resolvedPath, template);
+  }
+
+  has(resolvedPath: string): boolean {
+    return this.cache.has(resolvedPath);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+
+  get size(): number {
+    return this.cache.size;
+  }
+}
+
+// Module-level singleton for template caching
+const templateCache = new TemplateCache();
+
+/**
+ * Clears the template cache. Call this between test runs if templates may have changed.
+ */
+export function clearTemplateCache(): void {
+  templateCache.clear();
+}
+
 export function deepMerge<T extends Record<string, unknown>>(parent: T, child: T): T {
   if (!parent) return child;
   if (!child) return parent;
@@ -79,16 +117,30 @@ export function loadTemplateChain(templatePath: string, baseDir: string, visited
   }
   visited.add(resolvedPath);
   
+  // Check cache first to avoid redundant file reads
+  const cached = templateCache.get(resolvedPath);
+  if (cached) {
+    // For cached templates, we still need to check for circular deps in the current chain
+    // but we can return the cached resolved template directly
+    return cached;
+  }
+  
   const template = parseYamlFile(resolvedPath);
   const templateDir = path.dirname(resolvedPath);
   
+  let resolvedTemplate: TSpec;
   if (template.extends) {
     const parentTemplate = loadTemplateChain(template.extends, templateDir, visited);
     const { extends: _, ...templateWithoutExtends } = template;
-    return deepMerge(parentTemplate as unknown as Record<string, unknown>, templateWithoutExtends as unknown as Record<string, unknown>) as unknown as TSpec;
+    resolvedTemplate = deepMerge(parentTemplate as unknown as Record<string, unknown>, templateWithoutExtends as unknown as Record<string, unknown>) as unknown as TSpec;
+  } else {
+    resolvedTemplate = template;
   }
   
-  return template;
+  // Cache the fully resolved template
+  templateCache.set(resolvedPath, resolvedTemplate);
+  
+  return resolvedTemplate;
 }
 
 export function applyTemplateInheritance(spec: TSpec, baseDir: string): TSpec {
