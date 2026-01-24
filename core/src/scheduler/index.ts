@@ -52,12 +52,9 @@ export class TestScheduler {
   ): Promise<TestResult[]> {
     const results: TestResult[] = [];
     const queue = [...testCases];
-    const executing: Promise<void>[] = [];
+    const executing = new Set<Promise<void>>();
 
-    const executeNext = async (): Promise<void> => {
-      if (queue.length === 0) return;
-      
-      const testCase = queue.shift()!;
+    const executeOne = async (testCase: TestCase): Promise<void> => {
       try {
         const result = await executeTestCase(testCase, runnerOptions);
         results.push(result);
@@ -66,26 +63,23 @@ export class TestScheduler {
       }
     };
 
-    // Start initial batch
-    for (let i = 0; i < Math.min(concurrency, testCases.length); i++) {
-      const promise = executeNext().then(() => {
-        // Remove from executing and start next
-        const index = executing.indexOf(promise);
-        if (index > -1) {
-          executing.splice(index, 1);
-        }
-        if (queue.length > 0) {
-          const next = executeNext();
-          executing.push(next);
-          return next;
-        }
-      });
-      executing.push(promise);
-    }
+    const enqueue = (): void => {
+      while (executing.size < concurrency && queue.length > 0) {
+        const testCase = queue.shift()!;
+        const promise = executeOne(testCase).finally(() => {
+          executing.delete(promise);
+        });
+        executing.add(promise);
+      }
+    };
 
-    // Wait for all to complete
-    while (executing.length > 0) {
+    // Start initial batch
+    enqueue();
+
+    // Process until all complete
+    while (executing.size > 0) {
       await Promise.race(executing);
+      enqueue();
     }
 
     return results;
