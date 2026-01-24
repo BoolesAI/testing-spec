@@ -124,7 +124,7 @@ For complete TSpec DSL documentation, see the [docs](../doc) directory.
 
 ## Related
 
-- [@boolesai/tspec-cli](../cli) - Command-line interface for TSpec
+- [@boolesai/tspec-cli](https://www.npmjs.com/package/@boolesai/tspec-cli) - Command-line interface for TSpec
 
 ## License
 

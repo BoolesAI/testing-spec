@@ -169,7 +169,7 @@ For complete TSpec DSL documentation, see the [docs](../doc) directory.
 
 ## Related
 
-- [@boolesai/tspec](../core) - Core library for TSpec
+- [@boolesai/tspec](https://www.npmjs.com/package/@boolesai/tspec) - Core library for TSpec
 
 ## License
 

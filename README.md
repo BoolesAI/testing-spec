@@ -20,12 +20,10 @@ TSpec (Test Specification) is a YAML-based domain-specific language for defining
 
 ## Packages
 
-This monorepo contains the following packages:
-
-| Package | Description | Documentation |
-|---------|-------------|---------------|
-| [@boolesai/tspec](./core) | Core library for parsing, running, and asserting TSpec files | [README](./core/README.md) |
-| [@boolesai/tspec-cli](./cli) | Command-line interface for TSpec | [README](./cli/README.md) |
+| Package | Description |
+|---------|-------------|
+| [@boolesai/tspec](https://www.npmjs.com/package/@boolesai/tspec) | Core library for parsing, running, and asserting TSpec files |
+| [@boolesai/tspec-cli](https://www.npmjs.com/package/@boolesai/tspec-cli) | Command-line interface for TSpec |
 
 ## Quick Start
 
@@ -156,14 +154,15 @@ For complete documentation, see the [docs](./doc) directory:
 ## Development
 
 ```bash
-# Install dependencies
+# Core package
+cd core
 npm install
-
-# Build all packages
 npm run build
 
-# Run tests
-npm test
+# CLI package
+cd cli
+npm install
+npm run build
 ```
 
 ## License

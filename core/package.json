@@ -1,6 +1,6 @@
 {
   "name": "@boolesai/tspec",
-  "version": "2.0.0",
+  "version": "0.0.1",
   "description": "Unified testing framework for test specification files (.tspec)",
   "type": "module",
   "main": "./dist/index.cjs",
