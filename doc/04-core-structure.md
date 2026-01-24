@@ -40,7 +40,7 @@ description: "Verify user login with valid credentials returns JWT token"
 
 ### `metadata`
 
-AI and collaboration metadata. **All 7 fields are mandatory** - the parser will reject files missing any required field. See [Field Reference](./05-field-reference.md#metadata) for details.
+AI and collaboration metadata. All fields are optional - include only what's relevant. See [Field Reference](./05-field-reference.md#metadata) for details.
 
 ```yaml
 metadata:

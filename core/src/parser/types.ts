@@ -17,13 +17,13 @@ export interface TSpec {
 }
 
 export interface TSpecMetadata {
-  prompt: string;
-  related_code: string[];
-  test_category: 'functional' | 'integration' | 'performance' | 'security';
-  risk_level: 'low' | 'medium' | 'high' | 'critical';
-  tags: string[];
-  priority: 'low' | 'medium' | 'high';
-  timeout: string;
+  prompt?: string;
+  related_code?: string[];
+  test_category?: 'functional' | 'integration' | 'performance' | 'security';
+  risk_level?: 'low' | 'medium' | 'high' | 'critical';
+  tags?: string[];
+  priority?: 'low' | 'medium' | 'high';
+  timeout?: string;
 }
 
 export interface Assertion {

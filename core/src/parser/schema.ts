@@ -27,15 +27,8 @@ export function validateTspec(spec: TSpec, options: SchemaValidationOptions = {}
     errors.push('Missing protocol block (http, grpc, graphql, or websocket)');
   }
 
-  // Metadata validation
+  // Metadata validation (all fields are optional, only validate types when present)
   if (spec.metadata) {
-    const requiredMetadata = ['prompt', 'related_code', 'test_category', 'risk_level', 'tags', 'priority', 'timeout'] as const;
-    for (const field of requiredMetadata) {
-      if (!(field in spec.metadata)) {
-        errors.push(`Missing required metadata field: ${field}`);
-      }
-    }
-
     if (spec.metadata.test_category && !VALID_CATEGORIES.includes(spec.metadata.test_category)) {
       errors.push(`Invalid test_category: ${spec.metadata.test_category}. Must be one of: ${VALID_CATEGORIES.join(', ')}`);
     }

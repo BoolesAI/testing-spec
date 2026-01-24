@@ -4,24 +4,19 @@ Detailed reference for all TSpec fields.
 
 ## `metadata`
 
-**Required**. Contains AI generation context and test categorization.
+**Optional**. Contains AI generation context and test categorization.
 
-> **Important**: All 7 metadata fields listed below are **mandatory**. The parser will reject any `.tspec` file missing any of these fields.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `prompt` | string | **Yes** | Natural language description for AI generation |
-| `related_code` | list[string] | **Yes** | Related source code paths (relative to repo root) |
-| `test_category` | enum | **Yes** | Test type category |
-| `risk_level` | enum | **Yes** | Risk level assessment |
-| `tags` | list[string] | **Yes** | Tags for filtering and grouping |
-| `priority` | enum | **Yes** | Execution priority |
-| `timeout` | duration | **Yes** | Maximum execution time |
-
-**Optional fields:**
+> **Note**: All metadata fields are **optional**. You can include only the fields relevant to your test case.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
+| `prompt` | string | No | Natural language description for AI generation |
+| `related_code` | list[string] | No | Related source code paths (relative to repo root) |
+| `test_category` | enum | No | Test type category |
+| `risk_level` | enum | No | Risk level assessment |
+| `tags` | list[string] | No | Tags for filtering and grouping |
+| `priority` | enum | No | Execution priority |
+| `timeout` | duration | No | Maximum execution time |
 | `business_rule` | string | No | Business rule ID or description |
 
 ### `prompt`
