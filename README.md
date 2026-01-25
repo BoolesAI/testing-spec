@@ -7,6 +7,7 @@
 A multi-protocol testing DSL designed for Developer + AI collaboration.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+![Badge](https://hitscounter.dev/api/hit?url=https%3A%2F%2Fgithub.com%2FBoolesAI%2Ftesting-spec&label=Visitors&icon=github&color=%233d8bfd&message=&style=flat&tz=UTC)
 
 ## Overview
 
@@ -29,6 +30,7 @@ TSpec (Test Specification) is a YAML-based domain-specific language for defining
 | [@boolesai/tspec](https://www.npmjs.com/package/@boolesai/tspec) | Core library for parsing, running, and asserting TSpec files |
 | [@boolesai/tspec-cli](https://www.npmjs.com/package/@boolesai/tspec-cli) | Command-line interface for TSpec |
 | [vscode-tspec](./vscode-extension/README.md) | Visual Studio Code extension for TSpec language support |
+| [skills](./skills) | AI agent skills for TSpec MCP integration |
 | [demo](./demo/README.md) | Bookstore API demo for TSpec functionality demonstration |
 
 ## Quick Start

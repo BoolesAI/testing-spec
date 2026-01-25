@@ -2,7 +2,7 @@
 
 Visual Studio Code extension providing language support for TSpec test specification files.
 
-[![Version](https://img.shields.io/badge/version-0.0.1-blue.svg)](https://marketplace.visualstudio.com/items?itemName=boolesai.vscode-tspec)
+[![VSCode Extension Version](https://vsmarketplacebadges.dev/version/BoolesAI.vscode-tspec.png)](https://marketplace.visualstudio.com/items?itemName=BoolesAI.vscode-tspec)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
