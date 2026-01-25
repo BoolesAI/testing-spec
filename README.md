@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="https://raw.githubusercontent.com/BoolesAI/testing-spec/refs/heads/main/assets/logo.png" alt="Testing Spec Logo" width="128"/>
+</div>
+
 # TSpec - Test Specification DSL
 
 A multi-protocol testing DSL designed for Developer + AI collaboration.
