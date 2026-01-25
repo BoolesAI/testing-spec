@@ -4,12 +4,13 @@
   "description": "Language support and test runner for TSpec test specification files",
   "version": "0.0.3",
   "publisher": "boolesai",
-  "icon": "asserts/logo.png",
+  "icon": "logo.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/boolesai/testing-spec.git",
     "directory": "vscode-extension"
   },
+  "license": "MIT",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -126,7 +127,7 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run build",
     "build": "vite build",
     "watch": "vite build --watch",
     "typecheck": "tsc --noEmit",

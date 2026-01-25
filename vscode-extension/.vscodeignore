@@ -3,6 +3,7 @@
 src/**
 .gitignore
 tsconfig.json
+vite.config.mts
 **/*.map
 **/*.ts
 node_modules/**
