@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/BoolesAI/testing-spec/refs/heads/main/assets/logo.png" alt="Testing Spec Logo" width="128"/>
+  <img src="https://github.com/BoolesAI/testing-spec/blob/main/assets/logo.png?raw=true" alt="Testing Spec Logo" width="128"/>
 </div>
 
 # TSpec - Test Specification DSL
