@@ -15,6 +15,7 @@ export class TSpecTestProvider implements vscode.Disposable {
   private fileWatcher: TSpecFileWatcher;
   private testItemManager: TestItemManager;
   private testRunner: TestRunner;
+  private runProfile: vscode.TestRunProfile;
   private disposables: vscode.Disposable[] = [];
 
   constructor(context: vscode.ExtensionContext) {
@@ -38,13 +39,13 @@ export class TSpecTestProvider implements vscode.Disposable {
     };
 
     // Create run profile
-    const runProfile = this.controller.createRunProfile(
+    this.runProfile = this.controller.createRunProfile(
       'Run Tests',
       vscode.TestRunProfileKind.Run,
       (request, token) => this.testRunner.runTests(request, this.controller, token),
       true // isDefault
     );
-    this.disposables.push(runProfile);
+    this.disposables.push(this.runProfile);
 
     // Set up file watcher
     const config = this.cliAdapter.getConfig();
@@ -185,6 +186,13 @@ export class TSpecTestProvider implements vscode.Disposable {
    */
   getTestItemManager(): TestItemManager {
     return this.testItemManager;
+  }
+
+  /**
+   * Get the run profile
+   */
+  getRunProfile(): vscode.TestRunProfile {
+    return this.runProfile;
   }
 
   dispose(): void {

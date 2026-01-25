@@ -89,7 +89,34 @@ export function registerCodeLens(
     vscode.commands.registerCommand(
       'tspec.runTestFromCodeLens',
       async (uri: vscode.Uri) => {
-        await testProvider.runTestFile(uri);
+        // Get the test item for this file
+        const testItemManager = testProvider.getTestItemManager();
+        let testItem = testItemManager.getByFilePath(uri.fsPath);
+        
+        if (!testItem) {
+          // Try to discover the test first
+          await testProvider.discoverTestsInFile(uri);
+          testItem = testItemManager.getByFilePath(uri.fsPath);
+          
+          if (!testItem) {
+            vscode.window.showErrorMessage('Could not find test in file');
+            return;
+          }
+        }
+        
+        // Show test results panel first
+        await vscode.commands.executeCommand('testing.showMostRecentOutput');
+        
+        // Create a test run request and execute it through the run profile
+        const request = new vscode.TestRunRequest([testItem]);
+        const runProfile = testProvider.getRunProfile();
+        const tokenSource = new vscode.CancellationTokenSource();
+        
+        try {
+          await runProfile.runHandler(request, tokenSource.token);
+        } finally {
+          tokenSource.dispose();
+        }
       }
     )
   );
