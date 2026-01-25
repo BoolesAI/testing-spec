@@ -25,4 +25,4 @@ export interface AssertionSummary {
     failed: number;
     passRate: number;
 }
-export type ComparisonOperator = 'equals' | 'eq' | 'not_equals' | 'neq' | 'exists' | 'not_exists' | 'not_empty' | 'contains' | 'not_contains' | 'matches' | 'gt' | 'gte' | 'lt' | 'lte' | 'type' | 'length';
+export type ComparisonOperator = 'equals' | 'eq' | 'not_equals' | 'neq' | 'exists' | 'not_exists' | 'not_empty' | 'contains' | 'not_contains' | 'matches' | 'gt' | 'gte' | 'lt' | 'lte' | 'type' | 'length' | 'length_gt' | 'length_gte' | 'length_lt' | 'length_lte';
