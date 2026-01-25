@@ -1,0 +1,24 @@
+<svg
+      width="64"
+      height="64"
+      viewBox="0 0 256 256"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        x="0"
+        y="0"
+        width="256"
+        height="256"
+        rx="48"
+        fill="#000000"
+      />
+      <path
+        d="M 65 80 L 125 80 L 125 100 L 105 100 L 105 180 L 85 180 L 85 100 L 65 100 Z"
+        fill="#FFFFFF"
+      />
+      <path
+        d="M 145 80 L 185 80 L 185 100 L 145 100 L 145 120 L 175 120 L 175 180 L 135 180 L 135 160 L 175 160 L 175 140 L 145 140 L 145 80 Z"
+        fill="#FFFFFF"
+      />
+    </svg>
