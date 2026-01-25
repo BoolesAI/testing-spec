@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { CLIAdapter } from './cliAdapter';
 import { TestItemManager } from './testItemManager';
+import { TestResultStore } from './testResultStore';
 import { TSpecTestResult, TSpecAssertionResult } from './types';
 
 /**
@@ -9,10 +10,16 @@ import { TSpecTestResult, TSpecAssertionResult } from './types';
 export class TestRunner {
   private cliAdapter: CLIAdapter;
   private testItemManager: TestItemManager;
+  private resultStore: TestResultStore | null;
 
-  constructor(cliAdapter: CLIAdapter, testItemManager: TestItemManager) {
+  constructor(
+    cliAdapter: CLIAdapter,
+    testItemManager: TestItemManager,
+    resultStore?: TestResultStore
+  ) {
     this.cliAdapter = cliAdapter;
     this.testItemManager = testItemManager;
+    this.resultStore = resultStore || null;
   }
 
   /**
@@ -184,6 +191,8 @@ export class TestRunner {
         this.reportTestResult(testItem, result, run);
       } else {
         run.errored(testItem, new vscode.TestMessage('No result found for test'));
+        // Store failed result for gutter decoration
+        this.storeTestResult(data.uri.fsPath, data.metadata?.testCaseId || '', false, Date.now() - startTime);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -194,11 +203,29 @@ export class TestRunner {
         duration
       );
 
+      // Store failed result for gutter decoration
+      this.storeTestResult(data.uri.fsPath, data.metadata?.testCaseId || '', false, duration);
+
       // Mark all assertion children as errored too
       const assertions = this.testItemManager.getAssertionItems(testItem);
       for (const assertion of assertions) {
         run.errored(assertion, new vscode.TestMessage('Parent test failed'));
       }
+    }
+  }
+
+  /**
+   * Store test result for gutter decorations
+   */
+  private storeTestResult(filePath: string, testCaseId: string, passed: boolean, duration: number): void {
+    if (this.resultStore) {
+      console.log('[TSpec] Storing test result:', { filePath, passed });
+      this.resultStore.setResult(filePath, {
+        testCaseId,
+        passed,
+        timestamp: Date.now(),
+        duration,
+      });
     }
   }
 
@@ -215,6 +242,12 @@ export class TestRunner {
     } else {
       const messages = this.buildFailureMessages(result);
       run.failed(testItem, messages, result.duration);
+    }
+
+    // Store result for gutter decorations
+    const filePath = testItem.uri?.fsPath;
+    if (filePath) {
+      this.storeTestResult(filePath, result.testCaseId, result.passed, result.duration);
     }
 
     // Report assertion results

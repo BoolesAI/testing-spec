@@ -103,3 +103,14 @@ export interface TestItemData {
   assertion?: TSpecAssertion;
   assertionIndex?: number;
 }
+
+/**
+ * Stored test result for persistence and gutter decorations
+ */
+export interface StoredTestResult {
+  filePath: string;
+  testCaseId: string;
+  passed: boolean;
+  timestamp: number;
+  duration: number;
+}

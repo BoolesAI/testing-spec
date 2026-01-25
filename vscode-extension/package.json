@@ -122,6 +122,11 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "tspec.testing.showGutterIcons": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show test result status icons in the editor gutter"
         }
       }
     }

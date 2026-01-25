@@ -4,6 +4,8 @@ import { TestParser } from './testParser';
 import { TSpecFileWatcher } from './fileWatcher';
 import { TestItemManager } from './testItemManager';
 import { TestRunner } from './testRunner';
+import { TestResultStore } from './testResultStore';
+import { GutterDecorationManager } from './gutterDecorationManager';
 
 /**
  * Main test provider that coordinates test discovery and execution
@@ -15,6 +17,8 @@ export class TSpecTestProvider implements vscode.Disposable {
   private fileWatcher: TSpecFileWatcher;
   private testItemManager: TestItemManager;
   private testRunner: TestRunner;
+  private testResultStore: TestResultStore;
+  private gutterDecorationManager: GutterDecorationManager;
   private runProfile: vscode.TestRunProfile;
   private disposables: vscode.Disposable[] = [];
 
@@ -28,7 +32,15 @@ export class TSpecTestProvider implements vscode.Disposable {
     this.testParser = new TestParser();
     this.fileWatcher = new TSpecFileWatcher();
     this.testItemManager = new TestItemManager(this.controller);
-    this.testRunner = new TestRunner(this.cliAdapter, this.testItemManager);
+    this.testResultStore = new TestResultStore(context);
+    this.testRunner = new TestRunner(this.cliAdapter, this.testItemManager, this.testResultStore);
+    this.gutterDecorationManager = new GutterDecorationManager(
+      this.testResultStore,
+      this.testItemManager,
+      context
+    );
+    this.disposables.push(this.testResultStore);
+    this.disposables.push(this.gutterDecorationManager);
 
     // Set up resolve handler for lazy loading
     this.controller.resolveHandler = async (item) => {
@@ -42,7 +54,11 @@ export class TSpecTestProvider implements vscode.Disposable {
     this.runProfile = this.controller.createRunProfile(
       'Run Tests',
       vscode.TestRunProfileKind.Run,
-      (request, token) => this.testRunner.runTests(request, this.controller, token),
+      async (request, token) => {
+        await this.testRunner.runTests(request, this.controller, token);
+        // Force update decorations after test run completes
+        this.gutterDecorationManager.updateAllVisibleDecorations();
+      },
       true // isDefault
     );
     this.disposables.push(this.runProfile);
@@ -161,6 +177,8 @@ export class TSpecTestProvider implements vscode.Disposable {
     
     try {
       await this.testRunner.runTests(request, this.controller, tokenSource.token);
+      // Force update decorations after test run completes
+      this.gutterDecorationManager.updateAllVisibleDecorations();
     } finally {
       tokenSource.dispose();
     }
