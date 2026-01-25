@@ -2,7 +2,7 @@
   "name": "vscode-tspec",
   "displayName": "Testing Spec",
   "description": "Language support and test runner for TSpec test specification files",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "publisher": "boolesai",
   "icon": "logo.png",
   "repository": {

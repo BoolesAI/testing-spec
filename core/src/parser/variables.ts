@@ -136,13 +136,75 @@ export function buildVariableContext(
   const specVars = spec.variables || {};
   const dataVars = spec.data?.variables || {};
   
-  const variables = {
+  // Build initial context without resolving variables yet
+  const initialContext: VariableContext = {
+    variables: {},
+    env: specEnv,
+    extract: extractedValues,
+    params: inputParams
+  };
+  
+  // Resolve variables in dependency order
+  const allVars = {
     ...specVars,
     ...dataVars
   };
   
+  const resolvedVariables: Record<string, unknown> = {};
+  const maxIterations = 10; // Prevent infinite loops
+  let iteration = 0;
+  let remaining = { ...allVars };
+  
+  while (Object.keys(remaining).length > 0 && iteration < maxIterations) {
+    const resolved: string[] = [];
+    
+    for (const [key, value] of Object.entries(remaining)) {
+      // Create temporary context with currently resolved variables
+      const tempContext = {
+        ...initialContext,
+        variables: resolvedVariables
+      };
+      
+      // Try to resolve this variable
+      const resolvedValue = typeof value === 'string' 
+        ? replaceVariablesInString(value, tempContext)
+        : value;
+      
+      // Check if resolution is complete (no more variable references)
+      const hasUnresolvedVars = typeof resolvedValue === 'string' && 
+        /\$\{[^}]+\}/.test(resolvedValue) &&
+        resolvedValue.includes('${');
+      
+      if (!hasUnresolvedVars) {
+        resolvedVariables[key] = resolvedValue;
+        resolved.push(key);
+      }
+    }
+    
+    // Remove resolved variables from remaining
+    for (const key of resolved) {
+      delete remaining[key];
+    }
+    
+    // If no progress was made, force resolve remaining to avoid infinite loop
+    if (resolved.length === 0 && Object.keys(remaining).length > 0) {
+      for (const [key, value] of Object.entries(remaining)) {
+        const tempContext = {
+          ...initialContext,
+          variables: resolvedVariables
+        };
+        resolvedVariables[key] = typeof value === 'string'
+          ? replaceVariablesInString(value, tempContext) 
+          : value;
+      }
+      break;
+    }
+    
+    iteration++;
+  }
+  
   return {
-    variables,
+    variables: resolvedVariables,
     env: specEnv,
     extract: extractedValues,
     params: inputParams

@@ -29,11 +29,42 @@ export function buildAxiosConfig(request: HttpRequest, options: BuildRequestOpti
 
   // Handle request body
   if (request.body) {
-    config.data = request.body;
+    // Unwrap body if it has a format wrapper (json, text, form, etc.)
+    let bodyData: unknown = request.body;
+    if (typeof request.body === 'object' && !Array.isArray(request.body) && request.body !== null) {
+      const bodyObj = request.body as Record<string, unknown>;
+      if ('json' in bodyObj) {
+        bodyData = bodyObj.json;
+        if (!config.headers?.['Content-Type'] && !config.headers?.['content-type']) {
+          config.headers = {
+            ...config.headers,
+            'Content-Type': 'application/json'
+          };
+        }
+      } else if ('text' in bodyObj) {
+        bodyData = bodyObj.text;
+        if (!config.headers?.['Content-Type'] && !config.headers?.['content-type']) {
+          config.headers = {
+            ...config.headers,
+            'Content-Type': 'text/plain'
+          };
+        }
+      } else if ('form' in bodyObj) {
+        bodyData = bodyObj.form;
+        if (!config.headers?.['Content-Type'] && !config.headers?.['content-type']) {
+          config.headers = {
+            ...config.headers,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          };
+        }
+      }
+    }
     
-    // Auto-detect content type if not set
+    config.data = bodyData;
+    
+    // Auto-detect content type if not set and no wrapper was used
     if (!config.headers?.['Content-Type'] && !config.headers?.['content-type']) {
-      if (typeof request.body === 'object') {
+      if (typeof bodyData === 'object') {
         config.headers = {
           ...config.headers,
           'Content-Type': 'application/json'
