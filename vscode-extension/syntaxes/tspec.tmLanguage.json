@@ -8,6 +8,7 @@
     { "include": "#top-level-keys" },
     { "include": "#protocol-blocks" },
     { "include": "#metadata-keys" },
+    { "include": "#related-code-values" },
     { "include": "#assertion-keys" },
     { "include": "#http-methods" },
     { "include": "#enum-values" },
@@ -57,6 +58,20 @@
           "captures": {
             "1": { "name": "variable.other.metadata.tspec" },
             "2": { "name": "punctuation.separator.key-value.tspec" }
+          }
+        }
+      ]
+    },
+    "related-code-values": {
+      "patterns": [
+        {
+          "comment": "Related code path with line references in double quotes",
+          "match": "\"([^\"\\[\\]]+)(\\[)([0-9,\\-]+)(\\])\"",
+          "captures": {
+            "1": { "name": "string.other.file-path.tspec" },
+            "2": { "name": "punctuation.definition.line-reference.begin.tspec" },
+            "3": { "name": "constant.numeric.line-reference.tspec" },
+            "4": { "name": "punctuation.definition.line-reference.end.tspec" }
           }
         }
       ]

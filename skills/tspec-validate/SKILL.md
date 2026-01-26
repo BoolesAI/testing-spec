@@ -115,7 +115,12 @@ tspec validate tests/*.tspec && tspec run tests/*.tspec
 ### Metadata Validation
 - Valid `test_category` values
 - Valid `priority` values
-- Proper `related_code` paths format
+- Valid `related_code` format with optional line references `[1,2-10]`
+
+### Line Reference Validation
+- Line numbers must be positive integers (1-based)
+- Range end must be >= start
+- Format: `path/file.ext[N]` or `path/file.ext[N-M]` or `path/file.ext[N,M-P,...]`
 
 ## Exit Codes
 

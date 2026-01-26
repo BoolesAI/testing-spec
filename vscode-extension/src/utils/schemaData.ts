@@ -28,7 +28,7 @@ export const TOP_LEVEL_FIELDS: SchemaField[] = [
 
 export const METADATA_FIELDS: SchemaField[] = [
   { key: 'prompt', required: true, type: 'string', description: 'Natural language test description for AI' },
-  { key: 'related_code', required: true, type: 'array', description: 'Paths to related source files' },
+  { key: 'related_code', required: true, type: 'array', description: 'Paths to related source files. Supports line references: "path/file.js[1,5-10,20]"' },
   { key: 'test_category', required: true, type: 'enum', description: 'Test category', values: ['functional', 'integration', 'performance', 'security'] },
   { key: 'risk_level', required: true, type: 'enum', description: 'Risk level', values: ['low', 'medium', 'high', 'critical'] },
   { key: 'tags', required: true, type: 'array', description: 'Tags for filtering and grouping' },

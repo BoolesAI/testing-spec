@@ -1,3 +1,33 @@
+/**
+ * Represents a line range in a source file.
+ * For single lines, start equals end.
+ */
+export interface LineRange {
+  start: number;
+  end: number;
+}
+
+/**
+ * Represents a parsed related_code reference with optional line ranges.
+ * 
+ * @example
+ * // Plain path
+ * { filePath: "src/auth/login.js", rawValue: "src/auth/login.js" }
+ * 
+ * @example
+ * // With line references
+ * { 
+ *   filePath: "src/auth/login.js", 
+ *   lineRanges: [{ start: 1, end: 10 }, { start: 20, end: 20 }],
+ *   rawValue: "src/auth/login.js[1-10,20]"
+ * }
+ */
+export interface RelatedCodeReference {
+  filePath: string;
+  lineRanges?: LineRange[];
+  rawValue: string;
+}
+
 export interface TSpec {
   version: string;
   description: string;

@@ -29,9 +29,10 @@ export declare function parseTestCasesFromString(content: string, options?: Gene
 export declare function getTypeFromFilePath(filePath: string): string | null;
 export { parseYamlFile, parseYamlString, getProtocolType, getBaseDir } from './yaml-parser.js';
 export { validateTspec, validateDslFormat } from './schema.js';
+export { parseRelatedCodeReference, validateRelatedCodeFormat, formatRelatedCodeReference, RELATED_CODE_PATTERN } from './related-code.js';
 export { deepMerge, applyTemplateInheritance, clearTemplateCache } from './template.js';
 export { replaceVariables, buildVariableContext, getBuiltinFunctions } from './variables.js';
 export { generateParameterizedCases, loadDataFile, parseCSV } from './data-driver.js';
-export type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, ValidationResult, EnvironmentConfig, DataConfig, OutputConfig, LifecycleConfig } from './types.js';
+export type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, ValidationResult, EnvironmentConfig, DataConfig, OutputConfig, LifecycleConfig, LineRange, RelatedCodeReference } from './types.js';
 export type { VariableContext } from './variables.js';
 export type { DataFormat, DataRow, ParameterizedSpec } from './data-driver.js';

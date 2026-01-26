@@ -44,12 +44,45 @@ metadata:
 
 Paths to related source files. Helps AI understand implementation context.
 
+#### Format
+
+The `related_code` field supports optional line references to point to specific code locations:
+
+| Format | Example | Description |
+|--------|---------|-------------|
+| Plain path | `"src/auth/login.js"` | Reference entire file |
+| Single line | `"src/auth/login.js[42]"` | Reference specific line |
+| Line range | `"src/auth/login.js[10-20]"` | Reference line range |
+| Multiple | `"src/auth/login.js[1,5-10,20]"` | Multiple line references |
+
+#### Syntax
+
+```
+path/to/file.ext[line_specs]
+```
+
+Where `line_specs` is a comma-separated list of:
+- Single line: `N` (e.g., `42`)
+- Line range: `N-M` (e.g., `10-20`)
+
+#### Validation Rules
+
+- Line numbers must be positive integers (1-based)
+- Range end must be >= start
+- File path cannot contain `[` or `]` characters
+
+#### Examples
+
 ```yaml
 metadata:
   related_code:
+    # Plain paths (backward compatible)
     - "src/controllers/auth.controller.js"
     - "src/services/auth.service.js"
-    - "src/models/user.model.js"
+    
+    # With line references
+    - "src/models/user.model.js[25-45]"
+    - "src/utils/validation.js[100,150-160,200]"
 ```
 
 ### `business_rule`
