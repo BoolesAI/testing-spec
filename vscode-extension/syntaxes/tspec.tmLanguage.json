@@ -64,7 +64,7 @@
     "assertion-keys": {
       "patterns": [
         {
-          "match": "^\\s+(type|expected|expression|operator|path|name|value|pattern|max_ms|source|message|include)(:)",
+          "match": "^\\s+(type|expected|expression|operator|path|name|value|pattern|max_ms|source|message|include|extract_group)(:)",
           "captures": {
             "1": { "name": "support.type.property-name.assertion.tspec" },
             "2": { "name": "punctuation.separator.key-value.tspec" }
@@ -94,7 +94,7 @@
         },
         {
           "comment": "assertion types",
-          "match": "(?<=[:\\s\"'])(status_code|grpc_code|response_time|json_path|header|proto_field|javascript)(?=[\\s,\"']|$)",
+          "match": "(?<=[:\\s\"'])(status_code|grpc_code|response_time|json_path|header|proto_field|javascript|string|number|regex|xml_path)(?=[\\s,\"']|$)",
           "name": "support.function.assertion-type.tspec"
         }
       ]

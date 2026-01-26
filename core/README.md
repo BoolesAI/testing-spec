@@ -110,13 +110,26 @@ import { scheduler, TestScheduler } from '@boolesai/tspec/scheduler';
 
 ## Assertion Types
 
-- `status_code` - HTTP status code validation
-- `json_path` - JSONPath expression validation
-- `header` - HTTP header validation
-- `response_time` - Response time threshold
-- `javascript` - Custom JavaScript validation
-- `grpc_code` - gRPC status code (planned)
-- `proto_field` - Protocol buffer field (planned)
+### Primary Types (Recommended)
+
+| Type | Description |
+|------|-------------|
+| `json_path` | JSONPath expression validation with unified response access (`$.status`, `$.header`, `$.body`) |
+| `string` | Extract and coerce value to string before comparison |
+| `number` | Extract and coerce value to number before comparison |
+| `regex` | Extract value using regex capture groups |
+| `xml_path` | XPath expression validation for XML responses |
+| `response_time` | Response time threshold validation |
+| `javascript` | Custom JavaScript validation |
+
+### Deprecated Types (Still Functional)
+
+| Type | Migration |
+|------|-----------|
+| `status_code` | Use `json_path` with `expression: "$.status"` |
+| `grpc_code` | Use `json_path` with `expression: "$.grpcCode"` |
+| `header` | Use `json_path` with `expression: "$.header['Name']"` |
+| `proto_field` | Use `json_path` with `expression: "$.body.field.path"` |
 
 ## Build from Source
 

@@ -33,15 +33,20 @@ Parse and display TSpec test case information without executing any requests. Us
 Validate `.tspec` files for schema correctness without executing tests. Use this skill to:
 - Check YAML syntax and structure
 - Validate required fields and protocol blocks
+- Verify assertion types and operators
 - Pre-commit hook validation
 - CI/CD linting stages
+
+**Supported Assertion Types:**
+- Primary: `json_path`, `string`, `number`, `regex`, `xml_path`, `response_time`, `javascript`
+- Deprecated (still accepted): `status_code`, `grpc_code`, `header`, `proto_field`
 
 ### tspec-run
 
 Execute TSpec test cases against API endpoints and report results. Use this skill to:
 - Run HTTP and gRPC tests
-- Validate responses against assertions
-- Generate pass/fail reports
+- Validate responses against assertions using the unified response structure
+- Generate pass/fail reports with detailed assertion feedback
 - CI/CD test automation
 
 ## Typical Workflow

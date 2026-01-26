@@ -26,10 +26,12 @@
       "      ${12:key}: \"${13:value}\"",
       "",
       "assertions:",
-      "  - type: \"status_code\"",
+      "  - type: \"json_path\"",
+      "    expression: \"\\$.status\"",
+      "    operator: \"equals\"",
       "    expected: ${14:200}",
       "  - type: \"json_path\"",
-      "    expression: \"${15:\\$.data}\"",
+      "    expression: \"${15:\\$.body.data}\"",
       "    operator: \"${16|exists,equals,contains,matches|}\"",
       "$0"
     ],
@@ -59,7 +61,9 @@
       "    ${11:field}: \"${12:value}\"",
       "",
       "assertions:",
-      "  - type: \"grpc_code\"",
+      "  - type: \"json_path\"",
+      "    expression: \"\\$.grpcCode\"",
+      "    operator: \"equals\"",
       "    expected: \"${13:OK}\"",
       "$0"
     ],
@@ -94,10 +98,12 @@
       "    ${10:id}: \"${11:value}\"",
       "",
       "assertions:",
-      "  - type: \"status_code\"",
+      "  - type: \"json_path\"",
+      "    expression: \"\\$.status\"",
+      "    operator: \"equals\"",
       "    expected: 200",
       "  - type: \"json_path\"",
-      "    expression: \"\\$.data\"",
+      "    expression: \"\\$.body.data\"",
       "    operator: \"exists\"",
       "$0"
     ],
@@ -126,7 +132,9 @@
       "    - ${10:message}",
       "",
       "assertions:",
-      "  - type: \"status_code\"",
+      "  - type: \"json_path\"",
+      "    expression: \"\\$.status\"",
+      "    operator: \"equals\"",
       "    expected: 101",
       "$0"
     ],
@@ -171,10 +179,12 @@
     "prefix": "sec-assertions",
     "body": [
       "assertions:",
-      "  - type: \"status_code\"",
+      "  - type: \"json_path\"",
+      "    expression: \"\\$.status\"",
+      "    operator: \"equals\"",
       "    expected: ${1:200}",
       "  - type: \"json_path\"",
-      "    expression: \"${2:\\$.data}\"",
+      "    expression: \"${2:\\$.body.data}\"",
       "    operator: \"${3|exists,equals,contains,matches|}\"$0"
     ],
     "description": "Insert assertions block"
@@ -229,16 +239,18 @@
   "Status Code Assertion": {
     "prefix": "assert-status",
     "body": [
-      "- type: \"status_code\"",
+      "- type: \"json_path\"",
+      "  expression: \"\\$.status\"",
+      "  operator: \"equals\"",
       "  expected: ${1:200}$0"
     ],
-    "description": "Insert status code assertion"
+    "description": "Insert status code assertion (unified approach)"
   },
   "JSON Path Assertion": {
     "prefix": "assert-jsonpath",
     "body": [
       "- type: \"json_path\"",
-      "  expression: \"${1:\\$.data}\"",
+      "  expression: \"${1:\\$.body.data}\"",
       "  operator: \"${2|exists,equals,contains,matches,not_empty|}\"",
       "  ${3:expected: \"${4:value}\"}$0"
     ],
@@ -248,7 +260,7 @@
     "prefix": "assert-jsonpath-equals",
     "body": [
       "- type: \"json_path\"",
-      "  expression: \"${1:\\$.data.field}\"",
+      "  expression: \"${1:\\$.body.data.field}\"",
       "  operator: \"equals\"",
       "  expected: ${2:value}$0"
     ],
@@ -258,7 +270,7 @@
     "prefix": "assert-jsonpath-matches",
     "body": [
       "- type: \"json_path\"",
-      "  expression: \"${1:\\$.data.field}\"",
+      "  expression: \"${1:\\$.body.data.field}\"",
       "  operator: \"matches\"",
       "  pattern: \"${2:^[A-Za-z0-9]+$}\"$0"
     ],
@@ -267,12 +279,12 @@
   "Header Assertion": {
     "prefix": "assert-header",
     "body": [
-      "- type: \"header\"",
-      "  name: \"${1:Content-Type}\"",
+      "- type: \"json_path\"",
+      "  expression: \"\\$.header['${1:Content-Type}']\"",
       "  operator: \"${2|equals,contains|}\"",
-      "  value: \"${3:application/json}\"$0"
+      "  expected: \"${3:application/json}\"$0"
     ],
-    "description": "Insert header assertion"
+    "description": "Insert header assertion (unified approach)"
   },
   "Response Time Assertion": {
     "prefix": "assert-response-time",
@@ -290,6 +302,57 @@
       "    ${1:return response.body.data !== null;}$0"
     ],
     "description": "Insert custom JavaScript assertion"
+  },
+  "String Assertion": {
+    "prefix": "assert-string",
+    "body": [
+      "- type: \"string\"",
+      "  expression: \"${1:\\$.body.data.field}\"",
+      "  operator: \"${2|equals,contains,matches|}\"",
+      "  expected: \"${3:value}\"$0"
+    ],
+    "description": "Insert string type assertion (coerces value to string)"
+  },
+  "Number Assertion": {
+    "prefix": "assert-number",
+    "body": [
+      "- type: \"number\"",
+      "  expression: \"${1:\\$.body.data.count}\"",
+      "  operator: \"${2|equals,gt,gte,lt,lte|}\"",
+      "  expected: ${3:0}$0"
+    ],
+    "description": "Insert number type assertion (coerces value to number)"
+  },
+  "Regex Assertion": {
+    "prefix": "assert-regex",
+    "body": [
+      "- type: \"regex\"",
+      "  expression: \"${1:\\$.body.data.url}\"",
+      "  pattern: \"${2:/users/([a-f0-9-]+)}\"",
+      "  extract_group: ${3:1}",
+      "  operator: \"${4|exists,equals|}\"$0"
+    ],
+    "description": "Insert regex assertion with capture group"
+  },
+  "XML Path Assertion": {
+    "prefix": "assert-xml",
+    "body": [
+      "- type: \"xml_path\"",
+      "  expression: \"${1://root/element}\"",
+      "  operator: \"${2|exists,equals,contains|}\"",
+      "  expected: \"${3:value}\"$0"
+    ],
+    "description": "Insert XPath assertion for XML responses"
+  },
+  "gRPC Code Assertion": {
+    "prefix": "assert-grpc",
+    "body": [
+      "- type: \"json_path\"",
+      "  expression: \"\\$.grpcCode\"",
+      "  operator: \"equals\"",
+      "  expected: \"${1:OK}\"$0"
+    ],
+    "description": "Insert gRPC code assertion (unified approach)"
   },
   "Variable - Environment": {
     "prefix": "var-env",

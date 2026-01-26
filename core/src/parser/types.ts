@@ -36,6 +36,7 @@ export interface Assertion {
   name?: string;
   value?: unknown;
   pattern?: string;
+  extract_group?: number;
   max_ms?: number;
   source?: string;
   message?: string;

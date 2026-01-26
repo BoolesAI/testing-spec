@@ -25,6 +25,15 @@ describe('assertion/engine', () => {
         expect(result.expected).toBe(200);
         expect(result.actual).toBe(404);
       });
+
+      it('should include deprecation info', () => {
+        const response: Response = { statusCode: 200, body: {} };
+        const assertion: Assertion = { type: 'status_code', expected: 200 };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.deprecated).toBe(true);
+        expect(result.migrationHint).toContain('$.status');
+      });
     });
 
     describe('response_time assertion', () => {
@@ -328,6 +337,262 @@ describe('assertion/engine', () => {
       const result = assertResults(response, testCase);
       
       expect(result.extracted).toEqual({});
+    });
+  });
+
+  describe('new assertion types', () => {
+    describe('string assertion', () => {
+      it('should coerce value to string and compare', () => {
+        const response: Response = { 
+          statusCode: 200, 
+          body: { id: 12345 },
+          _envelope: {
+            status: 200,
+            header: {},
+            body: { id: 12345 },
+            responseTime: 100
+          }
+        };
+        const assertion: Assertion = { 
+          type: 'string', 
+          expression: '$.body.id',
+          operator: 'equals',
+          expected: '12345'
+        };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.passed).toBe(true);
+        expect(result.type).toBe('string');
+        expect(result.actual).toBe('12345');
+      });
+
+      it('should handle contains operator', () => {
+        const response: Response = { 
+          statusCode: 200, 
+          body: { message: 'Hello World' },
+          _envelope: {
+            status: 200,
+            header: {},
+            body: { message: 'Hello World' },
+            responseTime: 100
+          }
+        };
+        const assertion: Assertion = { 
+          type: 'string', 
+          expression: '$.body.message',
+          operator: 'contains',
+          expected: 'World'
+        };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.passed).toBe(true);
+      });
+    });
+
+    describe('number assertion', () => {
+      it('should coerce string to number and compare', () => {
+        const response: Response = { 
+          statusCode: 200, 
+          body: { price: '99.99' },
+          _envelope: {
+            status: 200,
+            header: {},
+            body: { price: '99.99' },
+            responseTime: 100
+          }
+        };
+        const assertion: Assertion = { 
+          type: 'number', 
+          expression: '$.body.price',
+          operator: 'gte',
+          expected: 50
+        };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.passed).toBe(true);
+        expect(result.type).toBe('number');
+        expect(result.actual).toBe(99.99);
+      });
+
+      it('should fail for non-numeric values', () => {
+        const response: Response = { 
+          statusCode: 200, 
+          body: { value: 'not a number' },
+          _envelope: {
+            status: 200,
+            header: {},
+            body: { value: 'not a number' },
+            responseTime: 100
+          }
+        };
+        const assertion: Assertion = { 
+          type: 'number', 
+          expression: '$.body.value',
+          operator: 'equals',
+          expected: 0
+        };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.passed).toBe(false);
+        expect(result.message).toContain('cannot be converted to number');
+      });
+    });
+
+    describe('regex assertion', () => {
+      it('should extract capture group and verify', () => {
+        const response: Response = { 
+          statusCode: 200, 
+          body: { url: '/users/abc-123-def/profile' },
+          _envelope: {
+            status: 200,
+            header: {},
+            body: { url: '/users/abc-123-def/profile' },
+            responseTime: 100
+          }
+        };
+        const assertion: Assertion = { 
+          type: 'regex', 
+          expression: '$.body.url',
+          pattern: '/users/([a-z0-9-]+)/profile',
+          extract_group: 1,
+          operator: 'exists'
+        };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.passed).toBe(true);
+        expect(result.type).toBe('regex');
+        expect(result.actual).toBe('abc-123-def');
+      });
+
+      it('should fail when pattern does not match', () => {
+        const response: Response = { 
+          statusCode: 200, 
+          body: { url: '/invalid/path' },
+          _envelope: {
+            status: 200,
+            header: {},
+            body: { url: '/invalid/path' },
+            responseTime: 100
+          }
+        };
+        const assertion: Assertion = { 
+          type: 'regex', 
+          expression: '$.body.url',
+          pattern: '/users/([a-z0-9-]+)/profile',
+          extract_group: 1,
+          operator: 'exists'
+        };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.passed).toBe(false);
+      });
+    });
+
+    describe('xml_path assertion', () => {
+      it('should extract value from XML', () => {
+        const xmlBody = '<?xml version="1.0"?><root><status>success</status></root>';
+        const response: Response = { 
+          statusCode: 200, 
+          body: xmlBody
+        };
+        const assertion: Assertion = { 
+          type: 'xml_path', 
+          expression: '//status/text()',
+          operator: 'equals',
+          expected: 'success'
+        };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.passed).toBe(true);
+        expect(result.type).toBe('xml_path');
+        expect(result.actual).toBe('success');
+      });
+
+      it('should extract attribute from XML', () => {
+        const xmlBody = '<response code="200"><message>OK</message></response>';
+        const response: Response = { 
+          statusCode: 200, 
+          body: xmlBody
+        };
+        const assertion: Assertion = { 
+          type: 'xml_path', 
+          expression: '//response/@code',
+          operator: 'equals',
+          expected: '200'
+        };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.passed).toBe(true);
+      });
+    });
+  });
+
+  describe('unified response envelope', () => {
+    it('should access status via json_path with envelope', () => {
+      const response: Response = { 
+        statusCode: 200, 
+        body: { data: 'test' },
+        _envelope: {
+          status: 200,
+          header: { 'Content-Type': 'application/json' },
+          body: { data: 'test' },
+          responseTime: 100
+        }
+      };
+      const assertion: Assertion = { 
+        type: 'json_path', 
+        expression: '$.status',
+        operator: 'equals',
+        expected: 200
+      };
+      const result = runAssertion(response, assertion);
+      
+      expect(result.passed).toBe(true);
+    });
+
+    it('should access header via json_path with envelope', () => {
+      const response: Response = { 
+        statusCode: 200, 
+        body: {},
+        headers: { 'Content-Type': 'application/json' },
+        _envelope: {
+          status: 200,
+          header: { 'Content-Type': 'application/json' },
+          body: {},
+          responseTime: 100
+        }
+      };
+      const assertion: Assertion = { 
+        type: 'json_path', 
+        expression: "$.header['Content-Type']",
+        operator: 'contains',
+        expected: 'json'
+      };
+      const result = runAssertion(response, assertion);
+      
+      expect(result.passed).toBe(true);
+    });
+
+    it('should access body via json_path with envelope', () => {
+      const response: Response = { 
+        statusCode: 200, 
+        body: { user: { name: 'Alice' } },
+        _envelope: {
+          status: 200,
+          header: {},
+          body: { user: { name: 'Alice' } },
+          responseTime: 100
+        }
+      };
+      const assertion: Assertion = { 
+        type: 'json_path', 
+        expression: '$.body.user.name',
+        operator: 'equals',
+        expected: 'Alice'
+      };
+      const result = runAssertion(response, assertion);
+      
+      expect(result.passed).toBe(true);
     });
   });
 });

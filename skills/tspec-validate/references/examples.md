@@ -151,10 +151,18 @@ Fix: Use a valid HTTP method.
 ### Invalid Assertion Type
 
 ```
-Error: Unknown assertion type 'contains'. Use 'json' with 'contains' operator instead.
+Error: Unknown assertion type 'body'. Use 'json_path' with expression "$.body.*" instead.
 ```
 
-Fix: Use proper assertion syntax with valid types.
+Fix: Use proper assertion syntax with valid types (`json_path`, `string`, `number`, `regex`, `xml_path`, `response_time`, `javascript`).
+
+### Deprecated Assertion Type Warning
+
+```
+Warning: Assertion type 'status_code' is deprecated. Use 'json_path' with expression "$.status" instead.
+```
+
+Note: Deprecated types (`status_code`, `grpc_code`, `header`, `proto_field`) still work but will show warnings.
 
 ### Missing Protocol Block
 

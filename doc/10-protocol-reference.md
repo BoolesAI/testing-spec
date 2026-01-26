@@ -125,15 +125,17 @@ http:
       role: "user"
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 201
   - type: "json_path"
-    expression: "$.data.id"
+    expression: "$.body.data.id"
     operator: "exists"
-  - type: "header"
-    name: "Location"
+  - type: "json_path"
+    expression: "$.header['Location']"
     operator: "matches"
-    value: "^/api/v1/users/[a-zA-Z0-9]+$"
+    pattern: "^/api/v1/users/[a-zA-Z0-9]+$"
 
 extract:
   user_id: "$.data.id"
@@ -235,14 +237,16 @@ grpc:
     include_sensitive: false
 
 assertions:
-  - type: "grpc_code"
+  - type: "json_path"
+    expression: "$.grpcCode"
+    operator: "equals"
     expected: "OK"
-  - type: "proto_field"
-    path: "user.id"
+  - type: "json_path"
+    expression: "$.body.user.id"
     operator: "equals"
     expected: "${user_id}"
-  - type: "proto_field"
-    path: "user.name"
+  - type: "json_path"
+    expression: "$.body.user.name"
     operator: "not_empty"
   - type: "response_time"
     max_ms: 1000

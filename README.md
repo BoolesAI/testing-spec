@@ -136,10 +136,12 @@ http:
       password: "${env.TEST_PASSWORD}"
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 200
   - type: "json_path"
-    expression: "$.data.token"
+    expression: "$.body.data.token"
     operator: "exists"
   - type: "response_time"
     max_ms: 1000

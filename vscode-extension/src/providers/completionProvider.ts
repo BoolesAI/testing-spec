@@ -116,7 +116,7 @@ export class TSpecCompletionProvider implements vscode.CompletionItemProvider {
     
     // Assertion type
     if (key === 'type' && (contextType === 'assertions' || contextType === 'assertion-item')) {
-      return createEnumCompletions(['status_code', 'grpc_code', 'response_time', 'json_path', 'header', 'proto_field', 'javascript', 'include']);
+      return createEnumCompletions(['json_path', 'string', 'number', 'regex', 'xml_path', 'response_time', 'javascript', 'include', 'status_code', 'grpc_code', 'header', 'proto_field']);
     }
     
     // Assertion operator
