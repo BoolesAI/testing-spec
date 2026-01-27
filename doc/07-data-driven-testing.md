@@ -146,10 +146,12 @@ http:
       password: "${password}"        # From CSV column
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: ${expected_status}     # From CSV column
   - type: "json_path"
-    expression: "$.message"
+    expression: "$.body.message"
     operator: "contains"
     expected: "${expected_message}"  # From CSV column
 ```
@@ -295,10 +297,12 @@ http:
       name: "${name}"
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: ${expected_status}
   - type: "json_path"
-    expression: "$.error"
+    expression: "$.body.error"
     operator: "contains"
     expected: "${expected_error}"
 ```

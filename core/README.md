@@ -110,8 +110,6 @@ import { scheduler, TestScheduler } from '@boolesai/tspec/scheduler';
 
 ## Assertion Types
 
-### Primary Types (Recommended)
-
 | Type | Description |
 |------|-------------|
 | `json_path` | JSONPath expression validation with unified response access (`$.status`, `$.header`, `$.body`) |
@@ -121,15 +119,6 @@ import { scheduler, TestScheduler } from '@boolesai/tspec/scheduler';
 | `xml_path` | XPath expression validation for XML responses |
 | `response_time` | Response time threshold validation |
 | `javascript` | Custom JavaScript validation |
-
-### Deprecated Types (Still Functional)
-
-| Type | Migration |
-|------|-----------|
-| `status_code` | Use `json_path` with `expression: "$.status"` |
-| `grpc_code` | Use `json_path` with `expression: "$.grpcCode"` |
-| `header` | Use `json_path` with `expression: "$.header['Name']"` |
-| `proto_field` | Use `json_path` with `expression: "$.body.field.path"` |
 
 ## Build from Source
 

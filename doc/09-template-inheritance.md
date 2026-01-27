@@ -73,7 +73,9 @@ assertions:
 ```yaml
 extends: "template.yaml"
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 200
 ```
 
@@ -82,7 +84,9 @@ assertions:
 assertions:
   - type: "response_time"    # From template
     max_ms: 5000
-  - type: "status_code"      # Appended from test file
+  - type: "json_path"        # Appended from test file
+    expression: "$.status"
+    operator: "equals"
     expected: 200
 ```
 
@@ -125,7 +129,9 @@ Use `$replace: true` to completely replace instead of merge:
 extends: "template.yaml"
 assertions:
   $replace: true
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 201
 ```
 
@@ -207,10 +213,10 @@ http:
 assertions:
   - type: "response_time"
     max_ms: 5000
-  - type: "header"
-    name: "Content-Type"
+  - type: "json_path"
+    expression: "$.header['Content-Type']"
     operator: "contains"
-    value: "application/json"
+    expected: "application/json"
 ```
 
 ### Auth Template Example
@@ -247,10 +253,12 @@ http:
   path: "/api/${api_version}/users/me"
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 200
   - type: "json_path"
-    expression: "$.data.id"
+    expression: "$.body.data.id"
     operator: "exists"
 ```
 

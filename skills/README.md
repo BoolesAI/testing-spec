@@ -38,8 +38,7 @@ Validate `.tspec` files for schema correctness without executing tests. Use this
 - CI/CD linting stages
 
 **Supported Assertion Types:**
-- Primary: `json_path`, `string`, `number`, `regex`, `xml_path`, `response_time`, `javascript`
-- Deprecated (still accepted): `status_code`, `grpc_code`, `header`, `proto_field`
+- `json_path`, `string`, `number`, `regex`, `xml_path`, `response_time`, `javascript`
 
 ### tspec-run
 

@@ -267,6 +267,8 @@ http:
       created_at: "${now(yyyy-MM-dd HH:mm:ss)}"
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 201
 ```
