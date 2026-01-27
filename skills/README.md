@@ -38,7 +38,7 @@ Validate `.tspec` files for schema correctness without executing tests. Use this
 - CI/CD linting stages
 
 **Supported Assertion Types:**
-- `json_path`, `string`, `number`, `regex`, `xml_path`, `response_time`, `javascript`
+- `json_path`, `string`, `number`, `regex`, `xml_path`, `response_time`, `javascript`, `file_exist`, `file_read`
 
 ### tspec-run
 

@@ -107,7 +107,7 @@ tspec validate tests/*.tspec && tspec run tests/*.tspec
 - Valid HTTP methods, status codes
 
 ### Assertion Validation
-- Valid assertion types (`json_path`, `string`, `number`, `regex`, `xml_path`, `response_time`, `javascript`)
+- Valid assertion types (`json_path`, `string`, `number`, `regex`, `xml_path`, `response_time`, `javascript`, `file_exist`, `file_read`)
 - Required assertion fields
 - Valid comparison operators
 
