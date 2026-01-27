@@ -346,6 +346,84 @@ function assertXmlPath(response: Response, assertion: Assertion): AssertionResul
   };
 }
 
+function assertFileExist(response: Response, assertion: Assertion): AssertionResult {
+  const filePath = assertion.expression || '';
+  
+  try {
+    const exists = fs.existsSync(filePath);
+    
+    return {
+      passed: exists,
+      type: 'file_exist',
+      expression: filePath,
+      expected: 'file exists',
+      actual: exists ? 'file exists' : 'file not found',
+      message: exists
+        ? `File exists: ${filePath}`
+        : assertion.message || `File not found: ${filePath}`
+    };
+  } catch (e) {
+    const err = e as Error;
+    return {
+      passed: false,
+      type: 'file_exist',
+      expression: filePath,
+      expected: 'file exists',
+      actual: 'error',
+      message: assertion.message || `File check error: ${err.message}`
+    };
+  }
+}
+
+function assertFileRead(response: Response, assertion: Assertion): AssertionResult {
+  const filePath = assertion.expression || '';
+  const operator = (assertion.operator || 'exists') as ComparisonOperator;
+  
+  try {
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      return {
+        passed: false,
+        type: 'file_read',
+        expression: filePath,
+        expected: 'file exists',
+        actual: 'file not found',
+        message: assertion.message || `File not found: ${filePath}`
+      };
+    }
+    
+    // Read file content
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const expected = assertion.expected ?? assertion.pattern ?? assertion.value;
+    const passed = compareValues(content, operator, expected);
+    
+    // Truncate content for display if too long
+    const displayContent = content.length > 100 ? content.substring(0, 100) + '...' : content;
+    
+    return {
+      passed,
+      type: 'file_read',
+      expression: filePath,
+      operator,
+      expected,
+      actual: displayContent,
+      message: passed
+        ? `File ${filePath} ${operator} assertion passed`
+        : assertion.message || `File ${filePath}: expected ${operator} ${JSON.stringify(expected)}`
+    };
+  } catch (e) {
+    const err = e as Error;
+    return {
+      passed: false,
+      type: 'file_read',
+      expression: filePath,
+      expected: assertion.expected,
+      actual: undefined,
+      message: assertion.message || `File read error: ${err.message}`
+    };
+  }
+}
+
 export function loadAssertionInclude(includePath: string, baseDir: string): Assertion {
   const [filePath, definitionId] = includePath.split('#');
   const fullPath = path.resolve(baseDir, filePath);
@@ -400,6 +478,13 @@ export function runAssertion(response: Response, assertion: Assertion, baseDir =
     
     case 'javascript':
       return assertJavaScript(response, assertion);
+    
+    // File assertion types
+    case 'file_exist':
+      return assertFileExist(response, assertion);
+    
+    case 'file_read':
+      return assertFileRead(response, assertion);
     
     // Deprecated assertion types (still functional)
     case 'status_code':

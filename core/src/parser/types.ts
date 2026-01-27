@@ -41,8 +41,6 @@ export interface TSpec {
   variables?: Record<string, unknown>;
   environment?: EnvironmentConfig;
   data?: DataConfig;
-  extract?: Record<string, string>;
-  output?: OutputConfig;
   lifecycle?: LifecycleConfig;
 }
 
@@ -113,13 +111,30 @@ export interface DataConfig {
 }
 
 export interface OutputConfig {
-  format?: string;
-  path?: string;
+  save_response_on_failure?: boolean;
+  metrics?: string[];
+  notifications?: Array<{
+    type: string;
+    channel?: string;
+    condition?: 'failure' | 'success' | 'always';
+  }>;
+}
+
+// Lifecycle action types
+export type LifecycleActionType = 'script' | 'extract' | 'output';
+export type LifecycleScope = 'test' | 'assert' | 'run' | 'data';
+
+export interface LifecycleAction {
+  action: LifecycleActionType;
+  scope: LifecycleScope;
+  source?: string;               // For script action
+  vars?: Record<string, string>; // For extract action
+  config?: OutputConfig;         // For output action
 }
 
 export interface LifecycleConfig {
-  before?: string[];
-  after?: string[];
+  setup?: LifecycleAction[];
+  teardown?: LifecycleAction[];
 }
 
 export interface ValidationResult {

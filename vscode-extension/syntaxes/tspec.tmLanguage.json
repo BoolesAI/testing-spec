@@ -32,7 +32,7 @@
     "top-level-keys": {
       "patterns": [
         {
-          "match": "^(version|description|metadata|environment|variables|data|extends|lifecycle|assertions|extract|output)(:)",
+          "match": "^(version|description|metadata|environment|variables|data|extends|lifecycle|assertions)(:)",
           "captures": {
             "1": { "name": "keyword.control.tspec" },
             "2": { "name": "punctuation.separator.key-value.tspec" }
@@ -79,7 +79,7 @@
     "assertion-keys": {
       "patterns": [
         {
-          "match": "^\\s+(type|expected|expression|operator|path|name|value|pattern|max_ms|source|message|include|extract_group)(:)",
+          "match": "^\\s+(type|expected|expression|operator|path|name|value|pattern|max_ms|source|message|include|extract_group|action|scope|vars|config)(:)",
           "captures": {
             "1": { "name": "support.type.property-name.assertion.tspec" },
             "2": { "name": "punctuation.separator.key-value.tspec" }
@@ -109,8 +109,18 @@
         },
         {
           "comment": "assertion types",
-          "match": "(?<=[:\\s\"'])(status_code|grpc_code|response_time|json_path|header|proto_field|javascript|string|number|regex|xml_path)(?=[\\s,\"']|$)",
+          "match": "(?<=[:\\s\"'])(status_code|grpc_code|response_time|json_path|header|proto_field|javascript|string|number|regex|xml_path|file_exist|file_read|include)(?=[\\s,\"']|$)",
           "name": "support.function.assertion-type.tspec"
+        },
+        {
+          "comment": "lifecycle action types",
+          "match": "(?<=[:\\s\"'])(script|extract|output)(?=[\\s,\"']|$)",
+          "name": "support.function.lifecycle-action.tspec"
+        },
+        {
+          "comment": "lifecycle scope values",
+          "match": "(?<=[:\\s\"'])(test|assert|run|data)(?=[\\s,\"']|$)",
+          "name": "constant.language.lifecycle-scope.tspec"
         }
       ]
     },

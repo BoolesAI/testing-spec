@@ -47,9 +47,14 @@ assertions:
   - type: "response_time"
     max_ms: 1000
 
-extract:
-  token: "$.data.token"
-  user_id: "$.data.user.id"
-
-output:
-  save_response_on_failure: true
+lifecycle:
+  teardown:
+    - action: "extract"
+      scope: "assert"
+      vars:
+        token: "$.data.token"
+        user_id: "$.data.user.id"
+    - action: "output"
+      scope: "test"
+      config:
+        save_response_on_failure: true

@@ -215,26 +215,50 @@
     ],
     "description": "Insert HTTP request with Bearer token"
   },
-  "Extract Block": {
-    "prefix": "sec-extract",
-    "body": [
-      "extract:",
-      "  ${1:variable_name}: \"${2:\\$.data.field}\"$0"
-    ],
-    "description": "Insert extract block for response data"
-  },
   "Lifecycle Block": {
     "prefix": "sec-lifecycle",
     "body": [
       "lifecycle:",
       "  setup:",
-      "    - action: \"${1:db.reset_table}\"",
-      "      params:",
-      "        ${2:table}: \"${3:users}\"",
+      "    - action: \"${1|script,extract,output|}\"",
+      "      scope: \"${2|test,assert,run,data|}\"",
+      "      ${3:source}: |",
+      "        ${4:return {};}",
       "  teardown:",
-      "    - action: \"${4:cache.clear}\"$0"
+      "    - action: \"${5|script,extract,output|}\"",
+      "      scope: \"${6|test,assert,run,data|}\"$0"
     ],
-    "description": "Insert lifecycle hooks block"
+    "description": "Insert lifecycle hooks block with scope control"
+  },
+  "Lifecycle Script Action": {
+    "prefix": "lifecycle-script",
+    "body": [
+      "- action: \"script\"",
+      "  scope: \"${1|test,assert,run,data|}\"",
+      "  source: |",
+      "    ${2:return {};}$0"
+    ],
+    "description": "Insert script action in lifecycle"
+  },
+  "Lifecycle Extract Action": {
+    "prefix": "lifecycle-extract",
+    "body": [
+      "- action: \"extract\"",
+      "  scope: \"${1|assert,test|}\"",
+      "  vars:",
+      "    ${2:variable_name}: \"${3:\\$.data.field}\"$0"
+    ],
+    "description": "Insert extract action in lifecycle"
+  },
+  "Lifecycle Output Action": {
+    "prefix": "lifecycle-output",
+    "body": [
+      "- action: \"output\"",
+      "  scope: \"test\"",
+      "  config:",
+      "    save_response_on_failure: ${1:true}$0"
+    ],
+    "description": "Insert output action in lifecycle"
   },
   "Status Code Assertion": {
     "prefix": "assert-status",
@@ -343,6 +367,25 @@
       "  expected: \"${3:value}\"$0"
     ],
     "description": "Insert XPath assertion for XML responses"
+  },
+  "File Exist Assertion": {
+    "prefix": "assert-file-exist",
+    "body": [
+      "- type: \"file_exist\"",
+      "  expression: \"${1:./output/report.html}\"",
+      "  message: \"${2:File should exist}\"$0"
+    ],
+    "description": "Insert file exist assertion"
+  },
+  "File Read Assertion": {
+    "prefix": "assert-file-read",
+    "body": [
+      "- type: \"file_read\"",
+      "  expression: \"${1:./output/result.json}\"",
+      "  operator: \"${2|not_empty,contains,equals,matches|}\"",
+      "  ${3:expected}: \"${4:value}\"$0"
+    ],
+    "description": "Insert file read assertion"
   },
   "gRPC Code Assertion": {
     "prefix": "assert-grpc",

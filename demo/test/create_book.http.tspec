@@ -66,5 +66,9 @@ assertions:
   - type: "response_time"
     max_ms: 2000
 
-extract:
-  created_book_id: "$.id"
+lifecycle:
+  teardown:
+    - action: "extract"
+      scope: "assert"
+      vars:
+        created_book_id: "$.id"

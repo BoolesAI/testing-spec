@@ -27,10 +27,12 @@ http:
   path: "/health"
 
 assertions:
-  - type: "status_code"
-    expected: 200
   - type: "json_path"
     expression: "$.status"
+    operator: "equals"
+    expected: 200
+  - type: "json_path"
+    expression: "$.body.status"
     operator: "equals"
     expected: "ok"
   - type: "response_time"
@@ -83,7 +85,9 @@ http:
       password: "${env.TEST_PASSWORD}"
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 200
   - type: "json_path"
     expression: "$.data.token"
@@ -100,12 +104,17 @@ assertions:
   - type: "response_time"
     max_ms: 1000
 
-extract:
-  auth_token: "$.data.token"
-  user_id: "$.data.user.id"
-
-output:
-  save_response_on_failure: true
+lifecycle:
+  teardown:
+    - action: "extract"
+      scope: "assert"
+      vars:
+        auth_token: "$.data.token"
+        user_id: "$.data.user.id"
+    - action: "output"
+      scope: "test"
+      config:
+        save_response_on_failure: true
 ```
 
 ### Login Failure Test
@@ -139,7 +148,9 @@ http:
       password: "wrong_password_123"
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 401
   - type: "json_path"
     expression: "$.error.code"
@@ -190,7 +201,9 @@ http:
       password: "${password}"
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: ${expected_status}
   - type: "json_path"
     expression: "$.error.code"
@@ -230,10 +243,10 @@ http:
     X-Client-Version: "1.0.0"
 
 assertions:
-  - type: "header"
-    name: "Content-Type"
+  - type: "json_path"
+    expression: "$.header['Content-Type']"
     operator: "contains"
-    value: "application/json"
+    expected: "application/json"
   - type: "response_time"
     max_ms: 5000
 ```
@@ -272,7 +285,9 @@ http:
   path: "/api/${api_version}/users/me"
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 200
   - type: "json_path"
     expression: "$.data.id"
@@ -282,9 +297,13 @@ assertions:
     operator: "matches"
     pattern: "^[^@]+@[^@]+\\.[^@]+$"
 
-extract:
-  user_id: "$.data.id"
-  user_email: "$.data.email"
+lifecycle:
+  teardown:
+    - action: "extract"
+      scope: "assert"
+      vars:
+        user_id: "$.data.id"
+        user_email: "$.data.email"
 ```
 
 ---
@@ -325,7 +344,9 @@ http:
       inventory: 100
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 201
   - type: "json_path"
     expression: "$.data.id"
@@ -334,19 +355,24 @@ assertions:
     expression: "$.data.name"
     operator: "equals"
     expected: "${product_name}"
-  - type: "header"
-    name: "Location"
+  - type: "json_path"
+    expression: "$.header['Location']"
     operator: "matches"
-    value: "^/api/v1/products/[a-zA-Z0-9]+$"
-
-extract:
-  product_id: "$.data.id"
+    expected: "^/api/v1/products/[a-zA-Z0-9]+$"
 
 lifecycle:
   teardown:
-    - action: "api.call"
-      target: "/api/v1/products/${product_id}"
-      method: "DELETE"
+    - action: "extract"
+      scope: "assert"
+      vars:
+        product_id: "$.data.id"
+    - action: "script"
+      scope: "test"
+      source: |
+        // Cleanup: Delete created product
+        const axios = require('axios');
+        await axios.delete(`/api/v1/products/${product_id}`);
+        return {};
 ```
 
 ---
@@ -389,21 +415,27 @@ grpc:
     include_preferences: false
 
 assertions:
-  - type: "grpc_code"
+  - type: "json_path"
+    expression: "$.grpcCode"
+    operator: "equals"
     expected: "OK"
-  - type: "proto_field"
-    path: "user.id"
+  - type: "json_path"
+    expression: "$.body.user.id"
     operator: "equals"
     expected: "${target_user_id}"
-  - type: "proto_field"
-    path: "user.email"
+  - type: "json_path"
+    expression: "$.body.user.email"
     operator: "not_empty"
   - type: "response_time"
     max_ms: 500
 
-extract:
-  user_name: "user.display_name"
-  user_email: "user.email"
+lifecycle:
+  teardown:
+    - action: "extract"
+      scope: "assert"
+      vars:
+        user_name: "$.body.user.display_name"
+        user_email: "$.body.user.email"
 ```
 
 ---
@@ -431,7 +463,9 @@ http:
   path: "/api/v1/orders/ORD-123"
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 200
   - type: "javascript"
     source: |
@@ -460,18 +494,22 @@ assertions:
 ```yaml
 definitions:
   - id: "common.success"
-    type: "status_code"
+    type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 200
 
   - id: "common.created"
-    type: "status_code"
+    type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 201
 
   - id: "common.json_response"
-    type: "header"
-    name: "Content-Type"
+    type: "json_path"
+    expression: "$.header['Content-Type']"
     operator: "contains"
-    value: "application/json"
+    expected: "application/json"
 
   - id: "common.fast_response"
     type: "response_time"

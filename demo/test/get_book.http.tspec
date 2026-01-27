@@ -56,6 +56,10 @@ assertions:
   - type: "response_time"
     max_ms: 1000
 
-extract:
-  book_title: "$.title"
-  book_author: "$.author"
+lifecycle:
+  teardown:
+    - action: "extract"
+      scope: "assert"
+      vars:
+        book_title: "$.title"
+        book_author: "$.author"

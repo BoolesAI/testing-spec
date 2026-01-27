@@ -13,11 +13,9 @@ environment:                    # Optional - Runtime environment
 variables:                      # Optional - Case-level variables
 data:                           # Optional - Data source configuration
 extends:                        # Optional - Template inheritance
-lifecycle:                      # Optional - Setup/teardown hooks
+lifecycle:                      # Optional - Setup/teardown hooks with scope control
 {protocol}:                     # Required - Protocol block (http, grpc, etc.)
 assertions:                     # Required - Validation rules
-extract:                        # Optional - Response extraction
-output:                         # Optional - Result handling
 ```
 
 ## Required Fields
@@ -74,7 +72,9 @@ List of validation rules. See [Assertions](./08-assertions.md).
 
 ```yaml
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 200
 ```
 
@@ -126,37 +126,23 @@ extends: "templates/base_auth.yaml"
 
 ### `lifecycle`
 
-Setup and teardown hooks.
+Setup and teardown hooks with scope-based execution control.
 
 ```yaml
 lifecycle:
   setup:
-    - action: "db.reset_table"
-      params:
-        table: "users"
+    - action: "script"
+      scope: "test"
+      source: |
+        return { test_id: "TEST_" + Date.now() };
   teardown:
-    - action: "cache.clear"
+    - action: "extract"
+      scope: "assert"
+      vars:
+        token: "$.data.token"
 ```
 
-### `extract`
-
-Response variable extraction.
-
-```yaml
-extract:
-  token: "$.data.token"
-  user_id: "$.data.user.id"
-```
-
-### `output`
-
-Result handling configuration.
-
-```yaml
-output:
-  save_response_on_failure: true
-  metrics: ["latency"]
-```
+See [Lifecycle Reference](./05-field-reference.md#lifecycle) for complete details.
 
 ## Field Order Recommendation
 
@@ -169,11 +155,9 @@ While YAML doesn't require specific ordering, the following order improves reada
 5. `environment` - Runtime configuration
 6. `variables` - Static variables
 7. `data` - Data sources
-8. `lifecycle` - Setup/teardown
+8. `lifecycle` - Setup/teardown hooks
 9. `{protocol}` - Request definition
 10. `assertions` - Validation rules
-11. `extract` - Response extraction
-12. `output` - Result handling
 
 ## Complete Example
 
@@ -206,11 +190,26 @@ variables:
   password: "SecurePass123!"
 
 lifecycle:
+  setup:
+    - action: "script"
+      scope: "test"
+      source: |
+        return { test_id: "TEST_" + Date.now() };
   teardown:
-    - action: "db.delete_record"
-      params:
-        table: "users"
-        condition: "email = '${email}'"
+    - action: "script"
+      scope: "test"
+      source: |
+        // Cleanup: Delete test user
+        console.log("Cleaning up user: " + email);
+        return {};
+    - action: "extract"
+      scope: "assert"
+      vars:
+        user_id: "$.data.id"
+    - action: "output"
+      scope: "test"
+      config:
+        save_response_on_failure: true
 
 http:
   method: "POST"
@@ -224,7 +223,9 @@ http:
       name: "Test User"
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 201
   - type: "json_path"
     expression: "$.data.id"
@@ -235,10 +236,4 @@ assertions:
     expected: "${email}"
   - type: "response_time"
     max_ms: 2000
-
-extract:
-  user_id: "$.data.id"
-
-output:
-  save_response_on_failure: true
 ```

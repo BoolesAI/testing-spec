@@ -16,14 +16,12 @@ export const TOP_LEVEL_FIELDS: SchemaField[] = [
   { key: 'variables', required: false, type: 'object', description: 'Variable definitions' },
   { key: 'data', required: false, type: 'object', description: 'Data-driven testing configuration' },
   { key: 'extends', required: false, type: 'string', description: 'Template file to extend' },
-  { key: 'lifecycle', required: false, type: 'object', description: 'Setup and teardown hooks' },
+  { key: 'lifecycle', required: false, type: 'object', description: 'Setup and teardown hooks with scope control' },
   { key: 'http', required: false, type: 'object', description: 'HTTP request configuration' },
   { key: 'grpc', required: false, type: 'object', description: 'gRPC request configuration' },
   { key: 'graphql', required: false, type: 'object', description: 'GraphQL request configuration' },
   { key: 'websocket', required: false, type: 'object', description: 'WebSocket request configuration' },
   { key: 'assertions', required: true, type: 'array', description: 'Test assertions' },
-  { key: 'extract', required: false, type: 'object', description: 'Response data extraction' },
-  { key: 'output', required: false, type: 'object', description: 'Output configuration' },
 ];
 
 export const METADATA_FIELDS: SchemaField[] = [
@@ -70,9 +68,9 @@ export const ENVIRONMENT_FIELDS: SchemaField[] = [
 ];
 
 export const ASSERTION_FIELDS: SchemaField[] = [
-  { key: 'type', required: true, type: 'enum', description: 'Assertion type', values: ['json_path', 'string', 'number', 'regex', 'xml_path', 'response_time', 'javascript', 'include', 'status_code', 'grpc_code', 'header', 'proto_field'] },
+  { key: 'type', required: true, type: 'enum', description: 'Assertion type', values: ['json_path', 'string', 'number', 'regex', 'xml_path', 'response_time', 'javascript', 'include', 'file_exist', 'file_read', 'status_code', 'grpc_code', 'header', 'proto_field'] },
   { key: 'expected', required: false, type: 'any', description: 'Expected value' },
-  { key: 'expression', required: false, type: 'string', description: 'JSONPath or XPath expression' },
+  { key: 'expression', required: false, type: 'string', description: 'JSONPath, XPath, or file path expression' },
   { key: 'operator', required: false, type: 'enum', description: 'Comparison operator', values: ['equals', 'eq', 'not_equals', 'neq', 'exists', 'not_exists', 'not_empty', 'contains', 'not_contains', 'matches', 'gt', 'gte', 'lt', 'lte', 'type', 'length', 'length_gt', 'length_gte', 'length_lt', 'length_lte'] },
   { key: 'path', required: false, type: 'string', description: 'Field path (deprecated - use expression)' },
   { key: 'name', required: false, type: 'string', description: 'Header name (deprecated - use expression)' },
@@ -93,11 +91,19 @@ export const DATA_FIELDS: SchemaField[] = [
 ];
 
 export const LIFECYCLE_FIELDS: SchemaField[] = [
-  { key: 'setup', required: false, type: 'array', description: 'Pre-test actions' },
-  { key: 'teardown', required: false, type: 'array', description: 'Post-test actions' },
+  { key: 'setup', required: false, type: 'array', description: 'Pre-test actions with scope control' },
+  { key: 'teardown', required: false, type: 'array', description: 'Post-test actions with scope control' },
 ];
 
-export const OUTPUT_FIELDS: SchemaField[] = [
+export const LIFECYCLE_ACTION_FIELDS: SchemaField[] = [
+  { key: 'action', required: true, type: 'enum', description: 'Action type', values: ['script', 'extract', 'output'] },
+  { key: 'scope', required: true, type: 'enum', description: 'Execution scope', values: ['test', 'assert', 'run', 'data'] },
+  { key: 'source', required: false, type: 'string', description: 'Script source code (for script action)' },
+  { key: 'vars', required: false, type: 'object', description: 'Variables to extract (for extract action)' },
+  { key: 'config', required: false, type: 'object', description: 'Output configuration (for output action)' },
+];
+
+export const OUTPUT_CONFIG_FIELDS: SchemaField[] = [
   { key: 'save_response_on_failure', required: false, type: 'boolean', description: 'Save response on test failure' },
   { key: 'metrics', required: false, type: 'array', description: 'Metrics to report' },
   { key: 'notifications', required: false, type: 'array', description: 'Notification configuration' },

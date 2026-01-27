@@ -11,7 +11,7 @@ import {
   ASSERTION_FIELDS,
   DATA_FIELDS,
   LIFECYCLE_FIELDS,
-  OUTPUT_FIELDS,
+  LIFECYCLE_ACTION_FIELDS,
   VARIABLE_FUNCTIONS,
   createFieldCompletions,
   createEnumCompletions,
@@ -77,8 +77,8 @@ export class TSpecCompletionProvider implements vscode.CompletionItemProvider {
       case 'lifecycle':
         return createFieldCompletions(LIFECYCLE_FIELDS);
       
-      case 'output':
-        return createFieldCompletions(OUTPUT_FIELDS);
+      case 'lifecycle-action':
+        return createFieldCompletions(LIFECYCLE_ACTION_FIELDS);
       
       case 'body':
         return [

@@ -8,14 +8,9 @@ const VALID_RISK_LEVELS = ['low', 'medium', 'high', 'critical'];
 const VALID_PRIORITIES = ['low', 'medium', 'high'];
 const PROTOCOL_BLOCKS = ['http', 'grpc', 'graphql', 'websocket'];
 const VALID_HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
-const VALID_ASSERTION_TYPES = ['json_path', 'string', 'number', 'regex', 'xml_path', 'response_time', 'javascript', 'include', 'status_code', 'grpc_code', 'header', 'proto_field'];
-const DEPRECATED_ASSERTION_TYPES = ['status_code', 'grpc_code', 'header', 'proto_field'];
-const DEPRECATED_TYPE_HINTS: Record<string, string> = {
-  'status_code': 'Use json_path with expression "$.status" instead',
-  'grpc_code': 'Use json_path with expression "$.grpcCode" instead',
-  'header': 'Use json_path with expression "$.header[\'Header-Name\']" instead',
-  'proto_field': 'Use json_path with expression "$.body.field.path" instead'
-};
+const VALID_ASSERTION_TYPES = ['json_path', 'string', 'number', 'regex', 'xml_path', 'response_time', 'javascript', 'include', 'file_exist', 'file_read', 'status_code', 'grpc_code', 'header', 'proto_field'];
+const VALID_LIFECYCLE_ACTIONS = ['script', 'extract', 'output'];
+const VALID_LIFECYCLE_SCOPES = ['test', 'assert', 'run', 'data'];
 const VALID_OPERATORS = ['equals', 'eq', 'not_equals', 'neq', 'exists', 'not_exists', 'not_empty', 'contains', 'not_contains', 'matches', 'gt', 'gte', 'lt', 'lte', 'type', 'length', 'length_gt', 'length_gte', 'length_lt', 'length_lte'];
 const VALID_DATA_FORMATS = ['csv', 'json', 'yaml', 'yml'];
 
@@ -356,12 +351,6 @@ export class TSpecDiagnosticProvider {
 
       if (assertion.type && !VALID_ASSERTION_TYPES.includes(assertion.type)) {
         this.addDiagnostic(document, 'type', `Invalid assertion type: "${assertion.type}". Must be one of: ${VALID_ASSERTION_TYPES.join(', ')}`, vscode.DiagnosticSeverity.Error, diagnostics);
-      }
-
-      // Deprecation warning for old assertion types
-      if (assertion.type && DEPRECATED_ASSERTION_TYPES.includes(assertion.type)) {
-        const hint = DEPRECATED_TYPE_HINTS[assertion.type] || 'Use json_path instead';
-        this.addDiagnostic(document, 'type', `Assertion type "${assertion.type}" is deprecated. ${hint}`, vscode.DiagnosticSeverity.Warning, diagnostics);
       }
 
       if (assertion.operator && !VALID_OPERATORS.includes(assertion.operator)) {

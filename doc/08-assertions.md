@@ -2,19 +2,6 @@
 
 Assertions define validation rules for test responses. TSpec provides built-in assertion types and supports custom JavaScript assertions.
 
-## Migration Notice
-
-TSpec v1.1 introduces a protocol-agnostic assertion model. The following assertion types are **deprecated** and will be removed in a future version:
-
-| Deprecated Type | Migration |
-|----------------|-----------|
-| `status_code` | Use `json_path` with `expression: "$.status"` |
-| `grpc_code` | Use `json_path` with `expression: "$.grpcCode"` |
-| `header` | Use `json_path` with `expression: "$.header['Header-Name']"` |
-| `proto_field` | Use `json_path` with `expression: "$.body.field.path"` |
-
-See [Migration Examples](#migration-examples) for detailed guidance.
-
 ## Unified Response Structure
 
 All response data is accessible via JSONPath expressions using a unified structure:
@@ -273,6 +260,62 @@ assertions:
     message: "Login should complete within 500ms"
 ```
 
+### `file_exist`
+
+Validates that a file exists at the specified path.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `expression` | string | Yes | File path (absolute or relative to test file) |
+
+```yaml
+assertions:
+  # Check file exists
+  - type: "file_exist"
+    expression: "./output/report.html"
+    message: "Test report should be generated"
+
+  # Check config file exists
+  - type: "file_exist"
+    expression: "/etc/app/config.yaml"
+```
+
+### `file_read`
+
+Validates file content against expected value.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `expression` | string | Yes | File path (absolute or relative to test file) |
+| `operator` | string | Yes | Comparison operator |
+| `expected` | any | Depends | Expected content or pattern |
+
+```yaml
+assertions:
+  # Check file exists and has content
+  - type: "file_read"
+    expression: "./output/result.json"
+    operator: "not_empty"
+
+  # Validate file content contains expected string
+  - type: "file_read"
+    expression: "./output/result.json"
+    operator: "contains"
+    expected: "success"
+
+  # Match file content with regex
+  - type: "file_read"
+    expression: "./logs/test.log"
+    operator: "matches"
+    pattern: "\\[INFO\\].*completed"
+
+  # Check file content equals expected value
+  - type: "file_read"
+    expression: "./output/status.txt"
+    operator: "equals"
+    expected: "OK"
+```
+
 ### `javascript`
 
 Custom JavaScript assertion for complex validation.
@@ -301,106 +344,6 @@ assertions:
       const parts = token.split('.');
       return parts.length === 3;  // JWT format
     message: "Token should be valid JWT format"
-```
-
-## Deprecated Assertion Types
-
-The following assertion types are deprecated but remain functional for backward compatibility.
-
-### `status_code` (DEPRECATED)
-
-> **Migration**: Use `json_path` with `expression: "$.status"`
-
-Validates HTTP status code.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `expected` | integer | Yes | Expected HTTP status code |
-
-```yaml
-# Deprecated
-- type: "status_code"
-  expected: 200
-
-# Recommended
-- type: "json_path"
-  expression: "$.status"
-  operator: "equals"
-  expected: 200
-```
-
-### `grpc_code` (DEPRECATED)
-
-> **Migration**: Use `json_path` with `expression: "$.grpcCode"`
-
-Validates gRPC status code.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `expected` | string | Yes | Expected gRPC code |
-
-**Common gRPC codes**: `OK`, `CANCELLED`, `UNKNOWN`, `INVALID_ARGUMENT`, `DEADLINE_EXCEEDED`, `NOT_FOUND`, `ALREADY_EXISTS`, `PERMISSION_DENIED`, `UNAUTHENTICATED`
-
-```yaml
-# Deprecated
-- type: "grpc_code"
-  expected: "OK"
-
-# Recommended
-- type: "json_path"
-  expression: "$.grpcCode"
-  operator: "equals"
-  expected: "OK"
-```
-
-### `header` (DEPRECATED)
-
-> **Migration**: Use `json_path` with `expression: "$.header['Header-Name']"`
-
-Validates HTTP response headers.
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Header name (case-insensitive) |
-| `operator` | string | Yes | Comparison operator |
-| `value` | string | Depends | Expected value |
-
-```yaml
-# Deprecated
-- type: "header"
-  name: "Content-Type"
-  operator: "contains"
-  value: "application/json"
-
-# Recommended
-- type: "json_path"
-  expression: "$.header['Content-Type']"
-  operator: "contains"
-  expected: "application/json"
-```
-
-### `proto_field` (DEPRECATED)
-
-> **Migration**: Use `json_path` with `expression: "$.body.field.path"`
-
-Validates Protobuf response fields (for gRPC).
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `path` | string | Yes | Dot-notation field path |
-| `operator` | string | Yes | Comparison operator |
-| `expected` | any | Depends | Expected value |
-
-```yaml
-# Deprecated
-- type: "proto_field"
-  path: "user.name"
-  operator: "not_empty"
-
-# Recommended
-- type: "json_path"
-  expression: "$.body.user.name"
-  operator: "not_empty"
 ```
 
 ## Comparison Operators
@@ -483,95 +426,15 @@ The `assertResults` function returns:
       operator: "exists",
       actual: "eyJhbGc...",
       message: "JSONPath $.body.data.token exists assertion passed"
-    },
-    {
-      passed: true,
-      type: "status_code",           // Deprecated type
-      expected: 200,
-      actual: 200,
-      message: "Status code is 200",
-      deprecated: true,
-      migrationHint: "Use json_path with expression \"$.status\" instead"
     }
   ],
   summary: {
-    total: 3,
-    passed: 3,
+    total: 2,
+    passed: 2,
     failed: 0,
     passRate: 100
-  },
-  extracted: {
-    token: "eyJhbGc..."
   }
 }
-```
-
-## Migration Examples
-
-### HTTP Status Code
-
-```yaml
-# Before (deprecated)
-assertions:
-  - type: "status_code"
-    expected: 200
-
-# After (recommended)
-assertions:
-  - type: "json_path"
-    expression: "$.status"
-    operator: "equals"
-    expected: 200
-```
-
-### HTTP Header
-
-```yaml
-# Before (deprecated)
-assertions:
-  - type: "header"
-    name: "Content-Type"
-    operator: "contains"
-    value: "application/json"
-
-# After (recommended)
-assertions:
-  - type: "json_path"
-    expression: "$.header['Content-Type']"
-    operator: "contains"
-    expected: "application/json"
-```
-
-### gRPC Code
-
-```yaml
-# Before (deprecated)
-assertions:
-  - type: "grpc_code"
-    expected: "OK"
-
-# After (recommended)
-assertions:
-  - type: "json_path"
-    expression: "$.grpcCode"
-    operator: "equals"
-    expected: "OK"
-```
-
-### Proto Field
-
-```yaml
-# Before (deprecated)
-assertions:
-  - type: "proto_field"
-    path: "user.name"
-    operator: "not_empty"
-
-# After (recommended)
-assertions:
-  - type: "json_path"
-    expression: "$.body.user.name"
-    operator: "not_empty"
 ```
 
 ## Best Practices
