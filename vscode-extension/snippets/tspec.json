@@ -387,6 +387,25 @@
     ],
     "description": "Insert file read assertion"
   },
+  "Exception Assertion": {
+    "prefix": "assert-exception",
+    "body": [
+      "- type: \"exception\"",
+      "  expression: \"${1|$,$.message,$.code,$.type|}\"",
+      "  operator: \"${2|empty,exists,equals,contains|}\"",
+      "  ${3:expected}: ${4:value}$0"
+    ],
+    "description": "Insert exception assertion"
+  },
+  "No Exception Assertion": {
+    "prefix": "assert-no-exception",
+    "body": [
+      "- type: \"exception\"",
+      "  expression: \"$\"",
+      "  operator: \"empty\"$0"
+    ],
+    "description": "Insert assertion that no exception occurred"
+  },
   "gRPC Code Assertion": {
     "prefix": "assert-grpc",
     "body": [

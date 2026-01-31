@@ -4,46 +4,10 @@ import yaml from 'js-yaml';
 import type { Assertion } from '../parser/types.js';
 import type { Response, AssertionResult, AssertionSummary, ComparisonOperator } from './types.js';
 import { compareValues } from './operators.js';
-import { extractJsonPath, extractByPath, extractVariables, extractRegex, extractXmlPath, coerceToString, coerceToNumber } from './extractors.js';
+import { extractJsonPath, extractVariables, extractRegex, extractXmlPath, coerceToString, coerceToNumber } from './extractors.js';
 
 interface AssertionLibrary {
   definitions: Array<{ id: string; [key: string]: unknown }>;
-}
-
-function assertStatusCode(response: Response, assertion: Assertion): AssertionResult {
-  const actual = response.statusCode || response.status;
-  const expected = assertion.expected as number;
-  const passed = actual === expected;
-  
-  return {
-    passed,
-    type: 'status_code',
-    expected,
-    actual,
-    message: passed 
-      ? `Status code is ${expected}` 
-      : assertion.message || `Expected status ${expected}, got ${actual}`,
-    deprecated: true,
-    migrationHint: 'Use json_path with expression "$.status" instead'
-  };
-}
-
-function assertGrpcCode(response: Response, assertion: Assertion): AssertionResult {
-  const actual = response.grpcCode || response.code;
-  const expected = assertion.expected as number;
-  const passed = actual === expected;
-  
-  return {
-    passed,
-    type: 'grpc_code',
-    expected,
-    actual,
-    message: passed 
-      ? `gRPC code is ${expected}` 
-      : assertion.message || `Expected gRPC code ${expected}, got ${actual}`,
-    deprecated: true,
-    migrationHint: 'Use json_path with expression "$.grpcCode" instead'
-  };
 }
 
 function assertResponseTime(response: Response, assertion: Assertion): AssertionResult {
@@ -96,55 +60,6 @@ function assertJsonPath(response: Response, assertion: Assertion): AssertionResu
     message: passed 
       ? `JSONPath ${expression} ${operator} assertion passed` 
       : assertion.message || `JSONPath ${expression}: expected ${operator} ${expected}, got ${JSON.stringify(actual)}`
-  };
-}
-
-function assertProtoField(response: Response, assertion: Assertion): AssertionResult {
-  const body = response.body;
-  const fieldPath = assertion.path || '';
-  const operator = (assertion.operator || 'exists') as ComparisonOperator;
-  
-  const actual = extractByPath(body, fieldPath);
-  const expected = assertion.expected ?? assertion.value;
-  const passed = compareValues(actual, operator, expected);
-  
-  return {
-    passed,
-    type: 'proto_field',
-    path: fieldPath,
-    operator,
-    expected,
-    actual,
-    message: passed 
-      ? `Proto field ${fieldPath} ${operator} assertion passed` 
-      : assertion.message || `Proto field ${fieldPath}: expected ${operator} ${expected}, got ${actual}`,
-    deprecated: true,
-    migrationHint: `Use json_path with expression "$.body.${fieldPath}" instead`
-  };
-}
-
-function assertHeader(response: Response, assertion: Assertion): AssertionResult {
-  const headers = response.headers || {};
-  const headerName = assertion.name || '';
-  const operator = (assertion.operator || 'exists') as ComparisonOperator;
-  
-  const headerKey = Object.keys(headers).find(k => k.toLowerCase() === headerName.toLowerCase());
-  const actual = headerKey ? headers[headerKey] : undefined;
-  const expected = assertion.value;
-  const passed = compareValues(actual, operator, expected);
-  
-  return {
-    passed,
-    type: 'header',
-    name: headerName,
-    operator,
-    expected,
-    actual,
-    message: passed 
-      ? `Header ${headerName} ${operator} assertion passed` 
-      : assertion.message || `Header ${headerName}: expected ${operator} ${expected}, got ${actual}`,
-    deprecated: true,
-    migrationHint: `Use json_path with expression "$.header['${headerName}']" instead`
   };
 }
 
@@ -424,6 +339,81 @@ function assertFileRead(response: Response, assertion: Assertion): AssertionResu
   }
 }
 
+// Exception assertion helpers
+
+function detectException(response: Response): Record<string, unknown> | null {
+  // Handle missing response (network error)
+  if (!response) {
+    return {
+      code: 0,
+      message: 'No response received',
+      type: 'NetworkError'
+    };
+  }
+
+  // HTTP status code 0 = network error
+  const status = response.status || response.statusCode || response._envelope?.status;
+  if (status === 0) {
+    const body = response.body as { error?: string; name?: string } | undefined;
+    return {
+      code: 0,
+      message: body?.error || 'Network error',
+      type: body?.name || 'NetworkError'
+    };
+  }
+  
+  // HTTP 5xx errors
+  if (status && status >= 500) {
+    return {
+      code: status,
+      message: `HTTP ${status} Server Error`,
+      type: 'HTTPError'
+    };
+  }
+  
+  // gRPC errors (non-OK codes)
+  const grpcCode = response.grpcCode || response._envelope?.grpcCode;
+  if (grpcCode && grpcCode !== 'OK' && grpcCode !== 0) {
+    return {
+      code: grpcCode,
+      message: `gRPC error: ${grpcCode}`,
+      type: 'GRPCError'
+    };
+  }
+  
+  return null;
+}
+
+function assertException(response: Response, assertion: Assertion): AssertionResult {
+  const exception = detectException(response);
+  const expression = assertion.expression || '$';
+  const operator = (assertion.operator || 'exists') as ComparisonOperator;
+  
+  // Extract value from exception using expression
+  let actual: unknown;
+  if (expression === '$') {
+    actual = exception;
+  } else {
+    // Use JSONPath extraction on the exception object
+    actual = exception ? extractJsonPath(exception, expression) : null;
+  }
+  
+  const expected = assertion.expected ?? assertion.value;
+  const passed = compareValues(actual, operator, expected);
+  
+  return {
+    passed,
+    type: 'exception',
+    expression,
+    operator,
+    expected,
+    actual,
+    message: passed
+      ? `Exception ${expression} ${operator} assertion passed`
+      : assertion.message || `Exception ${expression}: expected ${operator} ${expected !== undefined ? JSON.stringify(expected) : ''}, got ${JSON.stringify(actual)}`
+  };
+}
+
 export function loadAssertionInclude(includePath: string, baseDir: string): Assertion {
   const [filePath, definitionId] = includePath.split('#');
   const fullPath = path.resolve(baseDir, filePath);
@@ -448,7 +438,11 @@ export function loadAssertionInclude(includePath: string, baseDir: string): Asse
   return assertionConfig as unknown as Assertion;
 }
 
-export function runAssertion(response: Response, assertion: Assertion, baseDir = '.'): AssertionResult {
+export function runAssertion(
+  response: Response, 
+  assertion: Assertion, 
+  baseDir = '.'
+): AssertionResult {
   if (assertion.include) {
     const includedAssertion = loadAssertionInclude(assertion.include, baseDir);
     return runAssertion(response, includedAssertion, baseDir);
@@ -486,18 +480,9 @@ export function runAssertion(response: Response, assertion: Assertion, baseDir =
     case 'file_read':
       return assertFileRead(response, assertion);
     
-    // Deprecated assertion types (still functional)
-    case 'status_code':
-      return assertStatusCode(response, assertion);
-    
-    case 'grpc_code':
-      return assertGrpcCode(response, assertion);
-    
-    case 'header':
-      return assertHeader(response, assertion);
-    
-    case 'proto_field':
-      return assertProtoField(response, assertion);
+    // Exception assertion type
+    case 'exception':
+      return assertException(response, assertion);
     
     default:
       return {

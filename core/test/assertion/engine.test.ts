@@ -5,37 +5,6 @@ import type { Assertion } from '../../src/parser/types.js';
 
 describe('assertion/engine', () => {
   describe('runAssertion', () => {
-    describe('status_code assertion', () => {
-      it('should pass when status matches', () => {
-        const response: Response = { statusCode: 200, body: {} };
-        const assertion: Assertion = { type: 'status_code', expected: 200 };
-        const result = runAssertion(response, assertion);
-        
-        expect(result.passed).toBe(true);
-        expect(result.type).toBe('status_code');
-        expect(result.actual).toBe(200);
-      });
-
-      it('should fail when status does not match', () => {
-        const response: Response = { statusCode: 404, body: {} };
-        const assertion: Assertion = { type: 'status_code', expected: 200 };
-        const result = runAssertion(response, assertion);
-        
-        expect(result.passed).toBe(false);
-        expect(result.expected).toBe(200);
-        expect(result.actual).toBe(404);
-      });
-
-      it('should include deprecation info', () => {
-        const response: Response = { statusCode: 200, body: {} };
-        const assertion: Assertion = { type: 'status_code', expected: 200 };
-        const result = runAssertion(response, assertion);
-        
-        expect(result.deprecated).toBe(true);
-        expect(result.migrationHint).toContain('$.status');
-      });
-    });
-
     describe('response_time assertion', () => {
       it('should pass when response time is within limit', () => {
         const response: Response = { statusCode: 200, body: {}, responseTime: 100 };
@@ -131,41 +100,6 @@ describe('assertion/engine', () => {
       });
     });
 
-    describe('header assertion', () => {
-      it('should pass when header exists with correct value', () => {
-        const response: Response = { 
-          statusCode: 200, 
-          body: {},
-          headers: { 'Content-Type': 'application/json' }
-        };
-        const assertion: Assertion = { 
-          type: 'header', 
-          name: 'Content-Type',
-          operator: 'equals',
-          value: 'application/json'
-        };
-        const result = runAssertion(response, assertion);
-        
-        expect(result.passed).toBe(true);
-      });
-
-      it('should be case-insensitive for header names', () => {
-        const response: Response = { 
-          statusCode: 200, 
-          body: {},
-          headers: { 'content-type': 'application/json' }
-        };
-        const assertion: Assertion = { 
-          type: 'header', 
-          name: 'Content-Type',
-          operator: 'exists'
-        };
-        const result = runAssertion(response, assertion);
-        
-        expect(result.passed).toBe(true);
-      });
-    });
-
     describe('javascript assertion', () => {
       it('should pass when JS returns truthy', () => {
         const response: Response = { 
@@ -224,12 +158,18 @@ describe('assertion/engine', () => {
     it('should run multiple assertions', () => {
       const response: Response = { 
         statusCode: 200, 
-        body: { id: '12345', name: 'Alice' }
+        body: { id: '12345', name: 'Alice' },
+        _envelope: {
+          status: 200,
+          header: {},
+          body: { id: '12345', name: 'Alice' },
+          responseTime: 100
+        }
       };
       const assertions: Assertion[] = [
-        { type: 'status_code', expected: 200 },
-        { type: 'json_path', expression: '$.id', operator: 'exists' },
-        { type: 'json_path', expression: '$.name', operator: 'equals', expected: 'Alice' }
+        { type: 'json_path', expression: '$.status', operator: 'equals', expected: 200 },
+        { type: 'json_path', expression: '$.body.id', operator: 'exists' },
+        { type: 'json_path', expression: '$.body.name', operator: 'equals', expected: 'Alice' }
       ];
       
       const results = runAssertions(response, assertions);
@@ -286,12 +226,18 @@ describe('assertion/engine', () => {
     it('should assert response and extract variables', () => {
       const response: Response = { 
         statusCode: 200, 
-        body: { id: '12345', name: 'Alice' }
+        body: { id: '12345', name: 'Alice' },
+        _envelope: {
+          status: 200,
+          header: {},
+          body: { id: '12345', name: 'Alice' },
+          responseTime: 100
+        }
       };
       const testCase = {
         id: 'test-1',
         assertions: [
-          { type: 'status_code', expected: 200 }
+          { type: 'json_path', expression: '$.status', operator: 'equals', expected: 200 }
         ],
         extract: {
           userId: '$.id',
@@ -311,13 +257,19 @@ describe('assertion/engine', () => {
     it('should mark as failed when any assertion fails', () => {
       const response: Response = { 
         statusCode: 404, 
-        body: { error: 'Not found' }
+        body: { error: 'Not found' },
+        _envelope: {
+          status: 404,
+          header: {},
+          body: { error: 'Not found' },
+          responseTime: 100
+        }
       };
       const testCase = {
         id: 'test-2',
         assertions: [
-          { type: 'status_code', expected: 200 },
-          { type: 'json_path', expression: '$.data', operator: 'exists' }
+          { type: 'json_path', expression: '$.status', operator: 'equals', expected: 200 },
+          { type: 'json_path', expression: '$.body.data', operator: 'exists' }
         ]
       };
       
@@ -328,10 +280,19 @@ describe('assertion/engine', () => {
     });
 
     it('should handle test case without extract config', () => {
-      const response: Response = { statusCode: 200, body: {} };
+      const response: Response = { 
+        statusCode: 200, 
+        body: {},
+        _envelope: {
+          status: 200,
+          header: {},
+          body: {},
+          responseTime: 100
+        }
+      };
       const testCase = {
         id: 'test-3',
-        assertions: [{ type: 'status_code', expected: 200 }]
+        assertions: [{ type: 'json_path', expression: '$.status', operator: 'equals', expected: 200 }]
       };
       
       const result = assertResults(response, testCase);
@@ -593,6 +554,130 @@ describe('assertion/engine', () => {
       const result = runAssertion(response, assertion);
       
       expect(result.passed).toBe(true);
+    });
+  });
+
+  describe('exception assertions', () => {
+    describe('exception assertion', () => {
+      it('should pass when HTTP 500 error occurs and asserting exists', () => {
+        const response: Response = { 
+          statusCode: 500, 
+          status: 500,
+          body: { error: 'Internal Server Error' }
+        };
+        const assertion: Assertion = { 
+          type: 'exception',
+          expression: '$',
+          operator: 'exists'
+        };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.passed).toBe(true);
+        expect(result.type).toBe('exception');
+      });
+
+      it('should pass when specific error code matches', () => {
+        const response: Response = { 
+          statusCode: 503, 
+          status: 503,
+          body: {}
+        };
+        const assertion: Assertion = { 
+          type: 'exception',
+          expression: '$.code',
+          operator: 'equals',
+          expected: 503
+        };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.passed).toBe(true);
+      });
+
+      it('should pass when asserting exception is empty (no exception)', () => {
+        const response: Response = { 
+          statusCode: 200, 
+          status: 200,
+          body: {}
+        };
+        const assertion: Assertion = { 
+          type: 'exception',
+          expression: '$',
+          operator: 'empty'
+        };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.passed).toBe(true);
+        expect(result.actual).toBeNull();
+      });
+
+      it('should fail when asserting exists but no exception', () => {
+        const response: Response = { 
+          statusCode: 200, 
+          status: 200,
+          body: {}
+        };
+        const assertion: Assertion = { 
+          type: 'exception',
+          expression: '$',
+          operator: 'exists'
+        };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.passed).toBe(false);
+      });
+
+      it('should detect gRPC errors', () => {
+        const response: Response = { 
+          statusCode: 200, 
+          status: 200,
+          grpcCode: 'UNAVAILABLE',
+          body: {}
+        };
+        const assertion: Assertion = { 
+          type: 'exception',
+          expression: '$.code',
+          operator: 'equals',
+          expected: 'UNAVAILABLE'
+        };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.passed).toBe(true);
+      });
+
+      it('should match exception message', () => {
+        const response: Response = { 
+          statusCode: 500, 
+          status: 500,
+          body: {}
+        };
+        const assertion: Assertion = { 
+          type: 'exception',
+          expression: '$.message',
+          operator: 'contains',
+          expected: 'Server Error'
+        };
+        const result = runAssertion(response, assertion);
+        
+        expect(result.passed).toBe(true);
+      });
+
+      it('should fail when code does not match', () => {
+        const response: Response = { 
+          statusCode: 404, 
+          status: 404,
+          body: {}
+        };
+        const assertion: Assertion = { 
+          type: 'exception',
+          expression: '$.code',
+          operator: 'gte',
+          expected: 500
+        };
+        const result = runAssertion(response, assertion);
+        
+        // 404 is not an exception (only 5xx and network errors are)
+        expect(result.passed).toBe(false);
+      });
     });
   });
 });

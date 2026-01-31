@@ -549,3 +549,163 @@ assertions:
     operator: "matches"
     pattern: "^\\d+\\.\\d+\\.\\d+$"
 ```
+
+---
+
+## Exception Assertions
+
+### Testing for Expected Errors
+
+**tests/errors/server_error.http.tspec**:
+```yaml
+version: "1.0"
+description: "Verify server error handling"
+
+metadata:
+  prompt: "Test that invalid endpoint returns 500 error"
+  related_code: ["src/middleware/errorHandler.js"]
+  test_category: "functional"
+  risk_level: "medium"
+  tags: ["error", "negative"]
+  priority: "medium"
+  timeout: "10s"
+
+environment:
+  host: "${API_HOST|localhost:3000}"
+  scheme: "http"
+
+http:
+  method: "POST"
+  path: "/api/v1/internal/crash-test"
+  body:
+    json:
+      trigger_error: true
+
+assertions:
+  # Assert that a 500 error occurs
+  - type: "exception"
+    expression: "$.code"
+    operator: "equals"
+    expected: 500
+
+  # Assert error message contains expected text
+  - type: "exception"
+    expression: "$.message"
+    operator: "contains"
+    expected: "Internal Server Error"
+```
+
+### Testing for Network Errors
+
+**tests/errors/connection_timeout.http.tspec**:
+```yaml
+version: "1.0"
+description: "Verify timeout handling"
+
+metadata:
+  prompt: "Test that connection timeout is handled correctly"
+  related_code: ["src/utils/httpClient.js"]
+  test_category: "functional"
+  risk_level: "low"
+  tags: ["error", "timeout", "negative"]
+  priority: "low"
+  timeout: "5s"
+
+environment:
+  host: "10.255.255.1"  # Non-routable IP to trigger timeout
+  scheme: "http"
+
+http:
+  method: "GET"
+  path: "/health"
+
+assertions:
+  # Assert that an exception occurred
+  - type: "exception"
+    expression: "$"
+    operator: "exists"
+
+  # Assert exception type is network-related
+  - type: "exception"
+    expression: "$.type"
+    operator: "equals"
+    expected: "NetworkError"
+```
+
+### Testing for Success (No Exceptions)
+
+**tests/success/health_check.http.tspec**:
+```yaml
+version: "1.0"
+description: "Verify health endpoint succeeds"
+
+metadata:
+  prompt: "Test that health endpoint returns without errors"
+  related_code: ["src/routes/health.js"]
+  test_category: "functional"
+  risk_level: "low"
+  tags: ["health", "smoke"]
+  priority: "high"
+  timeout: "5s"
+
+environment:
+  host: "${API_HOST|localhost:3000}"
+  scheme: "http"
+
+http:
+  method: "GET"
+  path: "/health"
+
+assertions:
+  # Assert no exception occurred
+  - type: "exception"
+    expression: "$"
+    operator: "empty"
+
+  # Validate the response
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
+    expected: 200
+
+  - type: "json_path"
+    expression: "$.body.status"
+    operator: "equals"
+    expected: "ok"
+```
+
+### gRPC Error Testing
+
+**tests/grpc/unavailable_service.grpc.tspec**:
+```yaml
+version: "1.0"
+description: "Verify gRPC error handling"
+
+metadata:
+  prompt: "Test gRPC UNAVAILABLE error handling"
+  related_code: ["src/grpc/error_handler.go"]
+  test_category: "functional"
+  risk_level: "medium"
+  tags: ["grpc", "error", "negative"]
+  priority: "medium"
+  timeout: "10s"
+
+environment:
+  host: "nonexistent-service.local"
+  port: "50051"
+
+grpc:
+  service: "user.UserService"
+  method: "GetProfile"
+  package: "com.example.user"
+  proto_file: "protos/user.proto"
+  request:
+    user_id: "U123456"
+
+assertions:
+  # Assert gRPC UNAVAILABLE error
+  - type: "exception"
+    expression: "$.code"
+    operator: "equals"
+    expected: "UNAVAILABLE"
+```

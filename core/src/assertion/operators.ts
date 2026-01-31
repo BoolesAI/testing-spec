@@ -16,6 +16,13 @@ export function compareValues(actual: unknown, operator: ComparisonOperator, exp
     case 'not_exists':
       return actual === undefined || actual === null;
     
+    case 'empty':
+      if (actual === undefined || actual === null) return true;
+      if (typeof actual === 'string') return actual.length === 0;
+      if (Array.isArray(actual)) return actual.length === 0;
+      if (typeof actual === 'object') return Object.keys(actual).length === 0;
+      return false;
+    
     case 'not_empty':
       if (typeof actual === 'string') return actual.length > 0;
       if (Array.isArray(actual)) return actual.length > 0;

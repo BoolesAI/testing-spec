@@ -116,12 +116,12 @@ export class TSpecCompletionProvider implements vscode.CompletionItemProvider {
     
     // Assertion type
     if (key === 'type' && (contextType === 'assertions' || contextType === 'assertion-item')) {
-      return createEnumCompletions(['json_path', 'string', 'number', 'regex', 'xml_path', 'response_time', 'javascript', 'include', 'status_code', 'grpc_code', 'header', 'proto_field']);
+      return createEnumCompletions(['json_path', 'string', 'number', 'regex', 'xml_path', 'response_time', 'javascript', 'include', 'file_exist', 'file_read', 'exception']);
     }
     
     // Assertion operator
     if (key === 'operator') {
-      return createEnumCompletions(['equals', 'eq', 'not_equals', 'neq', 'exists', 'not_exists', 'not_empty', 'contains', 'not_contains', 'matches', 'gt', 'gte', 'lt', 'lte', 'type', 'length', 'length_gt', 'length_gte', 'length_lt', 'length_lte']);
+      return createEnumCompletions(['equals', 'eq', 'not_equals', 'neq', 'exists', 'not_exists', 'empty', 'not_empty', 'contains', 'not_contains', 'matches', 'gt', 'gte', 'lt', 'lte', 'type', 'length', 'length_gt', 'length_gte', 'length_lt', 'length_lte']);
     }
     
     // Data format

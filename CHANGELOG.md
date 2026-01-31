@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `runAssertion()` - Run a single assertion
   - `extractVariables()` - Extract variables from response
   - `getAssertionSummary()` - Get summary of assertion results
-  - Supported assertion types: `status_code`, `json_path`, `header`, `response_time`, `javascript`
+  - Supported assertion types: `json_path`, `string`, `number`, `regex`, `xml_path`, `response_time`, `javascript`, `file_exist`, `file_read`, `exception`
 - **Scheduler Module**: Concurrent test execution with configurable parallelism
   - `scheduler.schedule()` - Execute tests with concurrency
   - `scheduler.scheduleByType()` - Execute tests grouped by protocol

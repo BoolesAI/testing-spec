@@ -79,7 +79,7 @@
     "assertion-keys": {
       "patterns": [
         {
-          "match": "^\\s+(type|expected|expression|operator|path|name|value|pattern|max_ms|source|message|include|extract_group|action|scope|vars|config)(:)",
+          "match": "^\\s+(type|expected|expression|operator|path|name|value|pattern|max_ms|source|message|include|extract_group|action|scope|vars|config|code|code_pattern|message_pattern)(:)",
           "captures": {
             "1": { "name": "support.type.property-name.assertion.tspec" },
             "2": { "name": "punctuation.separator.key-value.tspec" }
@@ -109,7 +109,7 @@
         },
         {
           "comment": "assertion types",
-          "match": "(?<=[:\\s\"'])(status_code|grpc_code|response_time|json_path|header|proto_field|javascript|string|number|regex|xml_path|file_exist|file_read|include)(?=[\\s,\"']|$)",
+          "match": "(?<=[:\\s\"'])(response_time|json_path|javascript|string|number|regex|xml_path|file_exist|file_read|exception|include)(?=[\\s,\"']|$)",
           "name": "support.function.assertion-type.tspec"
         },
         {
@@ -127,7 +127,7 @@
     "operators": {
       "patterns": [
         {
-          "match": "(?<=[:\\s\"'])(equals|eq|not_equals|neq|exists|not_exists|not_empty|contains|not_contains|matches|gt|gte|lt|lte|type|length|length_gt|length_gte|length_lt|length_lte)(?=[\\s,\"']|$)",
+          "match": "(?<=[:\\s\"'])(equals|eq|not_equals|neq|exists|not_exists|empty|not_empty|contains|not_contains|matches|gt|gte|lt|lte|type|length|length_gt|length_gte|length_lt|length_lte)(?=[\\s,\"']|$)",
           "name": "keyword.operator.comparison.tspec"
         }
       ]

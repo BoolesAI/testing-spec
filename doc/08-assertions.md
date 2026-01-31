@@ -316,6 +316,65 @@ assertions:
     expected: "OK"
 ```
 
+### `exception`
+
+Validates exception state during test execution. The exception object is accessible via JSONPath expressions, allowing you to assert on exception properties or verify no exception occurred.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `expression` | string | Yes | JSONPath expression to access exception data |
+| `operator` | string | Yes | Comparison operator |
+| `expected` | any | Depends | Expected value (for `equals`, `contains`, etc.) |
+
+**Exception Object Structure:**
+- `$` - The exception object itself (null/empty if no exception)
+- `$.message` - Exception message string
+- `$.code` - Error code (HTTP status, gRPC code, etc.)
+- `$.type` - Exception type/name
+
+```yaml
+assertions:
+  # Assert no exception occurred
+  - type: "exception"
+    expression: "$"
+    operator: "empty"
+
+  # Assert exception message equals expected value
+  - type: "exception"
+    expression: "$.message"
+    operator: "equals"
+    expected: "File not found"
+
+  # Assert exception message contains text
+  - type: "exception"
+    expression: "$.message"
+    operator: "contains"
+    expected: "timeout"
+
+  # Assert specific error code
+  - type: "exception"
+    expression: "$.code"
+    operator: "equals"
+    expected: 500
+
+  # Assert error code in 5xx range
+  - type: "exception"
+    expression: "$.code"
+    operator: "gte"
+    expected: 500
+
+  # Assert exception type
+  - type: "exception"
+    expression: "$.type"
+    operator: "equals"
+    expected: "NetworkError"
+
+  # Assert exception exists (any exception)
+  - type: "exception"
+    expression: "$"
+    operator: "exists"
+```
+
 ### `javascript`
 
 Custom JavaScript assertion for complex validation.
@@ -354,6 +413,7 @@ assertions:
 | `not_equals` / `neq` | Not equal | `expected: "error"` |
 | `exists` | Value is not null/undefined | - |
 | `not_exists` | Value is null/undefined | - |
+| `empty` | Value is null/undefined/empty | - |
 | `not_empty` | String/array has length > 0 | - |
 | `contains` | String/array contains value | `expected: "success"` |
 | `not_contains` | Does not contain | `expected: "error"` |

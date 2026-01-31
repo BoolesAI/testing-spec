@@ -68,17 +68,14 @@ export const ENVIRONMENT_FIELDS: SchemaField[] = [
 ];
 
 export const ASSERTION_FIELDS: SchemaField[] = [
-  { key: 'type', required: true, type: 'enum', description: 'Assertion type', values: ['json_path', 'string', 'number', 'regex', 'xml_path', 'response_time', 'javascript', 'include', 'file_exist', 'file_read', 'status_code', 'grpc_code', 'header', 'proto_field'] },
+  { key: 'type', required: true, type: 'enum', description: 'Assertion type', values: ['json_path', 'string', 'number', 'regex', 'xml_path', 'response_time', 'javascript', 'include', 'file_exist', 'file_read', 'exception'] },
   { key: 'expected', required: false, type: 'any', description: 'Expected value' },
   { key: 'expression', required: false, type: 'string', description: 'JSONPath, XPath, or file path expression' },
-  { key: 'operator', required: false, type: 'enum', description: 'Comparison operator', values: ['equals', 'eq', 'not_equals', 'neq', 'exists', 'not_exists', 'not_empty', 'contains', 'not_contains', 'matches', 'gt', 'gte', 'lt', 'lte', 'type', 'length', 'length_gt', 'length_gte', 'length_lt', 'length_lte'] },
-  { key: 'path', required: false, type: 'string', description: 'Field path (deprecated - use expression)' },
-  { key: 'name', required: false, type: 'string', description: 'Header name (deprecated - use expression)' },
-  { key: 'value', required: false, type: 'any', description: 'Header value (deprecated - use expected)' },
+  { key: 'operator', required: false, type: 'enum', description: 'Comparison operator', values: ['equals', 'eq', 'not_equals', 'neq', 'exists', 'not_exists', 'empty', 'not_empty', 'contains', 'not_contains', 'matches', 'gt', 'gte', 'lt', 'lte', 'type', 'length', 'length_gt', 'length_gte', 'length_lt', 'length_lte'] },
   { key: 'pattern', required: false, type: 'string', description: 'Regex pattern' },
   { key: 'extract_group', required: false, type: 'number', description: 'Regex capture group index (default: 0)' },
   { key: 'max_ms', required: false, type: 'number', description: 'Maximum response time in ms' },
-  { key: 'source', required: false, type: 'string', description: 'JavaScript source code' },
+  { key: 'source', required: false, type: 'string', description: 'JavaScript source code (for javascript type)' },
   { key: 'message', required: false, type: 'string', description: 'Custom failure message' },
   { key: 'include', required: false, type: 'string', description: 'Path to assertion library' },
 ];

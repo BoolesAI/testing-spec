@@ -26,6 +26,13 @@ export interface Response {
   };
 }
 
+export interface ExceptionInfo {
+  source: 'protocol' | 'assertion';
+  code?: number | string;
+  message: string;
+  type?: string;
+}
+
 export interface AssertionResult {
   passed: boolean;
   type: string;
@@ -52,7 +59,7 @@ export type ComparisonOperator =
   | 'equals' | 'eq'
   | 'not_equals' | 'neq'
   | 'exists' | 'not_exists'
-  | 'not_empty'
+  | 'empty' | 'not_empty'
   | 'contains' | 'not_contains'
   | 'matches'
   | 'gt' | 'gte' | 'lt' | 'lte'

@@ -154,7 +154,7 @@ Fix: Use a valid HTTP method.
 Error: Unknown assertion type 'body'. Use 'json_path' with expression "$.body.*" instead.
 ```
 
-Fix: Use proper assertion syntax with valid types (`json_path`, `string`, `number`, `regex`, `xml_path`, `response_time`, `javascript`, `file_exist`, `file_read`).
+Fix: Use proper assertion syntax with valid types (`json_path`, `string`, `number`, `regex`, `xml_path`, `response_time`, `javascript`, `file_exist`, `file_read`, `exception`).
 
 ### Missing Protocol Block
 
