@@ -5,6 +5,83 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-01-31
+
+### Added
+
+#### @boolesai/tspec (Core Library)
+
+- **Lifecycle Module**: New lifecycle management system for test execution hooks
+  - `executeLifecycleActions()` - Execute actions filtered by scope (before_test, after_test, before_all, after_all)
+  - Support for script, extract, and output actions
+  - Context-aware execution with access to variables, extracted variables, and response data
+- **Related Code Support**: Associate test cases with source code references
+  - `related_code` field in test specifications for linking to implementation code
+  - Line reference support for precise code location tracking
+  - Parse and validate related code references
+- **Enhanced Assertion Engine**:
+  - **New Primary Assertion Types**: Unified response access through `json_path`, `string`, `number`, `regex` types
+  - **XML Path Support**: `xml_path` assertion type for XML response validation with XPath expressions
+  - **File Assertions**: New `file_exist` and `file_read` types for filesystem validation
+  - **Exception Handling**: `exception` assertion type for validating error conditions
+  - **Response Time**: `response_time` assertion for performance validation
+  - Improved extractor functions with comprehensive variable extraction from responses
+- **Dependencies**: Added `@xmldom/xmldom` (^0.8.11) and `xpath` (^0.0.34) for XML processing
+
+#### @boolesai/tspec-cli (Command Line Interface)
+
+- Enhanced test result formatting with improved readability
+- Updated to use @boolesai/tspec version 1.1.0
+- Better error reporting and test execution summaries
+
+#### vscode-tspec (VS Code Extension)
+
+- Updated code snippets with new assertion types and lifecycle actions
+- Enhanced syntax highlighting for new fields (`related_code`, lifecycle actions)
+- Improved validation and diagnostics for new assertion types
+- Enhanced IntelliSense support for lifecycle hooks and new assertion operators
+
+#### Skills (MCP Integration)
+
+- **tspec-gen**: New skill for AI-assisted test case generation from API specifications
+  - Generate comprehensive test cases from OpenAPI/Swagger specs
+  - Intelligent test scenario generation (positive, negative, edge cases)
+  - Support for data-driven test generation
+- **tspec-coverage**: New skill for test coverage analysis
+  - Analyze test coverage across API endpoints
+  - Identify untested scenarios and missing test cases
+  - Generate coverage reports
+
+#### Documentation
+
+- Updated **Core Structure** (04-core-structure.md) with lifecycle module documentation
+- Enhanced **Field Reference** (05-field-reference.md) with `related_code` field specifications
+- Comprehensive **Assertions** (08-assertions.md) update:
+  - Detailed documentation for all new assertion types
+  - Examples for `xml_path`, `file_exist`, `file_read`, and `exception` assertions
+  - Migration guide from deprecated assertion types
+- Updated **Examples** (12-examples.md) with real-world usage of new features
+- Enhanced **Template Inheritance** (09-template-inheritance.md) examples
+- Updated **Quick Start** (02-quick-start.md) with latest syntax
+
+### Changed
+
+- **Breaking**: Refactored assertion types for consistency
+  - Deprecated separate envelope-specific assertion types
+  - Migrated to unified access through primary types with JSONPath
+  - `status_code`, `header`, `body_json`, `body_text` assertions now use `json_path` with `$.status`, `$.headers.*`, `$.body.*` patterns
+- Improved test case parsing with better error messages
+- Enhanced variable extraction with more robust error handling
+- Updated all demo test cases to use new assertion syntax
+- Enhanced schema validation for new fields and assertion types
+
+### Fixed
+
+- Improved assertion error messages for better debugging
+- Better handling of edge cases in variable extraction
+- More robust XML parsing with proper namespace support
+- Fixed validation issues with complex nested assertions
+
 ## [1.0.0] - 2026-01-25
 
 ### Added
