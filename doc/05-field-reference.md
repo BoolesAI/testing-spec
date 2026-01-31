@@ -44,12 +44,45 @@ metadata:
 
 Paths to related source files. Helps AI understand implementation context.
 
+#### Format
+
+The `related_code` field supports optional line references to point to specific code locations:
+
+| Format | Example | Description |
+|--------|---------|-------------|
+| Plain path | `"src/auth/login.js"` | Reference entire file |
+| Single line | `"src/auth/login.js[42]"` | Reference specific line |
+| Line range | `"src/auth/login.js[10-20]"` | Reference line range |
+| Multiple | `"src/auth/login.js[1,5-10,20]"` | Multiple line references |
+
+#### Syntax
+
+```
+path/to/file.ext[line_specs]
+```
+
+Where `line_specs` is a comma-separated list of:
+- Single line: `N` (e.g., `42`)
+- Line range: `N-M` (e.g., `10-20`)
+
+#### Validation Rules
+
+- Line numbers must be positive integers (1-based)
+- Range end must be >= start
+- File path cannot contain `[` or `]` characters
+
+#### Examples
+
 ```yaml
 metadata:
   related_code:
+    # Plain paths (backward compatible)
     - "src/controllers/auth.controller.js"
     - "src/services/auth.service.js"
-    - "src/models/user.model.js"
+    
+    # With line references
+    - "src/models/user.model.js[25-45]"
+    - "src/utils/validation.js[100,150-160,200]"
 ```
 
 ### `business_rule`
@@ -214,7 +247,7 @@ See [Template Inheritance](./09-template-inheritance.md) for details.
 
 ## `lifecycle`
 
-**Optional**. Setup and teardown hooks.
+**Optional**. Setup and teardown hooks with scope-based execution control.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -223,60 +256,107 @@ See [Template Inheritance](./09-template-inheritance.md) for details.
 
 ### Action Structure
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `action` | string | Action type |
-| `params` | object | Action parameters |
-| `target` | string | Target path (for api.call) |
-| `method` | string | HTTP method (for api.call) |
+Each action in `setup` or `teardown` must include:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `action` | string | Yes | Action type (`script`, `extract`, `output`) |
+| `scope` | string | Yes | Execution scope |
+| `source` | string | Conditional | Script source code (for `script` action) |
+| `vars` | object | Conditional | Variables to extract (for `extract` action) |
+| `config` | object | Conditional | Output configuration (for `output` action) |
+
+### Action Types
+
+| Type | Description | Required Fields |
+|------|-------------|-----------------|
+| `script` | Execute custom JavaScript/TypeScript code | `source` |
+| `extract` | Extract values from response | `vars` |
+| `output` | Configure result handling | `config` |
+
+### Scope Values
+
+The `scope` field determines when the action executes:
+
+| Scope | Description | Example Use Case |
+|-------|-------------|------------------|
+| `test` | Execute at beginning/end of entire test case | Initialize test data, cleanup test artifacts |
+| `assert` | Execute before/after assertions | Prepare assertion context, log assertion results |
+| `run` | Execute before/after test execution | Set runtime flags, collect metrics |
+| `data` | Execute before/after dataset read (data-driven mode only) | Validate data file, transform data rows |
+
+### Execution Order
+
+**Setup Phase:**
+1. `scope: "test"` - Once at test start
+2. `scope: "data"` - Before reading each data row (data-driven only)
+3. `scope: "run"` - Before protocol execution
+4. `scope: "assert"` - Before running assertions
+
+**Teardown Phase:**
+1. `scope: "assert"` - After assertions complete
+2. `scope: "run"` - After protocol execution
+3. `scope: "data"` - After processing each data row (data-driven only)
+4. `scope: "test"` - Once at test end
+
+### Script Action
+
+Execute custom JavaScript/TypeScript code with return capability:
 
 ```yaml
 lifecycle:
   setup:
-    - action: "db.reset_table"
-      params:
-        table: "users"
-        condition: "username LIKE 'test_%'"
-    - action: "api.call"
-      target: "/v1/test/setup"
-      method: "POST"
-  teardown:
-    - action: "cache.clear"
-      params:
-        pattern: "user:*"
+    - action: "script"
+      scope: "test"
+      source: |
+        // Return value is merged into data context
+        // Accessible via ${key} in test case
+        const userId = "U" + Date.now();
+        return { userId: userId, timestamp: Date.now() };
 ```
 
-### Standard Action Library
+**Returned data access:**
+- Return value must be an object: `return { key: value }`
+- Accessible in test via `${key}` (e.g., `${userId}`)
+- Merged with existing variables (script-returned variables take lower precedence)
 
-| Action | Description |
-|--------|-------------|
-| `db.reset_table` | Reset database table |
-| `db.insert_record` | Insert record |
-| `cache.clear` | Clear cache entries |
-| `cache.set` | Set cache value |
-| `api.call` | Make API call |
-| `log.test_start` | Log test start |
+### Extract Action
 
----
-
-## `extract`
-
-**Optional**. Extract values from response for later use.
+Extract values from response for later use:
 
 ```yaml
-extract:
-  session_token: "$.data.token"
-  user_id: "$.data.user.id"
-  response_code: "$.code"
+lifecycle:
+  teardown:
+    - action: "extract"
+      scope: "assert"
+      vars:
+        session_token: "$.data.token"
+        user_id: "$.data.user.id"
 ```
 
-Extracted values can be referenced as `${extract.session_token}`.
+**Extracted data access:**
+- Accessible via `${extract.variable_name}`
+- Only available after action executes based on scope
 
----
+### Output Action
 
-## `output`
+Configure result handling:
 
-**Optional**. Result handling configuration.
+```yaml
+lifecycle:
+  teardown:
+    - action: "output"
+      scope: "test"
+      config:
+        save_response_on_failure: true
+        metrics: ["latency", "throughput"]
+        notifications:
+          - type: "slack"
+            channel: "#test-alerts"
+            condition: "failure"
+```
+
+**Output Config Fields:**
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -284,20 +364,51 @@ Extracted values can be referenced as `${extract.session_token}`.
 | `metrics` | list[string] | Metrics to report |
 | `notifications` | list[notification] | Notification configuration |
 
-```yaml
-output:
-  save_response_on_failure: true
-  metrics: ["latency", "throughput"]
-  notifications:
-    - type: "slack"
-      channel: "#test-alerts"
-      condition: "failure"
-```
-
-### Notification Conditions
+**Notification Conditions:**
 
 | Value | Description |
 |-------|-------------|
 | `failure` | Notify on failure only |
 | `success` | Notify on success only |
 | `always` | Always notify |
+
+### Complete Example
+
+```yaml
+lifecycle:
+  setup:
+    - action: "script"
+      scope: "test"
+      source: |
+        // Initialize test user
+        return { 
+          test_user_id: "TEST_" + Date.now(),
+          test_run_id: generateUUID()
+        };
+    
+    - action: "script"
+      scope: "data"
+      source: |
+        // Transform dataset before reading
+        console.log("Loading test data...");
+        return {};
+  
+  teardown:
+    - action: "extract"
+      scope: "assert"
+      vars:
+        token: "$.data.token"
+        user_id: "$.data.user.id"
+    
+    - action: "output"
+      scope: "test"
+      config:
+        save_response_on_failure: true
+    
+    - action: "script"
+      scope: "test"
+      source: |
+        // Cleanup test data
+        console.log("Cleaning up test user: " + test_user_id);
+        return {};
+```

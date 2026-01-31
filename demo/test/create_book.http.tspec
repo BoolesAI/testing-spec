@@ -40,7 +40,8 @@ http:
       inventoryQuantity: 10
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
     expected: 201
   - type: "json_path"
     expression: "$.id"
@@ -58,12 +59,16 @@ assertions:
   - type: "json_path"
     expression: "$.inventoryQuantity"
     expected: 10
-  - type: "header"
-    name: "Location"
+  - type: "json_path"
+    expression: "$.header['Location']"
     operator: "matches"
     pattern: "^/api/v1/books/\\d+$"
   - type: "response_time"
     max_ms: 2000
 
-extract:
-  created_book_id: "$.id"
+lifecycle:
+  teardown:
+    - action: "extract"
+      scope: "assert"
+      vars:
+        created_book_id: "$.id"

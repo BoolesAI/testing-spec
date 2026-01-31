@@ -118,10 +118,10 @@ assertions:
       expect(testCases[0].id).toMatch(/^inline_\d+$/);
     });
 
-    it('should pass through extract config', () => {
+    it('should pass through lifecycle config', () => {
       const yaml = `
 version: "1.0"
-description: Test with extract
+description: Test with lifecycle
 metadata:
   prompt: "test"
   related_code: []
@@ -133,14 +133,22 @@ metadata:
 http:
   method: GET
   path: /api/users
-extract:
-  userId: $.data.id
+lifecycle:
+  teardown:
+    - action: extract
+      scope: assert
+      vars:
+        userId: $.data.id
 assertions:
   - type: status_code
     expected: 200
 `;
       const testCases = parseTestCasesFromString(yaml);
-      expect(testCases[0].extract).toEqual({ userId: '$.data.id' });
+      expect(testCases[0].lifecycle).toBeDefined();
+      expect(testCases[0].lifecycle?.teardown).toHaveLength(1);
+      expect(testCases[0].lifecycle?.teardown?.[0].action).toBe('extract');
+      expect(testCases[0].lifecycle?.teardown?.[0].scope).toBe('assert');
+      expect(testCases[0].lifecycle?.teardown?.[0].vars).toEqual({ userId: '$.data.id' });
     });
   });
 });

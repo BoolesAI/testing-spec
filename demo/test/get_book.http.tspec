@@ -30,7 +30,8 @@ http:
     Accept: "application/json"
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
     expected: 200
   - type: "json_path"
     expression: "$.id"
@@ -55,6 +56,10 @@ assertions:
   - type: "response_time"
     max_ms: 1000
 
-extract:
-  book_title: "$.title"
-  book_author: "$.author"
+lifecycle:
+  teardown:
+    - action: "extract"
+      scope: "assert"
+      vars:
+        book_title: "$.title"
+        book_author: "$.author"

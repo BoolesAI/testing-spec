@@ -35,7 +35,8 @@ http:
       inventoryQuantity: -5
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
     expected: 400
   - type: "json_path"
     expression: "$.error"

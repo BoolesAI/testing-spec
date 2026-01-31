@@ -30,7 +30,8 @@ http:
     Accept: "application/json"
 
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
     expected: 404
   - type: "json_path"
     expression: "$.error"

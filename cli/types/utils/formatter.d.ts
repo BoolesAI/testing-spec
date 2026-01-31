@@ -22,6 +22,7 @@ export interface FormattedTestResult {
     testCaseId: string;
     passed: boolean;
     duration: number;
+    extracted?: Record<string, unknown>;
     assertions: Array<{
         passed: boolean;
         type: string;

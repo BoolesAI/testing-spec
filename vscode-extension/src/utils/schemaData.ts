@@ -16,19 +16,17 @@ export const TOP_LEVEL_FIELDS: SchemaField[] = [
   { key: 'variables', required: false, type: 'object', description: 'Variable definitions' },
   { key: 'data', required: false, type: 'object', description: 'Data-driven testing configuration' },
   { key: 'extends', required: false, type: 'string', description: 'Template file to extend' },
-  { key: 'lifecycle', required: false, type: 'object', description: 'Setup and teardown hooks' },
+  { key: 'lifecycle', required: false, type: 'object', description: 'Setup and teardown hooks with scope control' },
   { key: 'http', required: false, type: 'object', description: 'HTTP request configuration' },
   { key: 'grpc', required: false, type: 'object', description: 'gRPC request configuration' },
   { key: 'graphql', required: false, type: 'object', description: 'GraphQL request configuration' },
   { key: 'websocket', required: false, type: 'object', description: 'WebSocket request configuration' },
   { key: 'assertions', required: true, type: 'array', description: 'Test assertions' },
-  { key: 'extract', required: false, type: 'object', description: 'Response data extraction' },
-  { key: 'output', required: false, type: 'object', description: 'Output configuration' },
 ];
 
 export const METADATA_FIELDS: SchemaField[] = [
   { key: 'prompt', required: true, type: 'string', description: 'Natural language test description for AI' },
-  { key: 'related_code', required: true, type: 'array', description: 'Paths to related source files' },
+  { key: 'related_code', required: true, type: 'array', description: 'Paths to related source files. Supports line references: "path/file.js[1,5-10,20]"' },
   { key: 'test_category', required: true, type: 'enum', description: 'Test category', values: ['functional', 'integration', 'performance', 'security'] },
   { key: 'risk_level', required: true, type: 'enum', description: 'Risk level', values: ['low', 'medium', 'high', 'critical'] },
   { key: 'tags', required: true, type: 'array', description: 'Tags for filtering and grouping' },
@@ -70,16 +68,14 @@ export const ENVIRONMENT_FIELDS: SchemaField[] = [
 ];
 
 export const ASSERTION_FIELDS: SchemaField[] = [
-  { key: 'type', required: true, type: 'enum', description: 'Assertion type', values: ['status_code', 'grpc_code', 'response_time', 'json_path', 'header', 'proto_field', 'javascript', 'include'] },
+  { key: 'type', required: true, type: 'enum', description: 'Assertion type', values: ['json_path', 'string', 'number', 'regex', 'xml_path', 'response_time', 'javascript', 'include', 'file_exist', 'file_read', 'exception'] },
   { key: 'expected', required: false, type: 'any', description: 'Expected value' },
-  { key: 'expression', required: false, type: 'string', description: 'JSONPath expression' },
-  { key: 'operator', required: false, type: 'enum', description: 'Comparison operator', values: ['equals', 'eq', 'not_equals', 'neq', 'exists', 'not_exists', 'not_empty', 'contains', 'not_contains', 'matches', 'gt', 'gte', 'lt', 'lte', 'type', 'length'] },
-  { key: 'path', required: false, type: 'string', description: 'Field path' },
-  { key: 'name', required: false, type: 'string', description: 'Header name' },
-  { key: 'value', required: false, type: 'any', description: 'Header value' },
+  { key: 'expression', required: false, type: 'string', description: 'JSONPath, XPath, or file path expression' },
+  { key: 'operator', required: false, type: 'enum', description: 'Comparison operator', values: ['equals', 'eq', 'not_equals', 'neq', 'exists', 'not_exists', 'empty', 'not_empty', 'contains', 'not_contains', 'matches', 'gt', 'gte', 'lt', 'lte', 'type', 'length', 'length_gt', 'length_gte', 'length_lt', 'length_lte'] },
   { key: 'pattern', required: false, type: 'string', description: 'Regex pattern' },
+  { key: 'extract_group', required: false, type: 'number', description: 'Regex capture group index (default: 0)' },
   { key: 'max_ms', required: false, type: 'number', description: 'Maximum response time in ms' },
-  { key: 'source', required: false, type: 'string', description: 'JavaScript source code' },
+  { key: 'source', required: false, type: 'string', description: 'JavaScript source code (for javascript type)' },
   { key: 'message', required: false, type: 'string', description: 'Custom failure message' },
   { key: 'include', required: false, type: 'string', description: 'Path to assertion library' },
 ];
@@ -92,11 +88,19 @@ export const DATA_FIELDS: SchemaField[] = [
 ];
 
 export const LIFECYCLE_FIELDS: SchemaField[] = [
-  { key: 'setup', required: false, type: 'array', description: 'Pre-test actions' },
-  { key: 'teardown', required: false, type: 'array', description: 'Post-test actions' },
+  { key: 'setup', required: false, type: 'array', description: 'Pre-test actions with scope control' },
+  { key: 'teardown', required: false, type: 'array', description: 'Post-test actions with scope control' },
 ];
 
-export const OUTPUT_FIELDS: SchemaField[] = [
+export const LIFECYCLE_ACTION_FIELDS: SchemaField[] = [
+  { key: 'action', required: true, type: 'enum', description: 'Action type', values: ['script', 'extract', 'output'] },
+  { key: 'scope', required: true, type: 'enum', description: 'Execution scope', values: ['test', 'assert', 'run', 'data'] },
+  { key: 'source', required: false, type: 'string', description: 'Script source code (for script action)' },
+  { key: 'vars', required: false, type: 'object', description: 'Variables to extract (for extract action)' },
+  { key: 'config', required: false, type: 'object', description: 'Output configuration (for output action)' },
+];
+
+export const OUTPUT_CONFIG_FIELDS: SchemaField[] = [
   { key: 'save_response_on_failure', required: false, type: 'boolean', description: 'Save response on test failure' },
   { key: 'metrics', required: false, type: 'array', description: 'Metrics to report' },
   { key: 'notifications', required: false, type: 'array', description: 'Notification configuration' },

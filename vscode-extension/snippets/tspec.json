@@ -9,7 +9,7 @@
       "  prompt: |",
       "    ${2:Describe what this test verifies}",
       "  related_code:",
-      "    - \"${3:src/path/to/code.js}\"",
+      "    - \"${3:src/path/to/code.js[1-10]}\"",
       "  test_category: \"${4|functional,integration,performance,security|}\"",
       "  risk_level: \"${5|low,medium,high,critical|}\"",
       "  tags: [\"${6:tag1}\", \"${7:tag2}\"]",
@@ -26,10 +26,12 @@
       "      ${12:key}: \"${13:value}\"",
       "",
       "assertions:",
-      "  - type: \"status_code\"",
+      "  - type: \"json_path\"",
+      "    expression: \"\\$.status\"",
+      "    operator: \"equals\"",
       "    expected: ${14:200}",
       "  - type: \"json_path\"",
-      "    expression: \"${15:\\$.data}\"",
+      "    expression: \"${15:\\$.body.data}\"",
       "    operator: \"${16|exists,equals,contains,matches|}\"",
       "$0"
     ],
@@ -45,7 +47,7 @@
       "  prompt: |",
       "    ${2:Describe what this test verifies}",
       "  related_code:",
-      "    - \"${3:src/path/to/code.js}\"",
+      "    - \"${3:src/path/to/code.js[1-10]}\"",
       "  test_category: \"${4|functional,integration,performance,security|}\"",
       "  risk_level: \"${5|low,medium,high,critical|}\"",
       "  tags: [\"${6:grpc}\"]",
@@ -59,7 +61,9 @@
       "    ${11:field}: \"${12:value}\"",
       "",
       "assertions:",
-      "  - type: \"grpc_code\"",
+      "  - type: \"json_path\"",
+      "    expression: \"\\$.grpcCode\"",
+      "    operator: \"equals\"",
       "    expected: \"${13:OK}\"",
       "$0"
     ],
@@ -75,7 +79,7 @@
       "  prompt: |",
       "    ${2:Describe what this test verifies}",
       "  related_code:",
-      "    - \"${3:src/path/to/code.js}\"",
+      "    - \"${3:src/path/to/code.js[1-10]}\"",
       "  test_category: \"${4|functional,integration,performance,security|}\"",
       "  risk_level: \"${5|low,medium,high,critical|}\"",
       "  tags: [\"${6:graphql}\"]",
@@ -94,10 +98,12 @@
       "    ${10:id}: \"${11:value}\"",
       "",
       "assertions:",
-      "  - type: \"status_code\"",
+      "  - type: \"json_path\"",
+      "    expression: \"\\$.status\"",
+      "    operator: \"equals\"",
       "    expected: 200",
       "  - type: \"json_path\"",
-      "    expression: \"\\$.data\"",
+      "    expression: \"\\$.body.data\"",
       "    operator: \"exists\"",
       "$0"
     ],
@@ -113,7 +119,7 @@
       "  prompt: |",
       "    ${2:Describe what this test verifies}",
       "  related_code:",
-      "    - \"${3:src/path/to/code.js}\"",
+      "    - \"${3:src/path/to/code.js[1-10]}\"",
       "  test_category: \"${4|functional,integration,performance,security|}\"",
       "  risk_level: \"${5|low,medium,high,critical|}\"",
       "  tags: [\"${6:websocket}\"]",
@@ -126,7 +132,9 @@
       "    - ${10:message}",
       "",
       "assertions:",
-      "  - type: \"status_code\"",
+      "  - type: \"json_path\"",
+      "    expression: \"\\$.status\"",
+      "    operator: \"equals\"",
       "    expected: 101",
       "$0"
     ],
@@ -171,10 +179,12 @@
     "prefix": "sec-assertions",
     "body": [
       "assertions:",
-      "  - type: \"status_code\"",
+      "  - type: \"json_path\"",
+      "    expression: \"\\$.status\"",
+      "    operator: \"equals\"",
       "    expected: ${1:200}",
       "  - type: \"json_path\"",
-      "    expression: \"${2:\\$.data}\"",
+      "    expression: \"${2:\\$.body.data}\"",
       "    operator: \"${3|exists,equals,contains,matches|}\"$0"
     ],
     "description": "Insert assertions block"
@@ -205,40 +215,66 @@
     ],
     "description": "Insert HTTP request with Bearer token"
   },
-  "Extract Block": {
-    "prefix": "sec-extract",
-    "body": [
-      "extract:",
-      "  ${1:variable_name}: \"${2:\\$.data.field}\"$0"
-    ],
-    "description": "Insert extract block for response data"
-  },
   "Lifecycle Block": {
     "prefix": "sec-lifecycle",
     "body": [
       "lifecycle:",
       "  setup:",
-      "    - action: \"${1:db.reset_table}\"",
-      "      params:",
-      "        ${2:table}: \"${3:users}\"",
+      "    - action: \"${1|script,extract,output|}\"",
+      "      scope: \"${2|test,assert,run,data|}\"",
+      "      ${3:source}: |",
+      "        ${4:return {};}",
       "  teardown:",
-      "    - action: \"${4:cache.clear}\"$0"
+      "    - action: \"${5|script,extract,output|}\"",
+      "      scope: \"${6|test,assert,run,data|}\"$0"
     ],
-    "description": "Insert lifecycle hooks block"
+    "description": "Insert lifecycle hooks block with scope control"
+  },
+  "Lifecycle Script Action": {
+    "prefix": "lifecycle-script",
+    "body": [
+      "- action: \"script\"",
+      "  scope: \"${1|test,assert,run,data|}\"",
+      "  source: |",
+      "    ${2:return {};}$0"
+    ],
+    "description": "Insert script action in lifecycle"
+  },
+  "Lifecycle Extract Action": {
+    "prefix": "lifecycle-extract",
+    "body": [
+      "- action: \"extract\"",
+      "  scope: \"${1|assert,test|}\"",
+      "  vars:",
+      "    ${2:variable_name}: \"${3:\\$.data.field}\"$0"
+    ],
+    "description": "Insert extract action in lifecycle"
+  },
+  "Lifecycle Output Action": {
+    "prefix": "lifecycle-output",
+    "body": [
+      "- action: \"output\"",
+      "  scope: \"test\"",
+      "  config:",
+      "    save_response_on_failure: ${1:true}$0"
+    ],
+    "description": "Insert output action in lifecycle"
   },
   "Status Code Assertion": {
     "prefix": "assert-status",
     "body": [
-      "- type: \"status_code\"",
+      "- type: \"json_path\"",
+      "  expression: \"\\$.status\"",
+      "  operator: \"equals\"",
       "  expected: ${1:200}$0"
     ],
-    "description": "Insert status code assertion"
+    "description": "Insert status code assertion (unified approach)"
   },
   "JSON Path Assertion": {
     "prefix": "assert-jsonpath",
     "body": [
       "- type: \"json_path\"",
-      "  expression: \"${1:\\$.data}\"",
+      "  expression: \"${1:\\$.body.data}\"",
       "  operator: \"${2|exists,equals,contains,matches,not_empty|}\"",
       "  ${3:expected: \"${4:value}\"}$0"
     ],
@@ -248,7 +284,7 @@
     "prefix": "assert-jsonpath-equals",
     "body": [
       "- type: \"json_path\"",
-      "  expression: \"${1:\\$.data.field}\"",
+      "  expression: \"${1:\\$.body.data.field}\"",
       "  operator: \"equals\"",
       "  expected: ${2:value}$0"
     ],
@@ -258,7 +294,7 @@
     "prefix": "assert-jsonpath-matches",
     "body": [
       "- type: \"json_path\"",
-      "  expression: \"${1:\\$.data.field}\"",
+      "  expression: \"${1:\\$.body.data.field}\"",
       "  operator: \"matches\"",
       "  pattern: \"${2:^[A-Za-z0-9]+$}\"$0"
     ],
@@ -267,12 +303,12 @@
   "Header Assertion": {
     "prefix": "assert-header",
     "body": [
-      "- type: \"header\"",
-      "  name: \"${1:Content-Type}\"",
+      "- type: \"json_path\"",
+      "  expression: \"\\$.header['${1:Content-Type}']\"",
       "  operator: \"${2|equals,contains|}\"",
-      "  value: \"${3:application/json}\"$0"
+      "  expected: \"${3:application/json}\"$0"
     ],
-    "description": "Insert header assertion"
+    "description": "Insert header assertion (unified approach)"
   },
   "Response Time Assertion": {
     "prefix": "assert-response-time",
@@ -290,6 +326,95 @@
       "    ${1:return response.body.data !== null;}$0"
     ],
     "description": "Insert custom JavaScript assertion"
+  },
+  "String Assertion": {
+    "prefix": "assert-string",
+    "body": [
+      "- type: \"string\"",
+      "  expression: \"${1:\\$.body.data.field}\"",
+      "  operator: \"${2|equals,contains,matches|}\"",
+      "  expected: \"${3:value}\"$0"
+    ],
+    "description": "Insert string type assertion (coerces value to string)"
+  },
+  "Number Assertion": {
+    "prefix": "assert-number",
+    "body": [
+      "- type: \"number\"",
+      "  expression: \"${1:\\$.body.data.count}\"",
+      "  operator: \"${2|equals,gt,gte,lt,lte|}\"",
+      "  expected: ${3:0}$0"
+    ],
+    "description": "Insert number type assertion (coerces value to number)"
+  },
+  "Regex Assertion": {
+    "prefix": "assert-regex",
+    "body": [
+      "- type: \"regex\"",
+      "  expression: \"${1:\\$.body.data.url}\"",
+      "  pattern: \"${2:/users/([a-f0-9-]+)}\"",
+      "  extract_group: ${3:1}",
+      "  operator: \"${4|exists,equals|}\"$0"
+    ],
+    "description": "Insert regex assertion with capture group"
+  },
+  "XML Path Assertion": {
+    "prefix": "assert-xml",
+    "body": [
+      "- type: \"xml_path\"",
+      "  expression: \"${1://root/element}\"",
+      "  operator: \"${2|exists,equals,contains|}\"",
+      "  expected: \"${3:value}\"$0"
+    ],
+    "description": "Insert XPath assertion for XML responses"
+  },
+  "File Exist Assertion": {
+    "prefix": "assert-file-exist",
+    "body": [
+      "- type: \"file_exist\"",
+      "  expression: \"${1:./output/report.html}\"",
+      "  message: \"${2:File should exist}\"$0"
+    ],
+    "description": "Insert file exist assertion"
+  },
+  "File Read Assertion": {
+    "prefix": "assert-file-read",
+    "body": [
+      "- type: \"file_read\"",
+      "  expression: \"${1:./output/result.json}\"",
+      "  operator: \"${2|not_empty,contains,equals,matches|}\"",
+      "  ${3:expected}: \"${4:value}\"$0"
+    ],
+    "description": "Insert file read assertion"
+  },
+  "Exception Assertion": {
+    "prefix": "assert-exception",
+    "body": [
+      "- type: \"exception\"",
+      "  expression: \"${1|$,$.message,$.code,$.type|}\"",
+      "  operator: \"${2|empty,exists,equals,contains|}\"",
+      "  ${3:expected}: ${4:value}$0"
+    ],
+    "description": "Insert exception assertion"
+  },
+  "No Exception Assertion": {
+    "prefix": "assert-no-exception",
+    "body": [
+      "- type: \"exception\"",
+      "  expression: \"$\"",
+      "  operator: \"empty\"$0"
+    ],
+    "description": "Insert assertion that no exception occurred"
+  },
+  "gRPC Code Assertion": {
+    "prefix": "assert-grpc",
+    "body": [
+      "- type: \"json_path\"",
+      "  expression: \"\\$.grpcCode\"",
+      "  operator: \"equals\"",
+      "  expected: \"${1:OK}\"$0"
+    ],
+    "description": "Insert gRPC code assertion (unified approach)"
   },
   "Variable - Environment": {
     "prefix": "var-env",

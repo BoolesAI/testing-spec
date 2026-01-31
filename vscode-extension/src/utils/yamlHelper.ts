@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 export interface YamlContext {
-  type: 'top-level' | 'metadata' | 'http' | 'grpc' | 'graphql' | 'websocket' | 'environment' | 'assertions' | 'assertion-item' | 'data' | 'lifecycle' | 'output' | 'extract' | 'variables' | 'body' | 'unknown';
+  type: 'top-level' | 'metadata' | 'http' | 'grpc' | 'graphql' | 'websocket' | 'environment' | 'assertions' | 'assertion-item' | 'data' | 'lifecycle' | 'lifecycle-action' | 'variables' | 'body' | 'unknown';
   keyPath: string[];
   isValuePosition: boolean;
   currentKey?: string;
@@ -115,9 +115,12 @@ export class YamlHelper {
       case 'environment': return 'environment';
       case 'assertions': return keyPath.length > 1 ? 'assertion-item' : 'assertions';
       case 'data': return 'data';
-      case 'lifecycle': return 'lifecycle';
-      case 'output': return 'output';
-      case 'extract': return 'extract';
+      case 'lifecycle': 
+        // If inside setup/teardown array, return lifecycle-action context
+        if (keyPath.includes('setup') || keyPath.includes('teardown')) {
+          return 'lifecycle-action';
+        }
+        return 'lifecycle';
       case 'variables': return 'variables';
       default: return 'unknown';
     }

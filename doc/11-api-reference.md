@@ -85,7 +85,9 @@ http:
   method: "GET"
   path: "/api/health"
 assertions:
-  - type: "status_code"
+  - type: "json_path"
+    expression: "$.status"
+    operator: "equals"
     expected: 200
 `;
 

@@ -57,6 +57,7 @@ export interface FormattedTestResult {
   testCaseId: string;
   passed: boolean;
   duration: number;
+  extracted?: Record<string, unknown>;
   assertions: Array<{
     passed: boolean;
     type: string;
@@ -81,6 +82,13 @@ export function formatTestResult(result: FormattedTestResult, verbose = false): 
       });
     if (assertionLines.length > 0) {
       output += '\n' + assertionLines.join('\n');
+    }
+  }
+
+  if (verbose && result.extracted && Object.keys(result.extracted).length > 0) {
+    output += '\n' + chalk.gray('  Extracted:');
+    for (const [key, value] of Object.entries(result.extracted)) {
+      output += `\n    ${key}: ${JSON.stringify(value)}`;
     }
   }
 
@@ -147,7 +155,17 @@ export function formatParsedTestCase(testCase: unknown, options: FormatOptions =
   
   lines.push(chalk.bold(`Test Case: ${tc.id || 'unknown'}`));
   if (tc.description) lines.push(`  Description: ${tc.description}`);
-  if (tc.type) lines.push(`  Protocol: ${tc.type}`);
+  if (tc.protocol) lines.push(`  Protocol: ${tc.protocol}`);
+  
+  if (tc.lifecycle) {
+    const lifecycle = tc.lifecycle as { setup?: unknown[]; teardown?: unknown[] };
+    if (lifecycle.setup?.length) {
+      lines.push(`  Lifecycle Setup: ${lifecycle.setup.length} action(s)`);
+    }
+    if (lifecycle.teardown?.length) {
+      lines.push(`  Lifecycle Teardown: ${lifecycle.teardown.length} action(s)`);
+    }
+  }
   
   return lines.join('\n');
 }

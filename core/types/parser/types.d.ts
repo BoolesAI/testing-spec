@@ -1,3 +1,31 @@
+/**
+ * Represents a line range in a source file.
+ * For single lines, start equals end.
+ */
+export interface LineRange {
+    start: number;
+    end: number;
+}
+/**
+ * Represents a parsed related_code reference with optional line ranges.
+ *
+ * @example
+ * // Plain path
+ * { filePath: "src/auth/login.js", rawValue: "src/auth/login.js" }
+ *
+ * @example
+ * // With line references
+ * {
+ *   filePath: "src/auth/login.js",
+ *   lineRanges: [{ start: 1, end: 10 }, { start: 20, end: 20 }],
+ *   rawValue: "src/auth/login.js[1-10,20]"
+ * }
+ */
+export interface RelatedCodeReference {
+    filePath: string;
+    lineRanges?: LineRange[];
+    rawValue: string;
+}
 export interface TSpec {
     version: string;
     description: string;
@@ -11,8 +39,6 @@ export interface TSpec {
     variables?: Record<string, unknown>;
     environment?: EnvironmentConfig;
     data?: DataConfig;
-    extract?: Record<string, string>;
-    output?: OutputConfig;
     lifecycle?: LifecycleConfig;
 }
 export interface TSpecMetadata {
@@ -34,6 +60,7 @@ export interface Assertion {
     name?: string;
     value?: unknown;
     pattern?: string;
+    extract_group?: number;
     max_ms?: number;
     source?: string;
     message?: string;
@@ -73,12 +100,26 @@ export interface DataConfig {
     variables?: Record<string, unknown>;
 }
 export interface OutputConfig {
-    format?: string;
-    path?: string;
+    save_response_on_failure?: boolean;
+    metrics?: string[];
+    notifications?: Array<{
+        type: string;
+        channel?: string;
+        condition?: 'failure' | 'success' | 'always';
+    }>;
+}
+export type LifecycleActionType = 'script' | 'extract' | 'output';
+export type LifecycleScope = 'test' | 'assert' | 'run' | 'data';
+export interface LifecycleAction {
+    action: LifecycleActionType;
+    scope: LifecycleScope;
+    source?: string;
+    vars?: Record<string, string>;
+    config?: OutputConfig;
 }
 export interface LifecycleConfig {
-    before?: string[];
-    after?: string[];
+    setup?: LifecycleAction[];
+    teardown?: LifecycleAction[];
 }
 export interface ValidationResult {
     valid: boolean;

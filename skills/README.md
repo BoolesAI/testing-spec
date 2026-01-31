@@ -1,6 +1,6 @@
 # TSpec Skills
 
-This directory contains TSpec skills that provide specialized capabilities for working with `.tspec` test files. Each skill corresponds to an MCP tool and CLI command.
+This directory contains TSpec skills that provide specialized capabilities for working with `.tspec` test files. Skills may correspond to MCP tools and CLI commands, or provide workflow guidance for test generation and analysis.
 
 ## Available Skills
 
@@ -10,6 +10,8 @@ This directory contains TSpec skills that provide specialized capabilities for w
 | [tspec-parse](./tspec-parse/SKILL.md) | Parse and display test case information without execution | `tspec_parse` |
 | [tspec-validate](./tspec-validate/SKILL.md) | Validate .tspec files for schema correctness | `tspec_validate` |
 | [tspec-run](./tspec-run/SKILL.md) | Execute TSpec test cases and report results | `tspec_run` |
+| [tspec-gen](./tspec-gen/SKILL.md) | Generate TSpec test cases from code changes | - |
+| [tspec-coverage](./tspec-coverage/SKILL.md) | Analyze test coverage from related_code metadata | - |
 
 ## Skill Overview
 
@@ -33,20 +35,43 @@ Parse and display TSpec test case information without executing any requests. Us
 Validate `.tspec` files for schema correctness without executing tests. Use this skill to:
 - Check YAML syntax and structure
 - Validate required fields and protocol blocks
+- Verify assertion types and operators
 - Pre-commit hook validation
 - CI/CD linting stages
+
+**Supported Assertion Types:**
+- `json_path`, `string`, `number`, `regex`, `xml_path`, `response_time`, `javascript`, `file_exist`, `file_read`, `exception`
 
 ### tspec-run
 
 Execute TSpec test cases against API endpoints and report results. Use this skill to:
 - Run HTTP and gRPC tests
-- Validate responses against assertions
-- Generate pass/fail reports
+- Validate responses against assertions using the unified response structure
+- Generate pass/fail reports with detailed assertion feedback
 - CI/CD test automation
+
+### tspec-gen
+
+Generate TSpec test cases from source code changes. Use this skill to:
+- Create tests from git diff changes
+- Generate tests from explicit file paths
+- Build comprehensive test suites for new endpoints
+- Include proper `related_code` metadata for coverage tracking
+
+### tspec-coverage
+
+Analyze TSpec test coverage based on `metadata.related_code`. Use this skill to:
+- Generate coverage reports showing tested vs untested files
+- Identify coverage gaps at file and line level
+- Track coverage trends over time
+- Prioritize test creation efforts
 
 ## Typical Workflow
 
 ```
+tspec-gen        # Generate tests from code changes
+       |
+       v
 tspec list       # Check available protocols
        |
        v
@@ -57,6 +82,9 @@ tspec parse      # Inspect test structure (optional)
        |
        v
 tspec run        # Execute tests
+       |
+       v
+tspec-coverage   # Analyze coverage (optional)
 ```
 
 ## Directory Structure
@@ -76,7 +104,15 @@ skills/
 │   ├── SKILL.md
 │   └── references/
 │       └── examples.md
-└── tspec-run/
+├── tspec-run/
+│   ├── SKILL.md
+│   └── references/
+│       └── examples.md
+├── tspec-gen/
+│   ├── SKILL.md
+│   └── references/
+│       └── examples.md
+└── tspec-coverage/
     ├── SKILL.md
     └── references/
         └── examples.md

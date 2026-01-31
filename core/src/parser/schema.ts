@@ -1,4 +1,5 @@
 import type { TSpec, ValidationResult, ProtocolType } from './types.js';
+import { validateRelatedCodeFormat } from './related-code.js';
 
 const VALID_CATEGORIES = ['functional', 'integration', 'performance', 'security'] as const;
 const VALID_RISK_LEVELS = ['low', 'medium', 'high', 'critical'] as const;
@@ -41,8 +42,22 @@ export function validateTspec(spec: TSpec, options: SchemaValidationOptions = {}
       errors.push(`Invalid priority: ${spec.metadata.priority}. Must be one of: ${VALID_PRIORITIES.join(', ')}`);
     }
 
-    if (spec.metadata.related_code && !Array.isArray(spec.metadata.related_code)) {
-      errors.push('metadata.related_code must be an array');
+    if (spec.metadata.related_code) {
+      if (!Array.isArray(spec.metadata.related_code)) {
+        errors.push('metadata.related_code must be an array');
+      } else {
+        // Validate each entry format
+        spec.metadata.related_code.forEach((entry, index) => {
+          if (typeof entry !== 'string') {
+            errors.push(`metadata.related_code[${index}] must be a string`);
+          } else {
+            const result = validateRelatedCodeFormat(entry);
+            if (!result.valid) {
+              errors.push(`metadata.related_code[${index}]: ${result.error}`);
+            }
+          }
+        });
+      }
     }
 
     if (spec.metadata.tags && !Array.isArray(spec.metadata.tags)) {

@@ -151,10 +151,10 @@ Fix: Use a valid HTTP method.
 ### Invalid Assertion Type
 
 ```
-Error: Unknown assertion type 'contains'. Use 'json' with 'contains' operator instead.
+Error: Unknown assertion type 'body'. Use 'json_path' with expression "$.body.*" instead.
 ```
 
-Fix: Use proper assertion syntax with valid types.
+Fix: Use proper assertion syntax with valid types (`json_path`, `string`, `number`, `regex`, `xml_path`, `response_time`, `javascript`, `file_exist`, `file_read`, `exception`).
 
 ### Missing Protocol Block
 

@@ -1,12 +1,36 @@
 export interface Response {
+  // Legacy fields (keep for backward compat)
+  /** @deprecated Use _envelope.status instead */
   statusCode?: number;
+  /** @deprecated Use _envelope.status instead */
   status?: number;
-  grpcCode?: number;
+  /** @deprecated Use _envelope.grpcCode instead */
+  grpcCode?: number | string;
+  /** @deprecated Use _envelope.grpcCode instead */
   code?: number;
   body: unknown;
+  /** @deprecated Use _envelope.header instead */
   headers?: Record<string, string>;
+  /** @deprecated Use _envelope.responseTime instead */
   responseTime?: number;
+  /** @deprecated Use _envelope.responseTime instead */
   duration?: number;
+  
+  // Unified envelope for json_path access
+  _envelope?: {
+    status: number;
+    grpcCode?: string;
+    header: Record<string, string>;
+    body: unknown;
+    responseTime: number;
+  };
+}
+
+export interface ExceptionInfo {
+  source: 'protocol' | 'assertion';
+  code?: number | string;
+  message: string;
+  type?: string;
 }
 
 export interface AssertionResult {
@@ -19,6 +43,9 @@ export interface AssertionResult {
   operator?: string;
   path?: string;
   name?: string;
+  // Deprecation info for legacy assertion types
+  deprecated?: boolean;
+  migrationHint?: string;
 }
 
 export interface AssertionSummary {
@@ -32,7 +59,7 @@ export type ComparisonOperator =
   | 'equals' | 'eq'
   | 'not_equals' | 'neq'
   | 'exists' | 'not_exists'
-  | 'not_empty'
+  | 'empty' | 'not_empty'
   | 'contains' | 'not_contains'
   | 'matches'
   | 'gt' | 'gte' | 'lt' | 'lte'

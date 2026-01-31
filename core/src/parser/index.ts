@@ -4,7 +4,7 @@ import { validateTspec, validateDslFormat } from './schema.js';
 import { applyTemplateInheritance, deepMerge } from './template.js';
 import { replaceVariables, buildVariableContext, getBuiltinFunctions } from './variables.js';
 import { generateParameterizedCases, loadDataFile, parseCSV } from './data-driver.js';
-import type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, ValidationResult, EnvironmentConfig, DataConfig, OutputConfig, LifecycleConfig } from './types.js';
+import type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, ValidationResult, EnvironmentConfig, DataConfig, OutputConfig, LifecycleConfig, LifecycleAction, LifecycleScope, LifecycleActionType, LineRange, RelatedCodeReference } from './types.js';
 import type { VariableContext } from './variables.js';
 import type { DataFormat, DataRow, ParameterizedSpec } from './data-driver.js';
 
@@ -15,10 +15,9 @@ export interface TestCase {
   protocol: ProtocolType | null;
   request: HttpRequest | GrpcRequest | GraphqlRequest | WebsocketRequest | undefined;
   assertions: Assertion[];
-  extract?: Record<string, string>;
-  output?: TSpec['output'];
   lifecycle?: TSpec['lifecycle'];
   environment?: EnvironmentConfig;
+  variables?: Record<string, unknown>;
   _dataRow?: DataRow;
   _raw: TSpec;
 }
@@ -92,10 +91,9 @@ export function parseTestCases(filePath: string, options: GenerateOptions = {}):
       protocol,
       request,
       assertions: processedSpec.assertions,
-      extract: processedSpec.extract,
-      output: processedSpec.output,
       lifecycle: processedSpec.lifecycle,
       environment: processedSpec.environment,
+      variables: processedSpec.variables,
       _dataRow: caseSpec._dataRow,
       _raw: processedSpec
     };
@@ -140,10 +138,9 @@ export function parseTestCasesFromString(content: string, options: GenerateFromS
       protocol,
       request,
       assertions: processedSpec.assertions,
-      extract: processedSpec.extract,
-      output: processedSpec.output,
       lifecycle: processedSpec.lifecycle,
       environment: processedSpec.environment,
+      variables: processedSpec.variables,
       _dataRow: caseSpec._dataRow,
       _raw: processedSpec
     };
@@ -182,11 +179,12 @@ export function getTypeFromFilePath(filePath: string): string | null {
 // Re-exports
 export { parseYamlFile, parseYamlString, getProtocolType, getBaseDir } from './yaml-parser.js';
 export { validateTspec, validateDslFormat } from './schema.js';
+export { parseRelatedCodeReference, validateRelatedCodeFormat, formatRelatedCodeReference, RELATED_CODE_PATTERN } from './related-code.js';
 export { deepMerge, applyTemplateInheritance, clearTemplateCache } from './template.js';
 export { replaceVariables, buildVariableContext, getBuiltinFunctions } from './variables.js';
 export { generateParameterizedCases, loadDataFile, parseCSV } from './data-driver.js';
 
 // Type exports
-export type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, ValidationResult, EnvironmentConfig, DataConfig, OutputConfig, LifecycleConfig } from './types.js';
+export type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, ValidationResult, EnvironmentConfig, DataConfig, OutputConfig, LifecycleConfig, LifecycleAction, LifecycleScope, LifecycleActionType, LineRange, RelatedCodeReference } from './types.js';
 export type { VariableContext } from './variables.js';
 export type { DataFormat, DataRow, ParameterizedSpec } from './data-driver.js';

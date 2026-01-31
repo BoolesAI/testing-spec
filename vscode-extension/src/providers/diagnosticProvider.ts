@@ -8,9 +8,66 @@ const VALID_RISK_LEVELS = ['low', 'medium', 'high', 'critical'];
 const VALID_PRIORITIES = ['low', 'medium', 'high'];
 const PROTOCOL_BLOCKS = ['http', 'grpc', 'graphql', 'websocket'];
 const VALID_HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
-const VALID_ASSERTION_TYPES = ['status_code', 'grpc_code', 'response_time', 'json_path', 'header', 'proto_field', 'javascript', 'include'];
+const VALID_ASSERTION_TYPES = ['json_path', 'string', 'number', 'regex', 'xml_path', 'response_time', 'javascript', 'include', 'file_exist', 'file_read', 'exception'];
+const VALID_LIFECYCLE_ACTIONS = ['script', 'extract', 'output'];
+const VALID_LIFECYCLE_SCOPES = ['test', 'assert', 'run', 'data'];
 const VALID_OPERATORS = ['equals', 'eq', 'not_equals', 'neq', 'exists', 'not_exists', 'not_empty', 'contains', 'not_contains', 'matches', 'gt', 'gte', 'lt', 'lte', 'type', 'length', 'length_gt', 'length_gte', 'length_lt', 'length_lte'];
 const VALID_DATA_FORMATS = ['csv', 'json', 'yaml', 'yml'];
+
+// Related code format validation
+const RELATED_CODE_PATTERN = /^([^\[\]]+)(?:\[([0-9]+(?:-[0-9]+)?(?:,[0-9]+(?:-[0-9]+)?)*)\])?$/;
+const LINE_SPEC_PATTERN = /^([0-9]+)(?:-([0-9]+))?$/;
+
+function validateRelatedCodeFormat(input: string): { valid: boolean; error?: string } {
+  if (typeof input !== 'string') {
+    return { valid: false, error: 'related_code entry must be a string' };
+  }
+
+  if (!input.trim()) {
+    return { valid: false, error: 'related_code entry cannot be empty' };
+  }
+
+  const match = input.match(RELATED_CODE_PATTERN);
+  if (!match) {
+    return { valid: false, error: `Invalid related_code format: "${input}". Expected "path" or "path[line_specs]"` };
+  }
+
+  const filePath = match[1].trim();
+  const lineSpecsStr = match[2];
+
+  if (!filePath) {
+    return { valid: false, error: 'File path cannot be empty' };
+  }
+
+  if (!lineSpecsStr) {
+    return { valid: true };
+  }
+
+  const lineSpecs = lineSpecsStr.split(',');
+  for (const spec of lineSpecs) {
+    const specMatch = spec.match(LINE_SPEC_PATTERN);
+    if (!specMatch) {
+      return { valid: false, error: `Invalid line reference format: "${spec}"` };
+    }
+
+    const start = parseInt(specMatch[1], 10);
+    const end = specMatch[2] ? parseInt(specMatch[2], 10) : start;
+
+    if (start < 1) {
+      return { valid: false, error: `Line number must be >= 1, got "${start}"` };
+    }
+
+    if (end < 1) {
+      return { valid: false, error: `Line number must be >= 1, got "${end}"` };
+    }
+
+    if (end < start) {
+      return { valid: false, error: `Range end must be >= start in "${spec}"` };
+    }
+  }
+
+  return { valid: true };
+}
 
 interface TSpecDocument {
   version?: string;
@@ -205,8 +262,20 @@ export class TSpecDiagnosticProvider {
     }
 
     // Validate array types
-    if (metadata.related_code && !Array.isArray(metadata.related_code)) {
-      this.addDiagnostic(document, 'related_code', 'related_code must be an array', vscode.DiagnosticSeverity.Error, diagnostics);
+    if (metadata.related_code) {
+      if (!Array.isArray(metadata.related_code)) {
+        this.addDiagnostic(document, 'related_code', 'related_code must be an array', vscode.DiagnosticSeverity.Error, diagnostics);
+      } else {
+        // Validate each entry format
+        metadata.related_code.forEach((entry, index) => {
+          if (typeof entry === 'string') {
+            const result = validateRelatedCodeFormat(entry);
+            if (!result.valid) {
+              this.addDiagnostic(document, 'related_code', `related_code[${index}]: ${result.error}`, vscode.DiagnosticSeverity.Error, diagnostics);
+            }
+          }
+        });
+      }
     }
 
     if (metadata.tags && !Array.isArray(metadata.tags)) {
