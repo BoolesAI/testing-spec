@@ -22,6 +22,12 @@ export interface Response {
         responseTime: number;
     };
 }
+export interface ExceptionInfo {
+    source: 'protocol' | 'assertion';
+    code?: number | string;
+    message: string;
+    type?: string;
+}
 export interface AssertionResult {
     passed: boolean;
     type: string;
@@ -41,4 +47,4 @@ export interface AssertionSummary {
     failed: number;
     passRate: number;
 }
-export type ComparisonOperator = 'equals' | 'eq' | 'not_equals' | 'neq' | 'exists' | 'not_exists' | 'not_empty' | 'contains' | 'not_contains' | 'matches' | 'gt' | 'gte' | 'lt' | 'lte' | 'type' | 'length' | 'length_gt' | 'length_gte' | 'length_lt' | 'length_lte';
+export type ComparisonOperator = 'equals' | 'eq' | 'not_equals' | 'neq' | 'exists' | 'not_exists' | 'empty' | 'not_empty' | 'contains' | 'not_contains' | 'matches' | 'gt' | 'gte' | 'lt' | 'lte' | 'type' | 'length' | 'length_gt' | 'length_gte' | 'length_lt' | 'length_lte';

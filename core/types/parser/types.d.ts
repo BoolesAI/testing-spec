@@ -39,8 +39,6 @@ export interface TSpec {
     variables?: Record<string, unknown>;
     environment?: EnvironmentConfig;
     data?: DataConfig;
-    extract?: Record<string, string>;
-    output?: OutputConfig;
     lifecycle?: LifecycleConfig;
 }
 export interface TSpecMetadata {
@@ -102,12 +100,26 @@ export interface DataConfig {
     variables?: Record<string, unknown>;
 }
 export interface OutputConfig {
-    format?: string;
-    path?: string;
+    save_response_on_failure?: boolean;
+    metrics?: string[];
+    notifications?: Array<{
+        type: string;
+        channel?: string;
+        condition?: 'failure' | 'success' | 'always';
+    }>;
+}
+export type LifecycleActionType = 'script' | 'extract' | 'output';
+export type LifecycleScope = 'test' | 'assert' | 'run' | 'data';
+export interface LifecycleAction {
+    action: LifecycleActionType;
+    scope: LifecycleScope;
+    source?: string;
+    vars?: Record<string, string>;
+    config?: OutputConfig;
 }
 export interface LifecycleConfig {
-    before?: string[];
-    after?: string[];
+    setup?: LifecycleAction[];
+    teardown?: LifecycleAction[];
 }
 export interface ValidationResult {
     valid: boolean;

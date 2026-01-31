@@ -7,10 +7,9 @@ export interface TestCase {
     protocol: ProtocolType | null;
     request: HttpRequest | GrpcRequest | GraphqlRequest | WebsocketRequest | undefined;
     assertions: Assertion[];
-    extract?: Record<string, string>;
-    output?: TSpec['output'];
     lifecycle?: TSpec['lifecycle'];
     environment?: EnvironmentConfig;
+    variables?: Record<string, unknown>;
     _dataRow?: DataRow;
     _raw: TSpec;
 }
@@ -33,6 +32,6 @@ export { parseRelatedCodeReference, validateRelatedCodeFormat, formatRelatedCode
 export { deepMerge, applyTemplateInheritance, clearTemplateCache } from './template.js';
 export { replaceVariables, buildVariableContext, getBuiltinFunctions } from './variables.js';
 export { generateParameterizedCases, loadDataFile, parseCSV } from './data-driver.js';
-export type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, ValidationResult, EnvironmentConfig, DataConfig, OutputConfig, LifecycleConfig, LineRange, RelatedCodeReference } from './types.js';
+export type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, ValidationResult, EnvironmentConfig, DataConfig, OutputConfig, LifecycleConfig, LifecycleAction, LifecycleScope, LifecycleActionType, LineRange, RelatedCodeReference } from './types.js';
 export type { VariableContext } from './variables.js';
 export type { DataFormat, DataRow, ParameterizedSpec } from './data-driver.js';

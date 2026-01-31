@@ -59,6 +59,7 @@ function formatResult(result: TestResult): FormattedTestResult {
     testCaseId: result.testCaseId,
     passed: result.passed,
     duration: result.duration,
+    extracted: Object.keys(result.extracted).length > 0 ? result.extracted : undefined,
     assertions: result.assertions.map(a => ({
       passed: a.passed,
       type: a.type,
