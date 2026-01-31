@@ -164,20 +164,20 @@ TSpec uses protocol-specific file extensions:
 
 ## Documentation
 
-For complete documentation, see the [docs](./doc) directory:
+For complete documentation, see the [docs](./docs) directory:
 
-- [Introduction](./doc/01-introduction.md) - Overview and design goals
-- [Quick Start](./doc/02-quick-start.md) - Get started with TSpec
-- [File Specification](./doc/03-file-specification.md) - File naming and structure
-- [Core Structure](./doc/04-core-structure.md) - Understanding the TSpec format
-- [Field Reference](./doc/05-field-reference.md) - Complete field documentation
-- [Variables and Expressions](./doc/06-variables-expressions.md) - Variable system
-- [Data-Driven Testing](./doc/07-data-driven-testing.md) - Parameterized tests
-- [Assertions](./doc/08-assertions.md) - Validation and assertion types
-- [Template Inheritance](./doc/09-template-inheritance.md) - Reuse test configurations
-- [Protocol Reference](./doc/10-protocol-reference.md) - HTTP, gRPC protocol details
-- [API Reference](./doc/11-api-reference.md) - Parser API documentation
-- [Examples](./doc/12-examples.md) - Real-world examples
+- [Introduction](./docs/01-introduction.md) - Overview and design goals
+- [Quick Start](./docs/02-quick-start.md) - Get started with TSpec
+- [File Specification](./docs/03-file-specification.md) - File naming and structure
+- [Core Structure](./docs/04-core-structure.md) - Understanding the TSpec format
+- [Field Reference](./docs/05-field-reference.md) - Complete field documentation
+- [Variables and Expressions](./docs/06-variables-expressions.md) - Variable system
+- [Data-Driven Testing](./docs/07-data-driven-testing.md) - Parameterized tests
+- [Assertions](./docs/08-assertions.md) - Validation and assertion types
+- [Template Inheritance](./docs/09-template-inheritance.md) - Reuse test configurations
+- [Protocol Reference](./docs/10-protocol-reference.md) - HTTP, gRPC protocol details
+- [API Reference](./docs/11-api-reference.md) - Parser API documentation
+- [Examples](./docs/12-examples.md) - Real-world examples
 
 ## Why TSpec?
 
@@ -241,4 +241,4 @@ MIT
 
 ## Contributing
 
-Contributions are welcome! Please check the [documentation](./doc) for details on the DSL structure and design principles.
+Contributions are welcome! Please check the [documentation](./docs) for details on the DSL structure and design principles.
