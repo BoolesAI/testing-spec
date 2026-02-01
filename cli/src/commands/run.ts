@@ -7,9 +7,13 @@ import {
   clearTemplateCache,
   executeSuite,
   isSuiteFile,
+  getPluginManager,
+  registry,
+  version,
   type SuiteResult,
   type SuiteTestResult
 } from '@boolesai/tspec';
+import { findConfigFile } from '@boolesai/tspec/plugin';
 import type { TestCase, TestResult } from '@boolesai/tspec';
 import { discoverTSpecFiles, discoverAllTestFiles, type TSpecFileDescriptor, type TSuiteFileDescriptor } from '../utils/files.js';
 import { formatTestResults, formatJson, type FormattedTestResult, type TestResultSummary } from '../utils/formatter.js';
@@ -22,6 +26,7 @@ interface RunOptions {
   verbose?: boolean;
   quiet?: boolean;
   failFast?: boolean;
+  config?: string;
   env: Record<string, string>;
   params: Record<string, string>;
 }
@@ -33,6 +38,7 @@ export interface RunParams {
   verbose?: boolean;
   quiet?: boolean;
   failFast?: boolean;
+  config?: string;
   env?: Record<string, string>;
   params?: Record<string, string>;
 }
@@ -135,6 +141,14 @@ async function runFileTestCasesInternal(
  */
 export async function executeRun(params: RunParams): Promise<RunExecutionResult> {
   clearTemplateCache();
+  
+  // Initialize plugin manager if config file exists
+  const configPath = params.config || findConfigFile();
+  if (configPath) {
+    const pluginManager = getPluginManager(version);
+    await pluginManager.initialize(configPath);
+    registry.enablePluginManager();
+  }
   
   const concurrency = params.concurrency ?? 5;
   const env = params.env ?? {};
@@ -430,6 +444,7 @@ export const runCommand = new Command('run')
   .option('-v, --verbose', 'Verbose output')
   .option('-q, --quiet', 'Only output summary')
   .option('--fail-fast', 'Stop on first failure')
+  .option('--config <path>', 'Path to tspec.config.js for plugin loading')
   .action(async (files: string[], options: RunOptions) => {
     setLoggerOptions({ verbose: options.verbose, quiet: options.quiet });
     
@@ -443,6 +458,7 @@ export const runCommand = new Command('run')
         verbose: options.verbose,
         quiet: options.quiet,
         failFast: options.failFast,
+        config: options.config,
         env: options.env,
         params: options.params
       });

@@ -8,6 +8,7 @@ export interface RunParams {
     verbose?: boolean;
     quiet?: boolean;
     failFast?: boolean;
+    config?: string;
     env?: Record<string, string>;
     params?: Record<string, string>;
 }

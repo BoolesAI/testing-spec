@@ -7,6 +7,7 @@ import { runCommand } from './commands/run.js';
 import { parseCommand } from './commands/parse.js';
 import { listCommand } from './commands/list.js';
 import { mcpCommand } from './commands/mcp.js';
+import { pluginListCommand } from './commands/plugin-list.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -24,5 +25,6 @@ program.addCommand(runCommand);
 program.addCommand(parseCommand);
 program.addCommand(listCommand);
 program.addCommand(mcpCommand);
+program.addCommand(pluginListCommand);
 
 await program.parseAsync();

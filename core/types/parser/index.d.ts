@@ -1,11 +1,11 @@
-import type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, Assertion, ValidationResult, EnvironmentConfig, TSpecSuite, SuiteMetadata, ExecutionConfig, SuiteLifecycleConfig, SuiteLifecycleAction } from './types.js';
+import type { TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, WebRequest, Assertion, ValidationResult, EnvironmentConfig, TSpecSuite, SuiteMetadata, ExecutionConfig, SuiteLifecycleConfig, SuiteLifecycleAction } from './types.js';
 import type { DataRow } from './data-driver.js';
 export interface TestCase {
     id: string;
     description: string;
     metadata: TSpecMetadata;
     protocol: ProtocolType | null;
-    request: HttpRequest | GrpcRequest | GraphqlRequest | WebsocketRequest | undefined;
+    request: HttpRequest | GrpcRequest | GraphqlRequest | WebsocketRequest | WebRequest | undefined;
     assertions: Assertion[];
     lifecycle?: TSpec['lifecycle'];
     environment?: EnvironmentConfig;
