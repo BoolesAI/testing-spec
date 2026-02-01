@@ -52,7 +52,6 @@ Base URL: `http://localhost:3000/api/v1`
 | GET | `/books/:id` | Get book by ID | 200 | 404 |
 | POST | `/books` | Create new book | 201 | 400, 409 |
 | PUT | `/books/:id` | Update book | 200 | 400, 404, 409 |
-| DELETE | `/books/:id` | Delete book | 204 | 404 |
 
 ### Query Parameters (GET /books)
 
@@ -92,7 +91,6 @@ The `test/` directory contains comprehensive TSpec test cases demonstrating vari
 | `get_book.http.tcase` | Retrieve single book | Status 200, all fields exist |
 | `create_book.http.tcase` | Create book with valid data | Status 201, Location header |
 | `update_book.http.tcase` | Partial update | Status 200, updated values |
-| `delete_book.http.tcase` | Delete existing book | Status 204 |
 
 ### Negative Test Cases
 
@@ -103,7 +101,6 @@ The `test/` directory contains comprehensive TSpec test cases demonstrating vari
 | `create_book_invalid_isbn.http.tcase` | Invalid ISBN format | 400 |
 | `update_book_not_found.http.tcase` | Update non-existent book | 404 |
 | `update_book_validation_error.http.tcase` | Invalid update data | 400 |
-| `delete_book_not_found.http.tcase` | Delete non-existent book | 404 |
 
 ### Running Tests with TSpec CLI
 

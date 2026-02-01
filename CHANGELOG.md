@@ -5,6 +5,100 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-02-01
+
+### Added
+
+#### @boolesai/tspec (Core Library)
+
+- **Test Suite Support**: New test suite functionality with `.tsuite` file format
+  - `parseSuiteFile()` - Parse and validate `.tsuite` files
+  - `parseSuiteFileFromString()` - Parse suite file from string content
+  - `validateSuiteFile()` - Validate suite file for schema correctness
+  - Suite template inheritance with `suite_template` field
+  - Suite-level lifecycle hooks (before_all, after_all, before_each, after_each)
+  - Support for nested test suites and test cases
+  - Suite-level configuration and variable sharing
+- **Suite Runner Module**: Execute test suites with comprehensive orchestration
+  - `executeSuite()` - Execute a complete test suite with all test cases
+  - Hierarchical execution with suite and test-level lifecycle hooks
+  - Parallel and sequential execution support
+  - Context propagation across suite and test cases
+  - Fail-fast mode for suite execution
+  - Comprehensive suite result reporting with nested structure
+- **Mixed File Discovery**: Enhanced file utilities for combined test discovery
+  - `discoverSuiteFiles()` - Discover `.tsuite` files with lazy loading
+  - `discoverAllTestFiles()` - Discover both `.tcase` and `.tsuite` files
+  - `TSuiteFileDescriptor` interface for efficient suite file handling
+  - Support for glob patterns in suite and test case discovery
+
+#### @boolesai/tspec-cli (Command Line Interface)
+
+- **Enhanced Run Command**: Unified execution for both `.tcase` and `.tsuite` files
+  - Automatic detection and execution of suite files
+  - Parallel handling of suite and individual test executions
+  - Improved output formatting for suite test runs with nested display
+  - Suite-aware progress reporting and result summaries
+  - Fail-fast support across suites and test cases
+- Updated file discovery to handle mixed `.tcase` and `.tsuite` files
+- Enhanced validation command to support `.tsuite` file validation
+
+#### vscode-tspec (VS Code Extension)
+
+- **Test Suite Support**:
+  - Syntax highlighting for `.tsuite` files
+  - Code snippets for suite creation and configuration
+  - IntelliSense for suite-specific fields (suite_template, before_each, after_each)
+  - Real-time validation and diagnostics for suite files
+  - Suite file schema data for enhanced validation
+- Enhanced diagnostics provider with suite-specific validation rules
+- Updated file associations for `.tsuite` extension
+
+#### Documentation
+
+- **New Documentation**: Test Suites (13-test-suites.md)
+  - Comprehensive guide for creating and organizing test suites
+  - Suite file structure and syntax reference
+  - Template inheritance patterns for suites
+  - Lifecycle hooks and execution order
+  - Examples of suite organization strategies
+- Updated **Introduction** (01-introduction.md) with test suite overview
+- Enhanced **File Specification** (03-file-specification.md) with `.tsuite` format details
+- Updated **API Reference** (11-api-reference.md) with suite runner API
+- Revised **Quick Start** (02-quick-start.md) to include suite examples
+
+#### Skills (MCP Integration)
+
+- Updated **tspec-run** skill with suite execution support
+- Enhanced **tspec-validate** skill to handle `.tsuite` files
+- Updated **tspec-parse** skill to parse suite files
+
+#### Demo (Bookstore API)
+
+- Added `bookstore.http.tsuite` demonstrating suite organization
+  - Suite-level configuration and variables
+  - Grouped test cases by functionality (CRUD operations)
+  - Suite lifecycle hooks for setup and teardown
+
+### Changed
+
+- **Breaking**: Renamed test specification file extension from `.tspec` to `.tcase`
+  - All test case files now use `.tcase` extension (e.g., `login.http.tcase`)
+  - Updated file discovery, validation, and execution logic
+  - Changed protocol-specific extensions: `.http.tcase`, `.grpc.tcase`, `.graphql.tcase`, `.ws.tcase`
+  - Updated all documentation, examples, and demo files
+  - Modified VS Code extension to recognize `.tcase` files
+  - Updated CLI commands to process `.tcase` files
+- Enhanced file resolution to handle both `.tcase` and `.tsuite` files
+- Improved parser module with unified handling of test cases and suites
+- Updated all skills and documentation to reflect new file extension
+
+### Fixed
+
+- Improved error handling in suite execution
+- Better validation messages for suite files
+- Enhanced context propagation in nested suite structures
+
 ## [1.1.0] - 2026-01-31
 
 ### Added

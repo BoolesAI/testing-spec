@@ -40,7 +40,7 @@ suite:
     timeout: "5m"
     
   tests:
-    - file: "create_book.http.tspec"
-    - file: "get_book.http.tspec"
-    - files: "*.http.tspec"
+    - file: "create_book.http.tcase"
+    - file: "get_book.http.tcase"
+    - files: "*.http.tcase"
       skip: false
