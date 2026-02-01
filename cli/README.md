@@ -143,7 +143,15 @@ This starts an MCP server over stdio that exposes TSpec commands as tools for AI
 
 ## MCP Integration
 
-TSpec CLI can run as an MCP server, exposing all commands as tools for AI assistants.
+TSpec CLI can run as an MCP (Model Context Protocol) server, exposing all commands as tools for AI assistants. This enables AI assistants like Claude to execute TSpec commands directly through the MCP protocol.
+
+### Overview
+
+The MCP server runs over stdio, providing a standardized interface for AI tools to:
+- Execute test cases with customizable parameters
+- Validate test case files for schema correctness
+- Parse test specifications without execution
+- Query supported protocols and configurations
 
 ### Available Tools
 
@@ -154,12 +162,17 @@ TSpec CLI can run as an MCP server, exposing all commands as tools for AI assist
 | `tspec_parse` | Parse and display test case information |
 | `tspec_list` | List supported protocols |
 
-### Claude Desktop Configuration
+### Configuration
+
+#### Claude Desktop
 
 Add the following to your Claude Desktop configuration file:
 
 **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+**Linux:** `~/.config/Claude/claude_desktop_config.json`
+
+**Option 1: Using npx (recommended for always getting the latest version):**
 
 ```json
 {
@@ -172,7 +185,7 @@ Add the following to your Claude Desktop configuration file:
 }
 ```
 
-Or if installed globally:
+**Option 2: Using global installation:**
 
 ```json
 {
@@ -185,15 +198,56 @@ Or if installed globally:
 }
 ```
 
+**Option 3: Using absolute path (for development or specific versions):**
+
+```json
+{
+  "mcpServers": {
+    "tspec": {
+      "command": "/path/to/tspec/cli/bin/tspec.js",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+#### Other MCP Clients
+
+For other MCP-compatible clients, start the server with:
+
+```bash
+tspec mcp
+```
+
+The server will communicate via stdio, waiting for JSON-RPC 2.0 formatted requests.
+
+### Server Behavior
+
+- **Transport:** stdio (reads from stdin, writes to stdout)
+- **Protocol:** JSON-RPC 2.0 over MCP
+- **Lifecycle:** Runs indefinitely until explicitly terminated (Ctrl+C or SIGTERM)
+- **Logging:** Error logs are written to stderr to avoid polluting stdio transport
+
 ### Tool Parameters
 
 #### tspec_run
 
+Execute test cases with optional configuration.
+
+**Parameters:**
+- `files` (required): Array of file paths or glob patterns
+- `concurrency` (optional): Maximum concurrent test execution (default: 5)
+- `env` (optional): Environment variables as key-value object
+- `params` (optional): Test parameters as key-value object
+- `failFast` (optional): Stop on first failure (default: false)
+- `output` (optional): Output format - "json" or "text" (default: "text")
+
+**Example:**
 ```json
 {
   "files": ["tests/*.tcase"],
   "concurrency": 5,
-  "env": { "API_HOST": "localhost" },
+  "env": { "API_HOST": "localhost", "API_PORT": "8080" },
   "params": { "timeout": "5000" },
   "failFast": false,
   "output": "text"
@@ -202,6 +256,13 @@ Or if installed globally:
 
 #### tspec_validate
 
+Validate test case files for schema correctness.
+
+**Parameters:**
+- `files` (required): Array of file paths or glob patterns
+- `output` (optional): Output format - "json" or "text" (default: "text")
+
+**Example:**
 ```json
 {
   "files": ["tests/*.tcase"],
@@ -211,6 +272,16 @@ Or if installed globally:
 
 #### tspec_parse
 
+Parse test case files without execution.
+
+**Parameters:**
+- `files` (required): Array of file paths or glob patterns
+- `env` (optional): Environment variables for variable substitution
+- `params` (optional): Parameters for variable substitution
+- `verbose` (optional): Show detailed information (default: false)
+- `output` (optional): Output format - "json" or "text" (default: "text")
+
+**Example:**
 ```json
 {
   "files": ["tests/*.tcase"],
@@ -223,11 +294,34 @@ Or if installed globally:
 
 #### tspec_list
 
+List supported protocols and configuration.
+
+**Parameters:**
+- `output` (optional): Output format - "json" or "text" (default: "text")
+
+**Example:**
 ```json
 {
   "output": "text"
 }
 ```
+
+### Troubleshooting
+
+**Server doesn't appear in Claude Desktop:**
+- Verify the configuration file path is correct for your OS
+- Check JSON syntax is valid (use a JSON validator)
+- Restart Claude Desktop after configuration changes
+- Check Claude Desktop logs for connection errors
+
+**Server hangs or doesn't respond:**
+- Ensure Node.js >= 18.0.0 is installed
+- Verify `@boolesai/tspec-cli` is accessible (try running `tspec --version`)
+- Check stderr output for error messages
+
+**Permission errors:**
+- Ensure the tspec executable has proper permissions
+- For global installation, verify npm global bin directory is in PATH
 
 ## Exit Codes
 
