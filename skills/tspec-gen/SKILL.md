@@ -7,7 +7,7 @@ description: Generate TSpec test cases from code changes. Use for creating tests
 
 ## Overview
 
-Generate TSpec test cases from source code changes. This skill guides you through analyzing code (from git diff or explicit file paths) and creating corresponding `.tspec` test files with proper structure, metadata, and assertions.
+Generate TSpec test cases from source code changes. This skill guides you through analyzing code (from git diff or explicit file paths) and creating corresponding `.tcase` test files with proper structure, metadata, and assertions.
 
 Use this skill when:
 - New API endpoints are added
@@ -49,7 +49,7 @@ Specify source files directly when you know which code needs tests.
    - Note validation rules and error cases
 
 3. **Generate TSpec File(s)**
-   - Create `.tspec` file with proper naming
+   - Create `.tcase` file with proper naming
    - Populate all required fields
    - Add `metadata.related_code` pointing to source
 
@@ -118,13 +118,13 @@ lifecycle:
 
 ### File Naming
 
-Pattern: `{scenario}_{description}.{protocol}.tspec`
+Pattern: `{scenario}_{description}.{protocol}.tcase`
 
 Examples:
-- `create_user_success.http.tspec`
-- `get_book_not_found.http.tspec`
-- `update_order_validation_error.http.tspec`
-- `delete_product_unauthorized.http.tspec`
+- `create_user_success.http.tcase`
+- `get_book_not_found.http.tcase`
+- `update_order_validation_error.http.tcase`
+- `delete_product_unauthorized.http.tcase`
 
 ### Metadata Fields
 
@@ -262,17 +262,17 @@ After generating test files:
 
 1. **Validate syntax:**
    ```bash
-   tspec validate "tests/*.tspec"
+   tspec validate "tests/*.tcase"
    ```
 
 2. **Parse and inspect:**
    ```bash
-   tspec parse "tests/*.tspec" -v
+   tspec parse "tests/*.tcase" -v
    ```
 
 3. **Run tests:**
    ```bash
-   tspec run "tests/*.tspec" -e API_HOST=localhost
+   tspec run "tests/*.tcase" -e API_HOST=localhost
    ```
 
 ## Related Skills

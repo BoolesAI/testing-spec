@@ -1,13 +1,13 @@
 ---
 name: tspec-validate
-description: Validate .tspec files for schema correctness without executing tests. Use for syntax checking, pre-commit validation, and CI/CD linting. Validates YAML structure, required fields, protocol blocks, and assertion formats. Keywords: validate tspec, check syntax, lint tspec, verify schema, tspec errors, pre-commit, schema validation
+description: Validate .tcase and .tsuite files for schema correctness without executing tests. Use for syntax checking, pre-commit validation, and CI/CD linting. Validates YAML structure, required fields, protocol blocks, assertion formats, and suite structures. Keywords: validate tspec, check syntax, lint tspec, verify schema, tspec errors, pre-commit, schema validation, validate tsuite, suite validation
 ---
 
 # TSpec Validate
 
 ## Overview
 
-Validate `.tspec` files for schema correctness without executing any tests. This skill checks YAML syntax, required fields, protocol block structure, and assertion formats. Use it for pre-commit hooks, CI/CD validation stages, and catching errors before test execution.
+Validate `.tcase` and `.tsuite` files for schema correctness without executing any tests. This skill checks YAML syntax, required fields, protocol block structure, assertion formats, and suite configuration. Use it for pre-commit hooks, CI/CD validation stages, and catching errors before test execution.
 
 ## MCP Tool Integration
 
@@ -17,14 +17,23 @@ Validate `.tspec` files for schema correctness without executing any tests. This
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `files` | `string[]` | Yes | Files or glob patterns to validate |
+| `files` | `string[]` | Yes | Files or glob patterns to validate (`.tcase` or `.tsuite`) |
 | `output` | `string` | No | Output format: `json` or `text` (default: `text`) |
 
 ### Example MCP Call
 
 ```json
 {
-  "files": ["tests/*.tspec"],
+  "files": ["tests/*.tcase"],
+  "output": "text"
+}
+```
+
+### Validate Suite Files
+
+```json
+{
+  "files": ["tests/*.tsuite"],
   "output": "text"
 }
 ```
@@ -56,16 +65,22 @@ tspec validate <files...> [options]
 
 ```bash
 # Validate a single file
-tspec validate tests/login.http.tspec
+tspec validate tests/login.http.tcase
 
 # Validate multiple files with glob pattern
-tspec validate "tests/**/*.tspec"
+tspec validate "tests/**/*.tcase"
+
+# Validate suite files
+tspec validate "tests/**/*.tsuite"
+
+# Validate all test and suite files
+tspec validate "tests/**/*.tcase" "tests/**/*.tsuite"
 
 # JSON output for CI/CD
-tspec validate tests/*.tspec --output json
+tspec validate tests/*.tcase --output json
 
 # Quiet mode - only show errors
-tspec validate tests/*.tspec -q
+tspec validate tests/*.tcase -q
 ```
 
 ## Common Use Cases
@@ -73,25 +88,25 @@ tspec validate tests/*.tspec -q
 ### Validate All Test Files
 
 ```bash
-tspec validate "tests/**/*.tspec"
+tspec validate "tests/**/*.tcase"
 ```
 
 ### Pre-commit Hook Validation
 
 ```bash
-tspec validate $(git diff --cached --name-only --diff-filter=ACM | grep '.tspec$')
+tspec validate $(git diff --cached --name-only --diff-filter=ACM | grep '.tcase$')
 ```
 
 ### CI/CD Validation Stage
 
 ```bash
-tspec validate tests/*.tspec --output json
+tspec validate tests/*.tcase --output json
 ```
 
 ### Validate Before Running Tests
 
 ```bash
-tspec validate tests/*.tspec && tspec run tests/*.tspec
+tspec validate tests/*.tcase && tspec run tests/*.tcase
 ```
 
 ## What Gets Validated
@@ -120,6 +135,14 @@ tspec validate tests/*.tspec && tspec run tests/*.tspec
 - Line numbers must be positive integers (1-based)
 - Range end must be >= start
 - Format: `path/file.ext[N]` or `path/file.ext[N-M]` or `path/file.ext[N,M-P,...]`
+
+### Suite Validation (`.tsuite` files)
+- Valid suite structure with `suite:` top-level key
+- Required fields: `name`
+- Valid test references with `file` or `files` (but not both)
+- At least one test or nested suite reference
+- Valid lifecycle action types: `script`, `http`, `grpc`, `extract`, `output`, `wait`, `log`
+- Valid execution configuration fields
 
 ## Exit Codes
 

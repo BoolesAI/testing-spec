@@ -7,7 +7,7 @@ export interface FileWatcherHandler {
 }
 
 /**
- * File system watcher for .tspec files with debouncing
+ * File system watcher for .tcase files with debouncing
  */
 export class TSpecFileWatcher implements vscode.Disposable {
   private watcher: vscode.FileSystemWatcher;
@@ -16,8 +16,8 @@ export class TSpecFileWatcher implements vscode.Disposable {
   private debounceDelay = 300; // ms
 
   constructor() {
-    // Watch for all .tspec files in workspace
-    this.watcher = vscode.workspace.createFileSystemWatcher('**/*.tspec');
+    // Watch for all .tcase files in workspace
+    this.watcher = vscode.workspace.createFileSystemWatcher('**/*.tcase');
     
     this.watcher.onDidCreate((uri) => this.handleEvent(uri, 'created'));
     this.watcher.onDidChange((uri) => this.handleEvent(uri, 'changed'));

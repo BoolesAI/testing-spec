@@ -4,11 +4,11 @@ import * as path from 'path';
 import { TSpecTestMetadata, TSpecAssertion } from './types';
 
 /**
- * Parser for extracting test metadata from .tspec files
+ * Parser for extracting test metadata from .tcase files
  */
 export class TestParser {
   /**
-   * Parse a .tspec file and extract test metadata
+   * Parse a .tcase file and extract test metadata
    */
   async parseFile(uri: vscode.Uri): Promise<TSpecTestMetadata | null> {
     try {
@@ -22,7 +22,7 @@ export class TestParser {
   }
 
   /**
-   * Parse .tspec content and extract metadata
+   * Parse .tcase content and extract metadata
    */
   parseContent(content: string, uri: vscode.Uri): TSpecTestMetadata | null {
     try {
@@ -33,7 +33,7 @@ export class TestParser {
       }
 
       const testCaseId = this.generateTestId(uri.fsPath);
-      const description = (doc.description as string) || path.basename(uri.fsPath, '.tspec');
+      const description = (doc.description as string) || path.basename(uri.fsPath, '.tcase');
       
       // Extract metadata section
       const metadata = doc.metadata as Record<string, unknown> | undefined;
@@ -140,20 +140,20 @@ export class TestParser {
           const relativePath = path.relative(folder.uri.fsPath, filePath);
           // Remove extension and normalize path separators
           return relativePath
-            .replace(/\.(http|grpc|graphql|ws)?\.tspec$/, '')
+            .replace(/\.(http|grpc|graphql|ws)?\.tcase$/, '')
             .replace(/\\/g, '/');
         }
       }
     }
     
     // Fallback to filename without extension
-    return path.basename(filePath, '.tspec').replace(/\.(http|grpc|graphql|ws)$/, '');
+    return path.basename(filePath, '.tcase').replace(/\.(http|grpc|graphql|ws)$/, '');
   }
 
   /**
-   * Get all .tspec files in workspace
+   * Get all .tcase files in workspace
    */
   async findAllTestFiles(): Promise<vscode.Uri[]> {
-    return vscode.workspace.findFiles('**/*.tspec', '**/node_modules/**');
+    return vscode.workspace.findFiles('**/*.tcase', '**/node_modules/**');
   }
 }

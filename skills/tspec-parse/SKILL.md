@@ -1,13 +1,13 @@
 ---
 name: tspec-parse
-description: Parse and display test case information without executing tests. Use for exploring test structure, debugging variable substitution, understanding template inheritance, and inspecting request payloads. Keywords: parse tspec, inspect test, explore tspec, debug variables, view test structure, template inheritance, dry run
+description: Parse and display test case and suite information without executing tests. Use for exploring test structure, debugging variable substitution, understanding template inheritance, and inspecting request payloads. Keywords: parse tspec, inspect test, explore tspec, debug variables, view test structure, template inheritance, dry run, parse suite, tsuite
 ---
 
 # TSpec Parse
 
 ## Overview
 
-Parse and display TSpec test case information without executing any requests. This skill resolves variables, expands templates, and shows the final test configuration. Use it for debugging variable substitution, understanding template inheritance, and inspecting request payloads before actual execution.
+Parse and display TSpec test case and suite information without executing any requests. This skill resolves variables, expands templates, and shows the final test configuration. Use it for debugging variable substitution, understanding template inheritance, inspecting request payloads, and exploring suite structure before actual execution.
 
 ## MCP Tool Integration
 
@@ -27,7 +27,7 @@ Parse and display TSpec test case information without executing any requests. Th
 
 ```json
 {
-  "files": ["tests/login.http.tspec"],
+  "files": ["tests/login.http.tcase"],
   "env": { "API_HOST": "localhost" },
   "params": { "username": "testuser" },
   "verbose": true,
@@ -66,19 +66,22 @@ tspec parse <files...> [options]
 
 ```bash
 # Parse and display test cases
-tspec parse tests/login.http.tspec
+tspec parse tests/login.http.tcase
+
+# Parse suite file
+tspec parse tests/api.http.tsuite
 
 # JSON output for inspection
-tspec parse tests/*.tspec --output json
+tspec parse tests/*.tcase --output json
 
 # With variable substitution
-tspec parse tests/*.tspec -e API_HOST=localhost
+tspec parse tests/*.tcase -e API_HOST=localhost
 
 # Verbose output for debugging
-tspec parse tests/login.http.tspec -v
+tspec parse tests/login.http.tcase -v
 
 # Parse with parameters
-tspec parse tests/*.tspec -p username=testuser -p timeout=5000
+tspec parse tests/*.tcase -p username=testuser -p timeout=5000
 ```
 
 ## Common Use Cases
@@ -87,35 +90,35 @@ tspec parse tests/*.tspec -p username=testuser -p timeout=5000
 
 See how variables are resolved:
 ```bash
-tspec parse tests/login.http.tspec -e API_HOST=localhost -v
+tspec parse tests/login.http.tcase -e API_HOST=localhost -v
 ```
 
 ### Inspect Request Before Execution
 
 View the final request that would be sent:
 ```bash
-tspec parse tests/create_user.http.tspec --output json
+tspec parse tests/create_user.http.tcase --output json
 ```
 
 ### Understand Template Inheritance
 
 See how extended templates merge:
 ```bash
-tspec parse tests/auth_flow.http.tspec -v
+tspec parse tests/auth_flow.http.tcase -v
 ```
 
 ### Verify Data-Driven Test Expansion
 
 Check parameterized test variations:
 ```bash
-tspec parse tests/login_data_driven.http.tspec
+tspec parse tests/login_data_driven.http.tcase
 ```
 
 ### Check Environment Resolution
 
 Verify environment variable handling:
 ```bash
-tspec parse tests/*.tspec -e API_HOST=staging.example.com
+tspec parse tests/*.tcase -e API_HOST=staging.example.com
 ```
 
 ## When to Use Parse vs Run

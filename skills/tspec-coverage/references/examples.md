@@ -8,10 +8,10 @@ Analyze all tspec files against all source files:
 
 ```bash
 # Step 1: Find all tspec files
-# Using Glob: pattern="**/*.tspec"
+# Using Glob: pattern="**/*.tcase"
 
 # Step 2: Parse tspec files to extract metadata
-tspec parse "tests/**/*.tspec" --output json
+tspec parse "tests/**/*.tcase" --output json
 
 # Step 3: Find all source files
 # Using Glob: pattern="**/*.{ts,js}"  path="src/"
@@ -52,7 +52,7 @@ Focus coverage analysis on controller files:
 
 ```bash
 # TSpec files for controllers
-tests/controllers/**/*.tspec
+tests/controllers/**/*.tcase
 
 # Source files to check
 src/controllers/**/*.ts
@@ -115,13 +115,13 @@ Coverage: ~75%
 
 | Lines | TSpec File | Test Description |
 |-------|------------|------------------|
-| 5-25 | create_book_success.http.tspec | Create book with valid data |
-| 5-25 | create_book_validation.http.tspec | Create book validation errors |
-| 30-50 | get_book_success.http.tspec | Get book by ID |
-| 30-50 | get_book_not_found.http.tspec | Get non-existent book |
-| 55-75 | update_book_success.http.tspec | Update book details |
-| 80-100 | delete_book_success.http.tspec | Delete book |
-| 105-125 | list_books_paginated.http.tspec | List books with pagination |
+| 5-25 | create_book_success.http.tcase | Create book with valid data |
+| 5-25 | create_book_validation.http.tcase | Create book validation errors |
+| 30-50 | get_book_success.http.tcase | Get book by ID |
+| 30-50 | get_book_not_found.http.tcase | Get non-existent book |
+| 55-75 | update_book_success.http.tcase | Update book details |
+| 80-100 | delete_book_success.http.tcase | Delete book |
+| 105-125 | list_books_paginated.http.tcase | List books with pagination |
 | 130-150 | **UNCOVERED** | Search books endpoint |
 ```
 
@@ -134,15 +134,15 @@ Coverage: ~75%
 
 **Untested code blocks:**
 - Lines 130-150: Search functionality
-  - Recommendation: Create `search_books.http.tspec`
+  - Recommendation: Create `search_books.http.tcase`
 
 ### src/services/orderService.ts
 
 **Untested code blocks:**
 - Lines 80-120: Order cancellation logic
-  - Recommendation: Create `cancel_order_*.http.tspec` tests
+  - Recommendation: Create `cancel_order_*.http.tcase` tests
 - Lines 150-180: Refund processing
-  - Recommendation: Create `process_refund_*.http.tspec` tests
+  - Recommendation: Create `process_refund_*.http.tcase` tests
 ```
 
 ## Sample Complete Report

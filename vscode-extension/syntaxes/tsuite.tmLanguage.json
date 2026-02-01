@@ -1,0 +1,299 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "TSuite",
+  "scopeName": "source.tsuite",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#variable-interpolation" },
+    { "include": "#suite-top-level" },
+    { "include": "#suite-keys" },
+    { "include": "#lifecycle-keys" },
+    { "include": "#execution-keys" },
+    { "include": "#metadata-keys" },
+    { "include": "#test-reference-keys" },
+    { "include": "#lifecycle-actions" },
+    { "include": "#enum-values" },
+    { "include": "#http-methods" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#booleans" },
+    { "include": "#keys" },
+    { "include": "#punctuation" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.number-sign.tsuite",
+          "match": "#.*$"
+        }
+      ]
+    },
+    "suite-top-level": {
+      "patterns": [
+        {
+          "match": "^(suite)(:)",
+          "captures": {
+            "1": { "name": "keyword.control.suite.tsuite" },
+            "2": { "name": "punctuation.separator.key-value.tsuite" }
+          }
+        }
+      ]
+    },
+    "suite-keys": {
+      "patterns": [
+        {
+          "match": "^\\s+(name|description|version|extends|depends_on|metadata|environment|variables|lifecycle|before_each|after_each|execution|tests|suites)(:)",
+          "captures": {
+            "1": { "name": "keyword.control.suite-property.tsuite" },
+            "2": { "name": "punctuation.separator.key-value.tsuite" }
+          }
+        }
+      ]
+    },
+    "lifecycle-keys": {
+      "patterns": [
+        {
+          "match": "^\\s+(setup|teardown)(:)",
+          "captures": {
+            "1": { "name": "keyword.control.lifecycle.tsuite" },
+            "2": { "name": "punctuation.separator.key-value.tsuite" }
+          }
+        }
+      ]
+    },
+    "execution-keys": {
+      "patterns": [
+        {
+          "match": "^\\s+(parallel_tests|parallel_suites|concurrency|order|fail_fast|timeout|retry)(:)",
+          "captures": {
+            "1": { "name": "variable.other.execution.tsuite" },
+            "2": { "name": "punctuation.separator.key-value.tsuite" }
+          }
+        },
+        {
+          "match": "^\\s+(count|delay|on_failure_only)(:)",
+          "captures": {
+            "1": { "name": "variable.other.retry.tsuite" },
+            "2": { "name": "punctuation.separator.key-value.tsuite" }
+          }
+        }
+      ]
+    },
+    "metadata-keys": {
+      "patterns": [
+        {
+          "match": "^\\s+(prompt|related_code|test_category|risk_level|tags|priority|owner)(:)",
+          "captures": {
+            "1": { "name": "variable.other.metadata.tsuite" },
+            "2": { "name": "punctuation.separator.key-value.tsuite" }
+          }
+        }
+      ]
+    },
+    "test-reference-keys": {
+      "patterns": [
+        {
+          "match": "^\\s+(file|files|skip|only|timeout)(:)",
+          "captures": {
+            "1": { "name": "support.type.property-name.test-ref.tsuite" },
+            "2": { "name": "punctuation.separator.key-value.tsuite" }
+          }
+        }
+      ]
+    },
+    "lifecycle-actions": {
+      "patterns": [
+        {
+          "match": "^\\s+(action|source|request|extract|message|level|duration|config)(:)",
+          "captures": {
+            "1": { "name": "support.type.property-name.action.tsuite" },
+            "2": { "name": "punctuation.separator.key-value.tsuite" }
+          }
+        }
+      ]
+    },
+    "enum-values": {
+      "patterns": [
+        {
+          "comment": "lifecycle action types",
+          "match": "(?<=[:\\s\"'])(script|http|grpc|extract|output|wait|log)(?=[\\s,\"']|$)",
+          "name": "support.function.action-type.tsuite"
+        },
+        {
+          "comment": "execution order values",
+          "match": "(?<=[:\\s\"'])(defined|random)(?=[\\s,\"']|$)",
+          "name": "constant.language.execution-order.tsuite"
+        },
+        {
+          "comment": "test_category values",
+          "match": "(?<=[:\\s\"'])(functional|integration|performance|security)(?=[\\s,\"']|$)",
+          "name": "constant.language.test-category.tsuite"
+        },
+        {
+          "comment": "risk_level values",
+          "match": "(?<=[:\\s\"'])(low|medium|high|critical)(?=[\\s,\"']|$)",
+          "name": "constant.language.risk-level.tsuite"
+        },
+        {
+          "comment": "log level values",
+          "match": "(?<=[:\\s\"'])(debug|info|warn|error)(?=[\\s,\"']|$)",
+          "name": "constant.language.log-level.tsuite"
+        }
+      ]
+    },
+    "http-methods": {
+      "patterns": [
+        {
+          "match": "\\b(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\\b",
+          "name": "keyword.other.http-method.tsuite"
+        }
+      ]
+    },
+    "variable-interpolation": {
+      "patterns": [
+        {
+          "name": "meta.interpolation.tsuite",
+          "begin": "(\\$\\{)",
+          "beginCaptures": {
+            "1": { "name": "punctuation.definition.interpolation.begin.tsuite" }
+          },
+          "end": "(\\})",
+          "endCaptures": {
+            "1": { "name": "punctuation.definition.interpolation.end.tsuite" }
+          },
+          "patterns": [
+            { "include": "#variable-functions" },
+            { "include": "#variable-env" },
+            { "include": "#variable-default" },
+            { "include": "#variable-name" }
+          ]
+        }
+      ]
+    },
+    "variable-functions": {
+      "patterns": [
+        {
+          "match": "(timestamp|uuid|now|random_int)(\\([^)]*\\))?",
+          "captures": {
+            "1": { "name": "support.function.builtin.tsuite" },
+            "2": { "name": "meta.function-call.arguments.tsuite" }
+          }
+        }
+      ]
+    },
+    "variable-env": {
+      "patterns": [
+        {
+          "match": "(env)(\\.)(\\w+)",
+          "captures": {
+            "1": { "name": "storage.type.env.tsuite" },
+            "2": { "name": "punctuation.accessor.tsuite" },
+            "3": { "name": "variable.other.env.tsuite" }
+          }
+        }
+      ]
+    },
+    "variable-default": {
+      "patterns": [
+        {
+          "match": "(\\w+)(\\|)([^}]+)",
+          "captures": {
+            "1": { "name": "variable.other.tsuite" },
+            "2": { "name": "keyword.operator.default.tsuite" },
+            "3": { "name": "string.unquoted.default-value.tsuite" }
+          }
+        }
+      ]
+    },
+    "variable-name": {
+      "patterns": [
+        {
+          "match": "\\w+",
+          "name": "variable.other.tsuite"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.tsuite",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            { "include": "#variable-interpolation" },
+            { "include": "#escape-characters" }
+          ]
+        },
+        {
+          "name": "string.quoted.single.tsuite",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            { "include": "#escape-characters" }
+          ]
+        },
+        {
+          "comment": "Block scalar indicator",
+          "match": "[|>][+-]?",
+          "name": "keyword.control.flow.block-scalar.tsuite"
+        }
+      ]
+    },
+    "escape-characters": {
+      "patterns": [
+        {
+          "match": "\\\\[\\\\\"'nrtbf0/]",
+          "name": "constant.character.escape.tsuite"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "match": "\\b[0-9]+(\\.[0-9]+)?\\b",
+          "name": "constant.numeric.tsuite"
+        }
+      ]
+    },
+    "booleans": {
+      "patterns": [
+        {
+          "match": "\\b(true|false|yes|no|on|off)\\b",
+          "name": "constant.language.boolean.tsuite"
+        }
+      ]
+    },
+    "keys": {
+      "patterns": [
+        {
+          "match": "^\\s*(\\w[\\w-]*)(:)",
+          "captures": {
+            "1": { "name": "entity.name.tag.tsuite" },
+            "2": { "name": "punctuation.separator.key-value.tsuite" }
+          }
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "match": "-(?=\\s)",
+          "name": "punctuation.definition.block.sequence.item.tsuite"
+        },
+        {
+          "match": ":",
+          "name": "punctuation.separator.key-value.tsuite"
+        },
+        {
+          "match": "[\\[\\]]",
+          "name": "punctuation.definition.array.tsuite"
+        },
+        {
+          "match": "[\\{\\}]",
+          "name": "punctuation.definition.dictionary.tsuite"
+        }
+      ]
+    }
+  }
+}

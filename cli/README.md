@@ -21,7 +21,7 @@ npx @boolesai/tspec-cli <command>
 
 ### `tspec validate`
 
-Validate `.tspec` files for schema correctness.
+Validate `.tcase` files for schema correctness.
 
 ```bash
 tspec validate <files...> [options]
@@ -34,13 +34,13 @@ tspec validate <files...> [options]
 **Examples:**
 ```bash
 # Validate a single file
-tspec validate tests/login.http.tspec
+tspec validate tests/login.http.tcase
 
 # Validate multiple files with glob pattern
-tspec validate "tests/**/*.tspec"
+tspec validate "tests/**/*.tcase"
 
 # JSON output for CI/CD
-tspec validate tests/*.tspec --output json
+tspec validate tests/*.tcase --output json
 ```
 
 ### `tspec run`
@@ -63,25 +63,25 @@ tspec run <files...> [options]
 **Examples:**
 ```bash
 # Run tests with default settings
-tspec run tests/*.http.tspec
+tspec run tests/*.http.tcase
 
 # Run with environment variables
-tspec run tests/*.tspec -e API_HOST=api.example.com -e API_KEY=secret
+tspec run tests/*.tcase -e API_HOST=api.example.com -e API_KEY=secret
 
 # Run with parameters
-tspec run tests/*.tspec -p username=testuser -p timeout=5000
+tspec run tests/*.tcase -p username=testuser -p timeout=5000
 
 # Run with higher concurrency
-tspec run tests/*.tspec -c 10
+tspec run tests/*.tcase -c 10
 
 # Verbose output for debugging
-tspec run tests/*.tspec -v
+tspec run tests/*.tcase -v
 
 # JSON output for CI/CD
-tspec run tests/*.tspec --output json
+tspec run tests/*.tcase --output json
 
 # Stop on first failure
-tspec run tests/*.tspec --fail-fast
+tspec run tests/*.tcase --fail-fast
 ```
 
 ### `tspec parse`
@@ -102,13 +102,13 @@ tspec parse <files...> [options]
 **Examples:**
 ```bash
 # Parse and display test cases
-tspec parse tests/login.http.tspec
+tspec parse tests/login.http.tcase
 
 # JSON output for inspection
-tspec parse tests/*.tspec --output json
+tspec parse tests/*.tcase --output json
 
 # With variable substitution
-tspec parse tests/*.tspec -e API_HOST=localhost
+tspec parse tests/*.tcase -e API_HOST=localhost
 ```
 
 ### `tspec list`
@@ -150,7 +150,7 @@ TSpec CLI can run as an MCP server, exposing all commands as tools for AI assist
 | Tool | Description |
 |------|-------------|
 | `tspec_run` | Execute test cases and report results |
-| `tspec_validate` | Validate .tspec files for schema correctness |
+| `tspec_validate` | Validate .tcase files for schema correctness |
 | `tspec_parse` | Parse and display test case information |
 | `tspec_list` | List supported protocols |
 
@@ -191,7 +191,7 @@ Or if installed globally:
 
 ```json
 {
-  "files": ["tests/*.tspec"],
+  "files": ["tests/*.tcase"],
   "concurrency": 5,
   "env": { "API_HOST": "localhost" },
   "params": { "timeout": "5000" },
@@ -204,7 +204,7 @@ Or if installed globally:
 
 ```json
 {
-  "files": ["tests/*.tspec"],
+  "files": ["tests/*.tcase"],
   "output": "text"
 }
 ```
@@ -213,7 +213,7 @@ Or if installed globally:
 
 ```json
 {
-  "files": ["tests/*.tspec"],
+  "files": ["tests/*.tcase"],
   "env": { "API_HOST": "localhost" },
   "params": { "timeout": "5000" },
   "verbose": true,
@@ -244,10 +244,10 @@ Or if installed globally:
 ```yaml
 - name: Run TSpec tests
   run: |
-    npx @boolesai/tspec-cli run tests/*.tspec --output json > results.json
+    npx @boolesai/tspec-cli run tests/*.tcase --output json > results.json
     
 - name: Validate TSpec files
-  run: npx @boolesai/tspec-cli validate tests/*.tspec
+  run: npx @boolesai/tspec-cli validate tests/*.tcase
 ```
 
 ### GitLab CI
@@ -255,7 +255,7 @@ Or if installed globally:
 ```yaml
 test:
   script:
-    - npx @boolesai/tspec-cli run tests/*.tspec --output json
+    - npx @boolesai/tspec-cli run tests/*.tcase --output json
   artifacts:
     reports:
       junit: results.json

@@ -60,7 +60,10 @@ assertions:
     expression: "$.inventoryQuantity"
     expected: 10
   - type: "json_path"
-    expression: "$.header['Location']"
+    expression: "$.header"
+    operator: "exists"
+  - type: "json_path"
+    expression: "$.header.location"
     operator: "matches"
     pattern: "^/api/v1/books/\\d+$"
   - type: "response_time"

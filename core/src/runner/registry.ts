@@ -28,7 +28,7 @@ export class ExecutorRegistry {
   }
 
   getTypeFromExtension(filePath: string): ExecutorType | null {
-    const match = filePath.match(/\.(http|grpc|graphql|websocket)\.tspec$/i);
+    const match = filePath.match(/\.(http|grpc|graphql|websocket)\.tcase$/i);
     if (match) {
       return match[1].toLowerCase() as ExecutorType;
     }

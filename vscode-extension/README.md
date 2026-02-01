@@ -7,7 +7,7 @@ Visual Studio Code extension providing language support for TSpec test specifica
 
 ## Features
 
-- **Syntax Highlighting**: Rich syntax highlighting for `.tspec` files
+- **Syntax Highlighting**: Rich syntax highlighting for `.tcase` files
 - **Code Snippets**: Pre-built templates for common test patterns
 - **Validation**: Real-time validation with error diagnostics
 - **Auto-completion**: IntelliSense support for TSpec fields and values
@@ -33,11 +33,11 @@ code --install-extension vscode-tspec-0.0.1.vsix
 
 ### File Recognition
 
-The extension automatically activates for files with `.tspec` extension:
-- `.http.tspec` - HTTP protocol tests
-- `.grpc.tspec` - gRPC protocol tests
-- `.graphql.tspec` - GraphQL protocol tests
-- `.ws.tspec` - WebSocket protocol tests
+The extension automatically activates for files with `.tcase` extension:
+- `.http.tcase` - HTTP protocol tests
+- `.grpc.tcase` - gRPC protocol tests
+- `.graphql.tcase` - GraphQL protocol tests
+- `.ws.tcase` - WebSocket protocol tests
 
 ### Code Snippets
 
@@ -64,12 +64,12 @@ The extension integrates with VS Code's native testing UI to run TSpec test case
 
 1. **Via Test Explorer**
    - Open the Testing view in VS Code sidebar (beaker icon)
-   - All `.tspec` files in your workspace will be automatically discovered
+   - All `.tcase` files in your workspace will be automatically discovered
    - Click the play button next to any test to run it
    - View results in real-time with detailed assertion feedback
 
 2. **Via CodeLens**
-   - Open any `.tspec` file
+   - Open any `.tcase` file
    - Click the "▶ Run Test" link that appears above the test
 
 3. **Via Command Palette**
@@ -165,7 +165,7 @@ For local development and testing:
 1. Open the `vscode-extension` folder in VS Code
 2. Press `F5` to launch Extension Development Host
 3. The extension will be loaded in a new VS Code window
-4. Open any `.tspec` file to test features
+4. Open any `.tcase` file to test features
 
 ## Extension Structure
 
@@ -222,7 +222,7 @@ npx tspec --version
 ### Tests Not Appearing in Test Explorer
 
 1. Ensure `tspec.testing.enabled` is set to `true` in settings
-2. Check that your test files have the correct extension (e.g., `.http.tspec`)
+2. Check that your test files have the correct extension (e.g., `.http.tcase`)
 3. Try refreshing: Click the refresh button in the Test Explorer
 4. Check the "TSpec Tests" output channel for errors
 

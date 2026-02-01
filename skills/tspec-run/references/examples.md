@@ -5,19 +5,19 @@
 ### Run Single Test File
 
 ```bash
-tspec run tests/login_success.http.tspec
+tspec run tests/login_success.http.tcase
 ```
 
 ### Run All HTTP Tests
 
 ```bash
-tspec run "tests/**/*.http.tspec"
+tspec run "tests/**/*.http.tcase"
 ```
 
 ### Run All Tests with Glob Pattern
 
 ```bash
-tspec run "tests/*.tspec"
+tspec run "tests/*.tcase"
 ```
 
 ## Environment Variables
@@ -25,13 +25,13 @@ tspec run "tests/*.tspec"
 ### Single Environment Variable
 
 ```bash
-tspec run tests/*.tspec -e API_HOST=localhost
+tspec run tests/*.tcase -e API_HOST=localhost
 ```
 
 ### Multiple Environment Variables
 
 ```bash
-tspec run tests/*.tspec \
+tspec run tests/*.tcase \
   -e API_HOST=api.example.com \
   -e API_KEY=secret123 \
   -e API_PORT=8080
@@ -41,7 +41,7 @@ tspec run tests/*.tspec \
 
 ```json
 {
-  "files": ["tests/*.tspec"],
+  "files": ["tests/*.tcase"],
   "env": {
     "API_HOST": "api.example.com",
     "API_KEY": "secret123",
@@ -55,14 +55,14 @@ tspec run tests/*.tspec \
 ### Pass Test Parameters
 
 ```bash
-tspec run tests/*.tspec -p username=testuser -p password=testpass
+tspec run tests/*.tcase -p username=testuser -p password=testpass
 ```
 
 ### MCP Tool with Parameters
 
 ```json
 {
-  "files": ["tests/login.http.tspec"],
+  "files": ["tests/login.http.tcase"],
   "params": {
     "username": "testuser",
     "password": "testpass"
@@ -75,13 +75,13 @@ tspec run tests/*.tspec -p username=testuser -p password=testpass
 ### Run with Higher Concurrency
 
 ```bash
-tspec run tests/*.tspec -c 10
+tspec run tests/*.tcase -c 10
 ```
 
 ### Run Tests Sequentially
 
 ```bash
-tspec run tests/*.tspec -c 1
+tspec run tests/*.tcase -c 1
 ```
 
 ## Output Formats
@@ -89,19 +89,19 @@ tspec run tests/*.tspec -c 1
 ### JSON Output for CI/CD
 
 ```bash
-tspec run tests/*.tspec --output json
+tspec run tests/*.tcase --output json
 ```
 
 ### Verbose Text Output
 
 ```bash
-tspec run tests/*.tspec -v
+tspec run tests/*.tcase -v
 ```
 
 ### Quiet Mode (Summary Only)
 
 ```bash
-tspec run tests/*.tspec -q
+tspec run tests/*.tcase -q
 ```
 
 ## Failure Handling
@@ -109,7 +109,7 @@ tspec run tests/*.tspec -q
 ### Stop on First Failure
 
 ```bash
-tspec run tests/*.tspec --fail-fast
+tspec run tests/*.tcase --fail-fast
 ```
 
 ## CI/CD Integration
@@ -119,7 +119,7 @@ tspec run tests/*.tspec --fail-fast
 ```yaml
 - name: Run TSpec tests
   run: |
-    npx @boolesai/tspec-cli run tests/*.tspec --output json > results.json
+    npx @boolesai/tspec-cli run tests/*.tcase --output json > results.json
 ```
 
 ### GitLab CI
@@ -127,7 +127,7 @@ tspec run tests/*.tspec --fail-fast
 ```yaml
 test:
   script:
-    - npx @boolesai/tspec-cli run tests/*.tspec --output json
+    - npx @boolesai/tspec-cli run tests/*.tcase --output json
   artifacts:
     reports:
       junit: results.json
@@ -138,7 +138,7 @@ test:
 ### Full CI/CD Run
 
 ```bash
-tspec run "tests/**/*.tspec" \
+tspec run "tests/**/*.tcase" \
   -e API_HOST=staging.example.com \
   -e API_KEY=$API_KEY \
   -c 10 \
@@ -149,7 +149,7 @@ tspec run "tests/**/*.tspec" \
 ### Debug Run with Verbose Output
 
 ```bash
-tspec run tests/failing_test.http.tspec \
+tspec run tests/failing_test.http.tcase \
   -v \
   -e DEBUG=true \
   -c 1

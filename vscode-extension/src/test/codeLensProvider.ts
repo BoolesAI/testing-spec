@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { TSpecTestProvider } from './testProvider';
 
 /**
- * Provides CodeLens "Run Test" buttons in .tspec files
+ * Provides CodeLens "Run Test" buttons in .tcase files
  */
 export class TSpecCodeLensProvider implements vscode.CodeLensProvider {
   private testProvider: TSpecTestProvider;
@@ -14,7 +14,7 @@ export class TSpecCodeLensProvider implements vscode.CodeLensProvider {
   }
 
   /**
-   * Provide CodeLens for .tspec files
+   * Provide CodeLens for .tcase files
    */
   provideCodeLenses(
     document: vscode.TextDocument,

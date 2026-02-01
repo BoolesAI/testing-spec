@@ -10,9 +10,13 @@ let testProvider: TSpecTestProvider | undefined;
 export function activate(context: vscode.ExtensionContext): void {
   console.log('TSpec extension is now active');
 
-  // Define document selector for TSpec files
+  // Define document selectors for TSpec and TSuite files
   const tspecSelector: vscode.DocumentSelector = { 
     language: 'tspec', 
+    scheme: 'file' 
+  };
+  const tsuiteSelector: vscode.DocumentSelector = { 
+    language: 'tsuite', 
     scheme: 'file' 
   };
 
@@ -20,11 +24,20 @@ export function activate(context: vscode.ExtensionContext): void {
   diagnosticProvider = new TSpecDiagnosticProvider();
   context.subscriptions.push(diagnosticProvider);
 
-  // Register completion provider
+  // Register completion provider for TSpec
   const completionProvider = new TSpecCompletionProvider();
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
       tspecSelector,
+      completionProvider,
+      ':', '$', '{', '.'  // Trigger characters
+    )
+  );
+
+  // Register completion provider for TSuite (reusing TSpec provider for common completions)
+  context.subscriptions.push(
+    vscode.languages.registerCompletionItemProvider(
+      tsuiteSelector,
       completionProvider,
       ':', '$', '{', '.'  // Trigger characters
     )
@@ -41,9 +54,13 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(...codeLensDisposables);
   }
 
-  // Validate all open TSpec documents
+  // Helper function to check if document is TSpec or TSuite
+  const isTSpecOrTSuite = (doc: vscode.TextDocument) => 
+    doc.languageId === 'tspec' || doc.languageId === 'tsuite';
+
+  // Validate all open TSpec and TSuite documents
   vscode.workspace.textDocuments.forEach(document => {
-    if (document.languageId === 'tspec') {
+    if (isTSpecOrTSuite(document)) {
       diagnosticProvider.validateDocument(document);
     }
   });
@@ -51,7 +68,7 @@ export function activate(context: vscode.ExtensionContext): void {
   // Validate on document open
   context.subscriptions.push(
     vscode.workspace.onDidOpenTextDocument(document => {
-      if (document.languageId === 'tspec') {
+      if (isTSpecOrTSuite(document)) {
         diagnosticProvider.validateDocument(document);
       }
     })
@@ -60,7 +77,7 @@ export function activate(context: vscode.ExtensionContext): void {
   // Validate on document change (debounced)
   context.subscriptions.push(
     vscode.workspace.onDidChangeTextDocument(event => {
-      if (event.document.languageId === 'tspec') {
+      if (isTSpecOrTSuite(event.document)) {
         diagnosticProvider.validateDocumentDebounced(event.document);
       }
     })
@@ -69,7 +86,7 @@ export function activate(context: vscode.ExtensionContext): void {
   // Validate on document save
   context.subscriptions.push(
     vscode.workspace.onDidSaveTextDocument(document => {
-      if (document.languageId === 'tspec') {
+      if (isTSpecOrTSuite(document)) {
         diagnosticProvider.validateDocument(document);
       }
     })
@@ -78,7 +95,7 @@ export function activate(context: vscode.ExtensionContext): void {
   // Clear diagnostics when document is closed
   context.subscriptions.push(
     vscode.workspace.onDidCloseTextDocument(document => {
-      if (document.languageId === 'tspec') {
+      if (isTSpecOrTSuite(document)) {
         // Diagnostics are automatically cleared when document is closed
       }
     })

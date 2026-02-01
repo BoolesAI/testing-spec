@@ -20,7 +20,7 @@ const TOOL_DEFINITIONS = [
         files: {
           type: 'array',
           items: { type: 'string' },
-          description: 'Files or glob patterns to run (e.g., ["tests/*.tspec"])'
+          description: 'Files or glob patterns to run (e.g., ["tests/*.tcase"])'
         },
         concurrency: {
           type: 'number',
@@ -51,7 +51,7 @@ const TOOL_DEFINITIONS = [
   },
   {
     name: 'tspec_validate',
-    description: 'Validate .tspec files for schema correctness',
+    description: 'Validate .tcase files for schema correctness',
     inputSchema: {
       type: 'object' as const,
       properties: {

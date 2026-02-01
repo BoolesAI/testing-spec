@@ -1,6 +1,6 @@
 # 4. Core Structure
 
-Every `.tspec` file follows a consistent top-level schema. This section describes the overall structure and field ordering.
+Every `.tcase` file follows a consistent top-level schema. This section describes the overall structure and field ordering.
 
 ## Top-Level Schema
 

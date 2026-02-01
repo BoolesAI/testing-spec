@@ -42,13 +42,13 @@ TSpec (Test Specification) is a YAML-based domain-specific language for defining
 npm install -g @boolesai/tspec-cli
 
 # Validate test files
-tspec validate tests/*.tspec
+tspec validate tests/*.tcase
 
 # Run tests
-tspec run tests/*.http.tspec
+tspec run tests/*.http.tcase
 
 # Parse and inspect test cases
-tspec parse tests/login.http.tspec --output json
+tspec parse tests/login.http.tcase --output json
 ```
 
 ### Using the VSCode Extension
@@ -63,7 +63,7 @@ code --install-extension boolesai.vscode-tspec
 
 **Running Tests:**
 1. Open the Testing view in VS Code (beaker icon in sidebar)
-2. All `.tspec` files will be automatically discovered
+2. All `.tcase` files will be automatically discovered
 3. Click the play button next to any test to run it
 4. View real-time results with detailed assertion feedback
 
@@ -85,8 +85,8 @@ npm install @boolesai/tspec
 ```javascript
 import { parseTestCases, scheduler } from '@boolesai/tspec';
 
-// Parse test cases from a .tspec file
-const testCases = parseTestCases('./tests/login.http.tspec', {
+// Parse test cases from a .tcase file
+const testCases = parseTestCases('./tests/login.http.tcase', {
   params: { username: 'testuser' },
   env: { API_HOST: 'api.example.com' }
 });
@@ -157,10 +157,10 @@ TSpec uses protocol-specific file extensions:
 
 | Extension | Protocol |
 |-----------|----------|
-| `.http.tspec` | HTTP/HTTPS |
-| `.grpc.tspec` | gRPC |
-| `.graphql.tspec` | GraphQL (reserved) |
-| `.ws.tspec` | WebSocket (reserved) |
+| `.http.tcase` | HTTP/HTTPS |
+| `.grpc.tcase` | gRPC |
+| `.graphql.tcase` | GraphQL (reserved) |
+| `.ws.tcase` | WebSocket (reserved) |
 
 ## Documentation
 

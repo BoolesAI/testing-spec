@@ -4,7 +4,7 @@ TSpec supports multiple protocols through dedicated protocol blocks. Each protoc
 
 ## HTTP/HTTPS
 
-File extension: `.http.tspec`
+File extension: `.http.tcase`
 
 ### Configuration
 
@@ -145,7 +145,7 @@ extract:
 
 ## gRPC
 
-File extension: `.grpc.tspec`
+File extension: `.grpc.tcase`
 
 ### Configuration
 
@@ -260,7 +260,7 @@ extract:
 
 ## GraphQL (Reserved)
 
-File extension: `.graphql.tspec`
+File extension: `.graphql.tcase`
 
 > Note: GraphQL support is reserved for future implementation.
 
@@ -286,7 +286,7 @@ graphql:
 
 ## WebSocket (Reserved)
 
-File extension: `.websocket.tspec`
+File extension: `.websocket.tcase`
 
 > Note: WebSocket support is reserved for future implementation.
 

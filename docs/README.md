@@ -20,6 +20,7 @@ A multi-protocol testing DSL designed for Developer + AI collaboration.
 10. [Protocol Reference](./10-protocol-reference.md)
 11. [API Reference](./11-api-reference.md)
 12. [Examples](./12-examples.md)
+13. [Test Suites](./13-test-suites.md)
 
 ---
 
@@ -38,13 +39,19 @@ TSpec (Test Specification) is a YAML-based domain-specific language for defining
 - Built-in variable system with functions
 - Comprehensive assertion types
 - Lifecycle hooks for setup/teardown
+- Test suites for organizing related tests with shared configuration
 
-### File Extension
+### File Extensions
 
-`.tspec` with protocol suffix:
-- `.http.tspec` - HTTP/HTTPS tests
-- `.grpc.tspec` - gRPC tests
-- `.graphql.tspec` - GraphQL tests (reserved)
+**Test Cases** (`.tcase`):
+- `.http.tcase` - HTTP/HTTPS tests
+- `.grpc.tcase` - gRPC tests
+- `.graphql.tcase` - GraphQL tests (reserved)
+
+**Test Suites** (`.tsuite`):
+- `.http.tsuite` - HTTP test suite
+- `.grpc.tsuite` - gRPC test suite
+- `*.tsuite` - Mixed protocol suite
 
 ---
 
@@ -59,8 +66,8 @@ npm install @boolesai/tspec
 ```javascript
 import { parseTestCases, scheduler } from '@boolesai/tspec';
 
-// Parse test cases from a .tspec file
-const testCases = parseTestCases('./tests/login.http.tspec', {
+// Parse test cases from a .tcase file
+const testCases = parseTestCases('./tests/login.http.tcase', {
   params: { username: 'testuser' },
   env: { API_HOST: 'api.example.com' }
 });

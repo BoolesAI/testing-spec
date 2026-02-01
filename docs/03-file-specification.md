@@ -1,28 +1,63 @@
 # 3. File Specification
 
-## File Extension
+## File Types
 
-TSpec files use the `.tspec` extension with a protocol identifier:
+TSpec supports two file types: test case files (`.tcase`) and test suite files (`.tsuite`).
+
+### Test Case Files (`.tcase`)
+
+Individual test case files use the `.tcase` extension with a protocol identifier:
 
 | Extension | Protocol | Description |
 |-----------|----------|-------------|
-| `.http.tspec` | HTTP/HTTPS | REST API tests |
-| `.grpc.tspec` | gRPC | gRPC service tests |
-| `.graphql.tspec` | GraphQL | GraphQL API tests (reserved) |
-| `.websocket.tspec` | WebSocket | WebSocket tests (reserved) |
+| `.http.tcase` | HTTP/HTTPS | REST API tests |
+| `.grpc.tcase` | gRPC | gRPC service tests |
+| `.graphql.tcase` | GraphQL | GraphQL API tests (reserved) |
+| `.websocket.tcase` | WebSocket | WebSocket tests (reserved) |
+
+### Test Suite Files (`.tsuite`)
+
+Test suite files organize related tests with shared configuration:
+
+| Extension | Description |
+|-----------|-------------|
+| `*.http.tsuite` | HTTP test suite |
+| `*.grpc.tsuite` | gRPC test suite |
+| `*.graphql.tsuite` | GraphQL test suite (reserved) |
+| `*.ws.tsuite` | WebSocket test suite (reserved) |
+| `*.tsuite` | Mixed protocol suite |
+| `*.tsuite.yaml` | Suite template |
+
+See [Test Suites](./13-test-suites.md) for complete suite documentation.
 
 ## Naming Convention
 
-**Pattern**: `{business_scenario}_{test_type}_{description}.{protocol}.tspec`
+### Test Case Files
 
-### Examples
+**Pattern**: `{business_scenario}_{test_type}_{description}.{protocol}.tcase`
+
+#### Examples
 
 ```
-login_functional_success.http.tspec
-login_functional_invalid_password.http.tspec
-user_integration_create_and_delete.http.tspec
-payment_security_sql_injection.http.tspec
-order_performance_bulk_create.grpc.tspec
+login_functional_success.http.tcase
+login_functional_invalid_password.http.tcase
+user_integration_create_and_delete.http.tcase
+payment_security_sql_injection.http.tcase
+order_performance_bulk_create.grpc.tcase
+```
+
+### Test Suite Files
+
+**Pattern**: `{domain}.{protocol}.tsuite` or `{domain}_{description}.{protocol}.tsuite`
+
+#### Examples
+
+```
+auth.http.tsuite
+bookstore.http.tsuite
+user_api.http.tsuite
+order_service.grpc.tsuite
+api.tsuite                     # Mixed protocol
 ```
 
 ### Components
@@ -134,7 +169,7 @@ headers:
 
 ### Single Test Per File
 
-Each `.tspec` file should contain exactly one test case. For data-driven tests, the data source generates multiple test instances from a single file.
+Each `.tcase` file should contain exactly one test case. For data-driven tests, the data source generates multiple test instances from a single file.
 
 ### Related Tests Together
 
@@ -143,21 +178,25 @@ Group related tests in directories:
 ```
 testcases/
 ├── auth/
+│   ├── auth.http.tsuite              # Suite for auth tests
 │   ├── login/
-│   │   ├── success.http.tspec
-│   │   ├── invalid_password.http.tspec
-│   │   ├── locked_account.http.tspec
-│   │   └── rate_limited.http.tspec
+│   │   ├── success.http.tcase
+│   │   ├── invalid_password.http.tcase
+│   │   ├── locked_account.http.tcase
+│   │   └── rate_limited.http.tcase
 │   └── logout/
-│       └── success.http.tspec
+│       └── success.http.tcase
 ├── users/
-│   ├── create.http.tspec
-│   ├── read.http.tspec
-│   ├── update.http.tspec
-│   └── delete.http.tspec
-└── _templates/
-    ├── base_http.yaml
-    └── base_auth.yaml
+│   ├── users.http.tsuite             # Suite for user tests
+│   ├── create.http.tcase
+│   ├── read.http.tcase
+│   ├── update.http.tcase
+│   └── delete.http.tcase
+├── _templates/
+│   ├── base_http.yaml
+│   ├── base_auth.yaml
+│   └── api-suite.tsuite.yaml         # Suite template
+└── api.tsuite                        # Root suite
 ```
 
 ### Template Organization
@@ -169,6 +208,7 @@ _templates/
 ├── base_http.yaml        # Base HTTP configuration
 ├── base_auth.yaml        # Authentication defaults
 ├── base_grpc.yaml        # Base gRPC configuration
+├── api-suite.tsuite.yaml # Suite template
 └── assertions/
     └── common.yaml       # Reusable assertion definitions
 ```

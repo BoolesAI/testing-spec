@@ -12,13 +12,13 @@ npm install tspec-parser
 
 ### `generateTestCases(filePath, options)`
 
-Parse a `.tspec` file and generate executable test cases.
+Parse a `.tcase` file and generate executable test cases.
 
 **Parameters**:
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `filePath` | string | Yes | Path to the `.tspec` file |
+| `filePath` | string | Yes | Path to the `.tcase` file |
 | `options` | object | No | Generation options |
 | `options.params` | object | No | Input parameters (override variables) |
 | `options.env` | object | No | Environment variables |
@@ -31,7 +31,7 @@ Parse a `.tspec` file and generate executable test cases.
 ```javascript
 import { generateTestCases } from 'tspec-parser';
 
-const testCases = generateTestCases('./tests/login.http.tspec', {
+const testCases = generateTestCases('./tests/login.http.tcase', {
   params: { username: 'custom_user' },
   env: { 
     API_HOST: 'api.staging.example.com',
@@ -122,7 +122,7 @@ Run assertions against a response.
 ```javascript
 import { generateTestCases, assertResults } from 'tspec-parser';
 
-const testCases = generateTestCases('./test.http.tspec');
+const testCases = generateTestCases('./test.http.tcase');
 
 // Execute request (using your HTTP client)
 const response = {
@@ -230,7 +230,7 @@ Parse a YAML file.
 
 ```javascript
 import { parseYamlFile } from 'tspec-parser';
-const spec = parseYamlFile('./test.http.tspec');
+const spec = parseYamlFile('./test.http.tcase');
 ```
 
 ### `parseYamlString(content)`
@@ -252,6 +252,57 @@ const { valid, errors } = validateTspec(spec);
 if (!valid) {
   console.error('Validation errors:', errors);
 }
+```
+
+### `validateSuite(suite)`
+
+Validate a parsed suite object.
+
+```javascript
+import { validateSuite } from 'tspec-parser';
+const { valid, errors } = validateSuite(suite);
+if (!valid) {
+  console.error('Suite validation errors:', errors);
+}
+```
+
+### `parseSuiteFile(filePath)`
+
+Parse a `.tsuite` file.
+
+```javascript
+import { parseSuiteFile } from 'tspec-parser';
+const suite = parseSuiteFile('./tests/api.http.tsuite');
+console.log(suite.suite.name);     // Suite name
+console.log(suite.suite.tests);    // Test references
+```
+
+### `isSuiteFile(filePath)`
+
+Check if a file is a suite file.
+
+```javascript
+import { isSuiteFile } from 'tspec-parser';
+console.log(isSuiteFile('./api.http.tsuite'));  // true
+console.log(isSuiteFile('./test.http.tcase'));  // false
+```
+
+### `executeSuite(suitePath, options)`
+
+Execute a test suite.
+
+```javascript
+import { executeSuite } from 'tspec-parser';
+
+const result = await executeSuite('./tests/api.http.tsuite', {
+  env: { API_HOST: 'localhost:3000' },
+  parallel: true,
+  concurrency: 3
+});
+
+console.log(result.suiteName);     // Suite name
+console.log(result.passed);        // Overall pass/fail
+console.log(result.testResults);   // Individual test results
 ```
 
 ### `replaceVariables(obj, context)`
@@ -321,7 +372,7 @@ import { generateTestCases, assertResults } from 'tspec-parser';
 
 async function runTests() {
   // 1. Generate test cases
-  const testCases = generateTestCases('./tests/api/login.http.tspec', {
+  const testCases = generateTestCases('./tests/api/login.http.tcase', {
     env: {
       API_HOST: process.env.API_HOST || 'localhost:3000',
       TEST_PASSWORD: process.env.TEST_PASSWORD

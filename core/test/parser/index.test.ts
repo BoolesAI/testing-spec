@@ -4,32 +4,32 @@ import { getTypeFromFilePath, parseTestCasesFromString } from '../../src/parser/
 describe('parser/index', () => {
   describe('getTypeFromFilePath', () => {
     it('should extract http type', () => {
-      expect(getTypeFromFilePath('/path/to/test.http.tspec')).toBe('http');
-      expect(getTypeFromFilePath('test.HTTP.tspec')).toBe('http');
+      expect(getTypeFromFilePath('/path/to/test.http.tcase')).toBe('http');
+      expect(getTypeFromFilePath('test.HTTP.tcase')).toBe('http');
     });
 
     it('should extract grpc type', () => {
-      expect(getTypeFromFilePath('/path/to/test.grpc.tspec')).toBe('grpc');
-      expect(getTypeFromFilePath('test.GRPC.tspec')).toBe('grpc');
+      expect(getTypeFromFilePath('/path/to/test.grpc.tcase')).toBe('grpc');
+      expect(getTypeFromFilePath('test.GRPC.tcase')).toBe('grpc');
     });
 
     it('should extract graphql type', () => {
-      expect(getTypeFromFilePath('/path/to/test.graphql.tspec')).toBe('graphql');
-      expect(getTypeFromFilePath('test.GraphQL.tspec')).toBe('graphql');
+      expect(getTypeFromFilePath('/path/to/test.graphql.tcase')).toBe('graphql');
+      expect(getTypeFromFilePath('test.GraphQL.tcase')).toBe('graphql');
     });
 
     it('should extract websocket type', () => {
-      expect(getTypeFromFilePath('/path/to/test.websocket.tspec')).toBe('websocket');
-      expect(getTypeFromFilePath('test.WebSocket.tspec')).toBe('websocket');
+      expect(getTypeFromFilePath('/path/to/test.websocket.tcase')).toBe('websocket');
+      expect(getTypeFromFilePath('test.WebSocket.tcase')).toBe('websocket');
     });
 
-    it('should return null for non-tspec files', () => {
+    it('should return null for non-tcase files', () => {
       expect(getTypeFromFilePath('/path/to/test.js')).toBeNull();
       expect(getTypeFromFilePath('test.txt')).toBeNull();
     });
 
-    it('should return null for tspec files without type', () => {
-      expect(getTypeFromFilePath('/path/to/test.tspec')).toBeNull();
+    it('should return null for tcase files without type', () => {
+      expect(getTypeFromFilePath('/path/to/test.tcase')).toBeNull();
     });
   });
 

@@ -13,7 +13,7 @@ npm install @boolesai/tspec
 
 ## Features
 
-- **Parser**: Parse and validate `.tspec` test specification files
+- **Parser**: Parse and validate `.tcase` test specification files
 - **Runner**: Execute test cases with HTTP protocol support
 - **Assertion**: Rich assertion engine with multiple validation types
 - **Scheduler**: Concurrent test execution with configurable parallelism
@@ -29,13 +29,13 @@ import {
 } from '@boolesai/tspec';
 
 // Validate a test file
-const validation = validateTestCase('./tests/login.http.tspec');
+const validation = validateTestCase('./tests/login.http.tcase');
 if (!validation.valid) {
   console.error('Validation errors:', validation.errors);
 }
 
 // Parse test cases
-const testCases = parseTestCases('./tests/login.http.tspec', {
+const testCases = parseTestCases('./tests/login.http.tcase', {
   params: { username: 'testuser' },
   env: { API_HOST: 'api.example.com' }
 });
@@ -71,7 +71,7 @@ import { scheduler, TestScheduler } from '@boolesai/tspec/scheduler';
 
 | Function | Description |
 |----------|-------------|
-| `validateTestCase(filePath)` | Validate a `.tspec` file |
+| `validateTestCase(filePath)` | Validate a `.tcase` file |
 | `parseTestCases(filePath, options?)` | Parse file into executable test cases |
 | `parseTestCasesFromString(content, options?)` | Parse YAML string content |
 

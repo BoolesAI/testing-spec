@@ -92,14 +92,14 @@ export class GutterDecorationManager implements vscode.Disposable {
   }
 
   /**
-   * Check if a document is a .tspec file
+   * Check if a document is a .tcase file
    */
   private isTspecFile(document: vscode.TextDocument): boolean {
-    return document.languageId === 'tspec' || document.fileName.endsWith('.tspec');
+    return document.languageId === 'tspec' || document.fileName.endsWith('.tcase');
   }
 
   /**
-   * Update decorations for all visible .tspec editors
+   * Update decorations for all visible .tcase editors
    */
   updateAllVisibleDecorations(): void {
     for (const editor of vscode.window.visibleTextEditors) {

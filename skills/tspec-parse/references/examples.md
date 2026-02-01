@@ -5,13 +5,13 @@
 ### Parse Single File
 
 ```bash
-tspec parse tests/login_success.http.tspec
+tspec parse tests/login_success.http.tcase
 ```
 
 ### Parse Multiple Files
 
 ```bash
-tspec parse "tests/**/*.tspec"
+tspec parse "tests/**/*.tcase"
 ```
 
 ## Variable Substitution Debugging
@@ -19,19 +19,19 @@ tspec parse "tests/**/*.tspec"
 ### With Environment Variables
 
 ```bash
-tspec parse tests/login.http.tspec -e API_HOST=localhost -e API_PORT=3000
+tspec parse tests/login.http.tcase -e API_HOST=localhost -e API_PORT=3000
 ```
 
 ### With Parameters
 
 ```bash
-tspec parse tests/login.http.tspec -p username=testuser -p password=testpass
+tspec parse tests/login.http.tcase -p username=testuser -p password=testpass
 ```
 
 ### Combined Environment and Parameters
 
 ```bash
-tspec parse tests/login.http.tspec \
+tspec parse tests/login.http.tcase \
   -e API_HOST=localhost \
   -p username=testuser
 ```
@@ -41,7 +41,7 @@ tspec parse tests/login.http.tspec \
 ### Text Output (Default)
 
 ```bash
-tspec parse tests/login.http.tspec
+tspec parse tests/login.http.tcase
 ```
 
 Example output:
@@ -66,7 +66,7 @@ Assertions:
 ### Verbose Output
 
 ```bash
-tspec parse tests/login.http.tspec -v
+tspec parse tests/login.http.tcase -v
 ```
 
 Includes:
@@ -78,7 +78,7 @@ Includes:
 ### JSON Output
 
 ```bash
-tspec parse tests/login.http.tspec --output json
+tspec parse tests/login.http.tcase --output json
 ```
 
 Example output:
@@ -117,7 +117,7 @@ Example output:
 
 ```json
 {
-  "files": ["tests/login.http.tspec"]
+  "files": ["tests/login.http.tcase"]
 }
 ```
 
@@ -125,7 +125,7 @@ Example output:
 
 ```json
 {
-  "files": ["tests/login.http.tspec"],
+  "files": ["tests/login.http.tcase"],
   "env": {
     "API_HOST": "localhost",
     "API_PORT": "3000"
@@ -141,7 +141,7 @@ Example output:
 
 ```json
 {
-  "files": ["tests/*.tspec"],
+  "files": ["tests/*.tcase"],
   "output": "json"
 }
 ```
@@ -152,24 +152,24 @@ Example output:
 
 ```bash
 # See which variables couldn't be resolved
-tspec parse tests/login.http.tspec -v 2>&1 | grep -i "unresolved"
+tspec parse tests/login.http.tcase -v 2>&1 | grep -i "unresolved"
 ```
 
 ### Compare Variable Resolution
 
 ```bash
 # Development environment
-tspec parse tests/api.http.tspec -e API_HOST=localhost
+tspec parse tests/api.http.tcase -e API_HOST=localhost
 
 # Production environment
-tspec parse tests/api.http.tspec -e API_HOST=api.example.com
+tspec parse tests/api.http.tcase -e API_HOST=api.example.com
 ```
 
 ### Inspect Template Inheritance
 
 ```bash
 # See how base template merges with test
-tspec parse tests/auth_with_base.http.tspec -v
+tspec parse tests/auth_with_base.http.tcase -v
 ```
 
 ## Data-Driven Test Inspection
@@ -177,7 +177,7 @@ tspec parse tests/auth_with_base.http.tspec -v
 ### View Expanded Test Cases
 
 ```bash
-tspec parse tests/login_data_driven.http.tspec -v
+tspec parse tests/login_data_driven.http.tcase -v
 ```
 
 Shows all test case variations from CSV/JSON data sources.
@@ -186,16 +186,16 @@ Shows all test case variations from CSV/JSON data sources.
 
 ```bash
 # 1. Parse to verify request looks correct
-tspec parse tests/new_test.http.tspec -v
+tspec parse tests/new_test.http.tcase -v
 
 # 2. If satisfied, run the test
-tspec run tests/new_test.http.tspec
+tspec run tests/new_test.http.tcase
 ```
 
 ## Quiet Mode
 
 ```bash
-tspec parse tests/*.tspec -q
+tspec parse tests/*.tcase -q
 ```
 
 Minimal output, only shows essential information or errors.
