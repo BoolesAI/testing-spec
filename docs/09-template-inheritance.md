@@ -12,7 +12,7 @@ The `extends` field specifies a template file to inherit from. All fields from t
 
 ## Template File Format
 
-Templates are standard YAML files (not `.tspec`):
+Templates are standard YAML files (not `.tcase`):
 
 **_templates/base_http.yaml**:
 ```yaml
@@ -156,14 +156,14 @@ http:
     Authorization: "Bearer ${env.AUTH_TOKEN}"
 ```
 
-**test.http.tspec**:
+**test.http.tcase**:
 ```yaml
 extends: "_templates/base_auth.yaml"
 
 # Inherits from both base.yaml and base_auth.yaml
 ```
 
-**Inheritance chain**: `base.yaml` → `base_auth.yaml` → `test.http.tspec`
+**Inheritance chain**: `base.yaml` → `base_auth.yaml` → `test.http.tcase`
 
 ## Circular Dependency Protection
 
@@ -232,7 +232,7 @@ http:
 
 ### Using Templates
 
-**testcases/users/get_profile.http.tspec**:
+**testcases/users/get_profile.http.tcase**:
 ```yaml
 version: "1.0"
 description: "Get user profile"
@@ -281,7 +281,7 @@ _templates/everything.yaml     # All settings mixed
 ### Use Relative Paths
 
 ```yaml
-# From testcases/auth/login.http.tspec
+# From testcases/auth/login.http.tcase
 extends: "../../_templates/base_http.yaml"
 ```
 

@@ -87,35 +87,35 @@ The `test/` directory contains comprehensive TSpec test cases demonstrating vari
 
 | Test File | Description | Assertions |
 |-----------|-------------|------------|
-| `list_books.http.tspec` | List books with default pagination | Status 200, pagination metadata |
-| `list_books_paginated.http.tspec` | Custom pagination and sorting | Status 200, limit validation |
-| `get_book.http.tspec` | Retrieve single book | Status 200, all fields exist |
-| `create_book.http.tspec` | Create book with valid data | Status 201, Location header |
-| `update_book.http.tspec` | Partial update | Status 200, updated values |
-| `delete_book.http.tspec` | Delete existing book | Status 204 |
+| `list_books.http.tcase` | List books with default pagination | Status 200, pagination metadata |
+| `list_books_paginated.http.tcase` | Custom pagination and sorting | Status 200, limit validation |
+| `get_book.http.tcase` | Retrieve single book | Status 200, all fields exist |
+| `create_book.http.tcase` | Create book with valid data | Status 201, Location header |
+| `update_book.http.tcase` | Partial update | Status 200, updated values |
+| `delete_book.http.tcase` | Delete existing book | Status 204 |
 
 ### Negative Test Cases
 
 | Test File | Description | Expected Status |
 |-----------|-------------|-----------------|
-| `get_book_not_found.http.tspec` | Get non-existent book | 404 |
-| `create_book_validation_error.http.tspec` | Missing required fields | 400 |
-| `create_book_invalid_isbn.http.tspec` | Invalid ISBN format | 400 |
-| `update_book_not_found.http.tspec` | Update non-existent book | 404 |
-| `update_book_validation_error.http.tspec` | Invalid update data | 400 |
-| `delete_book_not_found.http.tspec` | Delete non-existent book | 404 |
+| `get_book_not_found.http.tcase` | Get non-existent book | 404 |
+| `create_book_validation_error.http.tcase` | Missing required fields | 400 |
+| `create_book_invalid_isbn.http.tcase` | Invalid ISBN format | 400 |
+| `update_book_not_found.http.tcase` | Update non-existent book | 404 |
+| `update_book_validation_error.http.tcase` | Invalid update data | 400 |
+| `delete_book_not_found.http.tcase` | Delete non-existent book | 404 |
 
 ### Running Tests with TSpec CLI
 
 ```bash
 # Validate all test cases
-tspec validate test/*.http.tspec
+tspec validate test/*.http.tcase
 
 # Run all tests against the local server
-tspec run test/*.http.tspec
+tspec run test/*.http.tcase
 
 # Run specific test
-tspec run test/create_book.http.tspec
+tspec run test/create_book.http.tcase
 ```
 
 ## NPM Scripts

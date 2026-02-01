@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 /**
- * Metadata extracted from a .tspec test file
+ * Metadata extracted from a .tcase test file
  */
 export interface TSpecTestMetadata {
   testCaseId: string;
@@ -14,7 +14,7 @@ export interface TSpecTestMetadata {
 }
 
 /**
- * Single assertion definition from a .tspec file
+ * Single assertion definition from a .tcase file
  */
 export interface TSpecAssertion {
   type: string;

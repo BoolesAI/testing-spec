@@ -144,13 +144,13 @@ export async function executeRun(params: RunParams): Promise<RunExecutionResult>
   const verbose = params.verbose ?? false;
   const quiet = params.quiet ?? false;
   
-  // Discover both .tspec and .tsuite files
+  // Discover both .tcase and .tsuite files
   const { tspecFiles, suiteFiles, errors: resolveErrors } = await discoverAllTestFiles(params.files);
   
   if (tspecFiles.length === 0 && suiteFiles.length === 0) {
     return {
       success: false,
-      output: 'No .tspec or .tsuite files found',
+      output: 'No .tcase or .tsuite files found',
       data: {
         results: [],
         summary: { total: 0, passed: 0, failed: 0, passRate: 0, duration: 0 },
@@ -195,7 +195,7 @@ interface ExecuteOptions {
 }
 
 /**
- * Execute .tspec files directly (original behavior)
+ * Execute .tcase files directly (original behavior)
  */
 async function executeTspecRun(
   fileDescriptors: TSpecFileDescriptor[],

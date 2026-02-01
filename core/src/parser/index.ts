@@ -180,7 +180,7 @@ function generateTestCaseId(filePath: string, index: number, suffix = ''): strin
 }
 
 export function getTypeFromFilePath(filePath: string): string | null {
-  const match = filePath.match(/\.(http|grpc|graphql|websocket)\.tspec$/i);
+  const match = filePath.match(/\.(http|grpc|graphql|websocket)\.tcase$/i);
   return match ? match[1].toLowerCase() : null;
 }
 

@@ -88,8 +88,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### @boolesai/tspec (Core Library)
 
-- **Parser Module**: Parse and validate `.tspec` test specification files
-  - `validateTestCase()` - Validate a `.tspec` file for schema correctness
+- **Parser Module**: Parse and validate `.tcase` test specification files
+  - `validateTestCase()` - Validate a `.tcase` file for schema correctness
   - `parseTestCases()` - Parse file into executable test cases
   - `parseTestCasesFromString()` - Parse YAML string content
 - **Runner Module**: Execute test cases with HTTP protocol support
@@ -110,7 +110,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### @boolesai/tspec-cli (Command Line Interface)
 
 - **Commands**:
-  - `tspec validate` - Validate `.tspec` files for schema correctness
+  - `tspec validate` - Validate `.tcase` files for schema correctness
   - `tspec run` - Execute test cases with configurable concurrency, environment variables, and parameters
   - `tspec parse` - Parse and display test case information without execution
   - `tspec list` - List supported protocols and configuration
@@ -123,7 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### vscode-tspec (VS Code Extension)
 
-- **Syntax Highlighting**: Rich syntax highlighting for `.tspec` files
+- **Syntax Highlighting**: Rich syntax highlighting for `.tcase` files
 - **Code Snippets**: Pre-built templates for common test patterns
   - `tspec-http`, `tspec-post`, `tspec-get`, `tspec-assertion`, `tspec-data`
 - **Validation**: Real-time validation with error diagnostics
@@ -142,7 +142,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **tspec-list**: List supported protocols and TSpec configuration
 - **tspec-parse**: Parse and display test case information without execution
-- **tspec-validate**: Validate `.tspec` files for schema correctness
+- **tspec-validate**: Validate `.tcase` files for schema correctness
 - **tspec-run**: Execute TSpec test cases and report results
 
 #### Demo (Bookstore API)
@@ -164,7 +164,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Variable system with built-in functions and dynamic substitution
 - Comprehensive metadata support for AI-assisted test generation
 - Lifecycle hooks for setup and teardown
-- Protocol-specific file extensions: `.http.tspec`, `.grpc.tspec`, `.graphql.tspec`, `.ws.tspec`
+- Protocol-specific file extensions: `.http.tcase`, `.grpc.tcase`, `.graphql.tcase`, `.ws.tcase`
 
 #### Documentation
 

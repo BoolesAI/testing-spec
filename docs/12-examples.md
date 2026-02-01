@@ -4,7 +4,7 @@ Complete examples demonstrating various TSpec features.
 
 ## Basic HTTP Test
 
-**tests/health_check.http.tspec**:
+**tests/health_check.http.tcase**:
 ```yaml
 version: "1.0"
 description: "API health check endpoint"
@@ -45,7 +45,7 @@ assertions:
 
 ### Login Test
 
-**tests/auth/login_success.http.tspec**:
+**tests/auth/login_success.http.tcase**:
 ```yaml
 version: "1.0"
 description: "User login with valid credentials"
@@ -119,7 +119,7 @@ lifecycle:
 
 ### Login Failure Test
 
-**tests/auth/login_invalid_password.http.tspec**:
+**tests/auth/login_invalid_password.http.tcase**:
 ```yaml
 version: "1.0"
 description: "Login fails with invalid password"
@@ -165,7 +165,7 @@ assertions:
 
 ## Data-Driven Test
 
-**tests/auth/login_scenarios.http.tspec**:
+**tests/auth/login_scenarios.http.tcase**:
 ```yaml
 version: "1.0"
 description: "Login scenarios - data driven"
@@ -264,7 +264,7 @@ http:
 
 ### Test Using Template
 
-**tests/users/get_profile.http.tspec**:
+**tests/users/get_profile.http.tcase**:
 ```yaml
 version: "1.0"
 description: "Get current user profile"
@@ -312,7 +312,7 @@ lifecycle:
 
 ### Create Resource
 
-**tests/products/create.http.tspec**:
+**tests/products/create.http.tcase**:
 ```yaml
 version: "1.0"
 description: "Create new product"
@@ -379,7 +379,7 @@ lifecycle:
 
 ## gRPC Example
 
-**tests/grpc/get_user.grpc.tspec**:
+**tests/grpc/get_user.grpc.tcase**:
 ```yaml
 version: "1.0"
 description: "Get user profile via gRPC"
@@ -442,7 +442,7 @@ lifecycle:
 
 ## Custom JavaScript Assertion
 
-**tests/orders/calculate_total.http.tspec**:
+**tests/orders/calculate_total.http.tcase**:
 ```yaml
 version: "1.0"
 description: "Verify order total calculation"
@@ -521,7 +521,7 @@ definitions:
     operator: "exists"
 ```
 
-**tests/api/test_with_includes.http.tspec**:
+**tests/api/test_with_includes.http.tcase**:
 ```yaml
 version: "1.0"
 description: "Test using assertion includes"
@@ -556,7 +556,7 @@ assertions:
 
 ### Testing for Expected Errors
 
-**tests/errors/server_error.http.tspec**:
+**tests/errors/server_error.http.tcase**:
 ```yaml
 version: "1.0"
 description: "Verify server error handling"
@@ -597,7 +597,7 @@ assertions:
 
 ### Testing for Network Errors
 
-**tests/errors/connection_timeout.http.tspec**:
+**tests/errors/connection_timeout.http.tcase**:
 ```yaml
 version: "1.0"
 description: "Verify timeout handling"
@@ -634,7 +634,7 @@ assertions:
 
 ### Testing for Success (No Exceptions)
 
-**tests/success/health_check.http.tspec**:
+**tests/success/health_check.http.tcase**:
 ```yaml
 version: "1.0"
 description: "Verify health endpoint succeeds"
@@ -676,7 +676,7 @@ assertions:
 
 ### gRPC Error Testing
 
-**tests/grpc/unavailable_service.grpc.tspec**:
+**tests/grpc/unavailable_service.grpc.tcase**:
 ```yaml
 version: "1.0"
 description: "Verify gRPC error handling"

@@ -233,8 +233,8 @@ export interface SuiteMetadata {
  * Either 'file' or 'files' must be specified, not both
  */
 export interface TestReference {
-  file?: string;                   // Path to single .tspec file
-  files?: string;                  // Glob pattern for multiple .tspec files
+  file?: string;                   // Path to single .tcase file
+  files?: string;                  // Glob pattern for multiple .tcase files
   skip?: boolean;                  // Skip this test/tests
   only?: boolean;                  // Run only this test/tests (focus mode)
   variables?: Record<string, unknown>; // Override variables

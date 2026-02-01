@@ -4,7 +4,7 @@ export interface FileResolutionResult {
     errors: string[];
 }
 /**
- * Represents a discovered .tspec file without loading its content.
+ * Represents a discovered .tcase file without loading its content.
  * Used for lazy file loading - files are scanned first, content read on-demand.
  */
 export interface TSpecFileDescriptor {
@@ -12,9 +12,9 @@ export interface TSpecFileDescriptor {
     path: string;
     /** Path relative to working directory */
     relativePath: string;
-    /** Base filename (e.g., "login.http.tspec") */
+    /** Base filename (e.g., "login.http.tcase") */
     fileName: string;
-    /** Protocol type extracted from filename (e.g., "http" from "login.http.tspec") */
+    /** Protocol type extracted from filename (e.g., "http" from "login.http.tcase") */
     protocol: ProtocolType | null;
 }
 export interface DiscoveryResult {
@@ -25,7 +25,7 @@ export declare function resolveFiles(patterns: string[], cwd?: string): Promise<
 export declare function filterByExtension(files: string[], extension: string): string[];
 export declare function getTspecFiles(files: string[]): string[];
 /**
- * Discovers .tspec files without loading their content.
+ * Discovers .tcase files without loading their content.
  * Files are scanned and classified, content is read on-demand during validation/parsing/execution.
  *
  * @param patterns - File paths, directory paths, or glob patterns
@@ -63,7 +63,7 @@ export interface SuiteDiscoveryResult {
  */
 export declare function discoverSuiteFiles(patterns: string[], cwd?: string): Promise<SuiteDiscoveryResult>;
 /**
- * Discovers both .tspec and .tsuite files.
+ * Discovers both .tcase and .tsuite files.
  * Useful when processing mixed inputs.
  */
 export interface MixedDiscoveryResult {

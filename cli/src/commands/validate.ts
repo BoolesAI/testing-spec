@@ -36,7 +36,7 @@ export async function executeValidate(params: ValidateParams): Promise<ValidateE
   if (fileDescriptors.length === 0) {
     return {
       success: false,
-      output: 'No .tspec files found',
+      output: 'No .tcase files found',
       data: { results: [] }
     };
   }
@@ -66,7 +66,7 @@ export async function executeValidate(params: ValidateParams): Promise<ValidateE
 }
 
 export const validateCommand = new Command('validate')
-  .description('Validate .tspec files for schema correctness')
+  .description('Validate .tcase files for schema correctness')
   .argument('<files...>', 'Files or glob patterns to validate')
   .option('-o, --output <format>', 'Output format: json, text', 'text')
   .option('-q, --quiet', 'Only output errors')

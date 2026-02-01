@@ -38,8 +38,8 @@ suite:
     api_version: "v1"
     
   tests:
-    - file: "create_book.http.tspec"
-    - files: "books/**/*.http.tspec"
+    - file: "create_book.http.tcase"
+    - files: "books/**/*.http.tcase"
 ```
 
 ## Test References
@@ -48,29 +48,29 @@ suite:
 
 ```yaml
 tests:
-  - file: "create_book.http.tspec"
+  - file: "create_book.http.tcase"
 ```
 
 ### Glob Pattern
 
 ```yaml
 tests:
-  - files: "books/**/*.http.tspec"
+  - files: "books/**/*.http.tcase"
 ```
 
 ### With Options
 
 ```yaml
 tests:
-  - file: "get_book.http.tspec"
+  - file: "get_book.http.tcase"
     timeout: "10s"
     variables:
       book_id: "123"
   
-  - files: "smoke/*.http.tspec"
+  - files: "smoke/*.http.tcase"
     skip: false
     
-  - files: "wip/*.http.tspec"
+  - files: "wip/*.http.tcase"
     skip: true
 ```
 
@@ -156,7 +156,7 @@ suite:
   name: "API Tests"
   
   tests:
-    - files: "smoke/*.http.tspec"
+    - files: "smoke/*.http.tcase"
     
   suites:
     - file: "auth/auth.http.tsuite"
@@ -174,7 +174,7 @@ suite:
     - "products.http.tsuite"
   
   tests:
-    - file: "create_order.http.tspec"
+    - file: "create_order.http.tcase"
 ```
 
 ## Suite Templates
@@ -217,7 +217,7 @@ suite:
     api_version: "v2"               # Override template
     
   tests:
-    - file: "create_book.http.tspec"
+    - file: "create_book.http.tcase"
 ```
 
 ## Variable Scoping
@@ -253,7 +253,7 @@ suite:
     entity_name: "book"          # New variable
     
   tests:
-    - file: "get_book.http.tspec"
+    - file: "get_book.http.tcase"
       variables:
         book_id: "123"           # Test-specific
 ```

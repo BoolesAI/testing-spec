@@ -8,7 +8,7 @@ npm install tspec-parser
 
 ## Your First Test Case
 
-Create a file named `login_success.http.tspec`:
+Create a file named `login_success.http.tcase`:
 
 ```yaml
 version: "1.0"
@@ -64,7 +64,7 @@ extract:
 import { generateTestCases, assertResults } from 'tspec-parser';
 
 // 1. Generate test cases
-const testCases = generateTestCases('./login_success.http.tspec', {
+const testCases = generateTestCases('./login_success.http.tcase', {
   env: { 
     API_HOST: 'localhost:3000',
     TEST_PASSWORD: 'secret123' 
@@ -114,8 +114,8 @@ my-service/
 │   ├── testcases/                # Test cases
 │   │   ├── auth/
 │   │   │   └── login/
-│   │   │       ├── success.http.tspec
-│   │   │       └── invalid_password.http.tspec
+│   │   │       ├── success.http.tcase
+│   │   │       └── invalid_password.http.tcase
 │   │   └── _templates/           # Templates
 │   ├── datasets/                 # Test data (CSV, JSON, YAML)
 │   └── suites/                   # Test suites

@@ -55,7 +55,7 @@ export async function executeParse(params: ParseParams): Promise<ParseExecutionR
   if (fileDescriptors.length === 0) {
     return {
       success: false,
-      output: 'No .tspec files found',
+      output: 'No .tcase files found',
       data: {
         testCases: [],
         parseErrors: [],

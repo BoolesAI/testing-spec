@@ -17,7 +17,7 @@ router.get('/api/v1/books/:id', async (req, res) => {
 });
 ```
 
-Generate test file `get_book_success.http.tspec`:
+Generate test file `get_book_success.http.tcase`:
 
 ```yaml
 version: "1.0"
@@ -76,7 +76,7 @@ router.post('/api/v1/users', async (req, res) => {
 });
 ```
 
-Generate test file `create_user_success.http.tspec`:
+Generate test file `create_user_success.http.tcase`:
 
 ```yaml
 version: "1.0"
@@ -168,14 +168,14 @@ When a controller has multiple endpoints, generate a test file for each operatio
 
 ```
 tests/orders/
-├── create_order_success.http.tspec
-├── create_order_validation_error.http.tspec
-├── get_order_success.http.tspec
-├── get_order_not_found.http.tspec
-├── update_order_success.http.tspec
-├── update_order_not_found.http.tspec
-├── delete_order_success.http.tspec
-└── delete_order_unauthorized.http.tspec
+├── create_order_success.http.tcase
+├── create_order_validation_error.http.tcase
+├── get_order_success.http.tcase
+├── get_order_not_found.http.tcase
+├── update_order_success.http.tcase
+├── update_order_not_found.http.tcase
+├── delete_order_success.http.tcase
+└── delete_order_unauthorized.http.tcase
 ```
 
 ## Different Test Categories
@@ -363,14 +363,14 @@ assertions:
 git diff --name-only src/
 
 # 2. Read changed files and generate tests
-# (Assistant reads files and creates .tspec files)
+# (Assistant reads files and creates .tcase files)
 
 # 3. Validate generated tests
-tspec validate "tests/**/*.tspec"
+tspec validate "tests/**/*.tcase"
 
 # 4. Parse to verify structure
-tspec parse "tests/**/*.tspec" -v
+tspec parse "tests/**/*.tcase" -v
 
 # 5. Run tests
-tspec run "tests/**/*.tspec" -e API_HOST=localhost:3000
+tspec run "tests/**/*.tcase" -e API_HOST=localhost:3000
 ```

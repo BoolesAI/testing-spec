@@ -169,7 +169,7 @@ user2,pass2,401
 The parser generates two test cases:
 
 ```javascript
-const testCases = generateTestCases('./login.http.tspec');
+const testCases = generateTestCases('./login.http.tcase');
 
 // testCases[0] - Row 0
 {
@@ -214,7 +214,7 @@ data:
 api/
 ├── testcases/
 │   └── auth/
-│       └── login.http.tspec
+│       └── login.http.tcase
 └── datasets/
     └── auth/
         ├── login_success.csv
@@ -263,7 +263,7 @@ valid2@example.com,weak,Test User,400,Password too weak
 valid3@example.com,SecurePass123!,,400,Name required
 ```
 
-**testcases/user/registration.http.tspec**:
+**testcases/user/registration.http.tcase**:
 ```yaml
 version: "1.0"
 description: "User registration - data driven validation"

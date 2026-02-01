@@ -43,10 +43,10 @@ TSpec (Test Specification) is a YAML-based domain-specific language for defining
 
 ### File Extensions
 
-**Test Cases** (`.tspec`):
-- `.http.tspec` - HTTP/HTTPS tests
-- `.grpc.tspec` - gRPC tests
-- `.graphql.tspec` - GraphQL tests (reserved)
+**Test Cases** (`.tcase`):
+- `.http.tcase` - HTTP/HTTPS tests
+- `.grpc.tcase` - gRPC tests
+- `.graphql.tcase` - GraphQL tests (reserved)
 
 **Test Suites** (`.tsuite`):
 - `.http.tsuite` - HTTP test suite
@@ -66,8 +66,8 @@ npm install @boolesai/tspec
 ```javascript
 import { parseTestCases, scheduler } from '@boolesai/tspec';
 
-// Parse test cases from a .tspec file
-const testCases = parseTestCases('./tests/login.http.tspec', {
+// Parse test cases from a .tcase file
+const testCases = parseTestCases('./tests/login.http.tcase', {
   params: { username: 'testuser' },
   env: { API_HOST: 'api.example.com' }
 });

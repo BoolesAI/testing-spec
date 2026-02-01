@@ -40,7 +40,7 @@
           "tspec"
         ],
         "extensions": [
-          ".tspec"
+          ".tcase"
         ],
         "configuration": "./language-configuration.json"
       },
@@ -134,7 +134,7 @@
         "tspec.testing.watchMode": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically refresh tests when .tspec or .tsuite files change"
+          "description": "Automatically refresh tests when .tcase or .tsuite files change"
         },
         "tspec.testing.envVars": {
           "type": "object",

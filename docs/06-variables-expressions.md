@@ -23,7 +23,7 @@ Variables are resolved in the following order (highest priority first):
 
 ```javascript
 // params has highest priority
-const testCases = generateTestCases('./test.http.tspec', {
+const testCases = generateTestCases('./test.http.tcase', {
   params: { username: 'override_user' },  // Highest priority
   env: { API_HOST: 'custom.api.com' }     // Second priority
 });
@@ -183,7 +183,7 @@ Extracted variables persist for the test execution and can be passed to subseque
 const result1 = assertResults(response1, testCase1);
 
 // Use extracted values in next test
-const testCases2 = generateTestCases('./next.http.tspec', {
+const testCases2 = generateTestCases('./next.http.tcase', {
   extracted: result1.extracted  // { token: '...', user_id: '...' }
 });
 ```

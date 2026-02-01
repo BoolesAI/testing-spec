@@ -11,7 +11,7 @@ export interface FileResolutionResult {
 }
 
 /**
- * Represents a discovered .tspec file without loading its content.
+ * Represents a discovered .tcase file without loading its content.
  * Used for lazy file loading - files are scanned first, content read on-demand.
  */
 export interface TSpecFileDescriptor {
@@ -19,9 +19,9 @@ export interface TSpecFileDescriptor {
   path: string;
   /** Path relative to working directory */
   relativePath: string;
-  /** Base filename (e.g., "login.http.tspec") */
+  /** Base filename (e.g., "login.http.tcase") */
   fileName: string;
-  /** Protocol type extracted from filename (e.g., "http" from "login.http.tspec") */
+  /** Protocol type extracted from filename (e.g., "http" from "login.http.tcase") */
   protocol: ProtocolType | null;
 }
 
@@ -45,10 +45,10 @@ export async function resolveFiles(patterns: string[], cwd?: string): Promise<Fi
         files.push(absolutePath);
         continue;
       } else if (stat.isDirectory()) {
-        // If it's a directory, glob for .tspec files
-        const dirFiles = await glob('**/*.tspec', { cwd: absolutePath, absolute: true });
+        // If it's a directory, glob for .tcase files
+        const dirFiles = await glob('**/*.tcase', { cwd: absolutePath, absolute: true });
         if (dirFiles.length === 0) {
-          errors.push(`No .tspec files found in directory: ${pattern}`);
+          errors.push(`No .tcase files found in directory: ${pattern}`);
         } else {
           files.push(...dirFiles);
         }
@@ -76,11 +76,11 @@ export function filterByExtension(files: string[], extension: string): string[] 
 }
 
 export function getTspecFiles(files: string[]): string[] {
-  return filterByExtension(files, '.tspec');
+  return filterByExtension(files, '.tcase');
 }
 
 /**
- * Discovers .tspec files without loading their content.
+ * Discovers .tcase files without loading their content.
  * Files are scanned and classified, content is read on-demand during validation/parsing/execution.
  * 
  * @param patterns - File paths, directory paths, or glob patterns
@@ -99,15 +99,15 @@ export async function discoverTSpecFiles(patterns: string[], cwd?: string): Prom
     if (existsSync(absolutePath)) {
       const stat = statSync(absolutePath);
       if (stat.isFile()) {
-        if (absolutePath.endsWith('.tspec')) {
+        if (absolutePath.endsWith('.tcase')) {
           filePaths.push(absolutePath);
         }
         continue;
       } else if (stat.isDirectory()) {
-        // If it's a directory, glob for .tspec files
-        const dirFiles = await glob('**/*.tspec', { cwd: absolutePath, absolute: true });
+        // If it's a directory, glob for .tcase files
+        const dirFiles = await glob('**/*.tcase', { cwd: absolutePath, absolute: true });
         if (dirFiles.length === 0) {
-          errors.push(`No .tspec files found in directory: ${pattern}`);
+          errors.push(`No .tcase files found in directory: ${pattern}`);
         } else {
           filePaths.push(...dirFiles);
         }
@@ -117,9 +117,9 @@ export async function discoverTSpecFiles(patterns: string[], cwd?: string): Prom
 
     // Treat as glob pattern
     const matches = await glob(pattern, { cwd: workingDir, absolute: true });
-    const tspecMatches = matches.filter(f => f.endsWith('.tspec'));
+    const tspecMatches = matches.filter(f => f.endsWith('.tcase'));
     if (tspecMatches.length === 0) {
-      errors.push(`No .tspec files matched pattern: ${pattern}`);
+      errors.push(`No .tcase files matched pattern: ${pattern}`);
     } else {
       filePaths.push(...tspecMatches);
     }
@@ -223,7 +223,7 @@ export async function discoverSuiteFiles(patterns: string[], cwd?: string): Prom
 }
 
 /**
- * Discovers both .tspec and .tsuite files.
+ * Discovers both .tcase and .tsuite files.
  * Useful when processing mixed inputs.
  */
 export interface MixedDiscoveryResult {
@@ -244,19 +244,19 @@ export async function discoverAllTestFiles(patterns: string[], cwd?: string): Pr
     if (existsSync(absolutePath)) {
       const stat = statSync(absolutePath);
       if (stat.isFile()) {
-        if (absolutePath.endsWith('.tspec')) {
+        if (absolutePath.endsWith('.tcase')) {
           tspecPaths.push(absolutePath);
         } else if (isSuiteFile(absolutePath)) {
           suitePaths.push(absolutePath);
         }
         continue;
       } else if (stat.isDirectory()) {
-        // Discover both .tspec and .tsuite files in directory
-        const tspecFiles = await glob('**/*.tspec', { cwd: absolutePath, absolute: true });
+        // Discover both .tcase and .tsuite files in directory
+        const tspecFiles = await glob('**/*.tcase', { cwd: absolutePath, absolute: true });
         const suiteFiles = await glob('**/*.tsuite', { cwd: absolutePath, absolute: true });
         
         if (tspecFiles.length === 0 && suiteFiles.length === 0) {
-          errors.push(`No .tspec or .tsuite files found in directory: ${pattern}`);
+          errors.push(`No .tcase or .tsuite files found in directory: ${pattern}`);
         } else {
           tspecPaths.push(...tspecFiles);
           suitePaths.push(...suiteFiles);
@@ -267,11 +267,11 @@ export async function discoverAllTestFiles(patterns: string[], cwd?: string): Pr
 
     // Treat as glob pattern
     const matches = await glob(pattern, { cwd: workingDir, absolute: true });
-    const tspecMatches = matches.filter(f => f.endsWith('.tspec'));
+    const tspecMatches = matches.filter(f => f.endsWith('.tcase'));
     const suiteMatches = matches.filter(f => isSuiteFile(f));
     
     if (tspecMatches.length === 0 && suiteMatches.length === 0) {
-      errors.push(`No .tspec or .tsuite files matched pattern: ${pattern}`);
+      errors.push(`No .tcase or .tsuite files matched pattern: ${pattern}`);
     } else {
       tspecPaths.push(...tspecMatches);
       suitePaths.push(...suiteMatches);

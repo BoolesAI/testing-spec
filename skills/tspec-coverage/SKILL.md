@@ -7,7 +7,7 @@ description: Analyze TSpec test coverage based on related_code metadata. Use for
 
 ## Overview
 
-Analyze TSpec test coverage by examining the `metadata.related_code` field across all `.tspec` files. This skill guides you through generating coverage reports that show which source files and lines have corresponding tests.
+Analyze TSpec test coverage by examining the `metadata.related_code` field across all `.tcase` files. This skill guides you through generating coverage reports that show which source files and lines have corresponding tests.
 
 Use this skill when:
 - Reviewing test coverage before release
@@ -18,11 +18,11 @@ Use this skill when:
 ## Analysis Approach
 
 1. **Scan TSpec Files**
-   - Find all `.tspec` files in the project
+   - Find all `.tcase` files in the project
    - Use glob patterns to match test directories
 
 2. **Extract related_code**
-   - Parse each `.tspec` file's metadata section
+   - Parse each `.tcase` file's metadata section
    - Extract `related_code` array entries
    - Parse file paths and line references
 
@@ -49,7 +49,7 @@ Use this skill when:
 
 ```bash
 # Using Glob tool
-pattern: "**/*.tspec"
+pattern: "**/*.tcase"
 path: "tests/"
 ```
 
@@ -57,7 +57,7 @@ Or use `tspec_parse` MCP tool:
 
 ```json
 {
-  "files": ["tests/**/*.tspec"],
+  "files": ["tests/**/*.tcase"],
   "output": "json"
 }
 ```
@@ -128,16 +128,16 @@ The following source files have no corresponding TSpec tests:
 
 | Lines | TSpec File | Description |
 |-------|------------|-------------|
-| 1-25 | create_book_success.http.tspec | Create book endpoint |
-| 26-50 | get_book_success.http.tspec | Get book by ID |
-| 75-100 | update_book_success.http.tspec | Update book |
+| 1-25 | create_book_success.http.tcase | Create book endpoint |
+| 26-50 | get_book_success.http.tcase | Get book by ID |
+| 75-100 | update_book_success.http.tcase | Update book |
 | 51-74 | **UNCOVERED** | Delete book endpoint |
 
 ### src/controllers/users.ts
 
 | Lines | TSpec File | Description |
 |-------|------------|-------------|
-| 10-30 | create_user_success.http.tspec | User registration |
+| 10-30 | create_user_success.http.tcase | User registration |
 | 31-60 | **UNCOVERED** | User profile endpoints |
 ```
 
@@ -208,7 +208,7 @@ Analyze coverage for specific directories:
 
 ```bash
 # Only analyze controllers
-tspec files: tests/controllers/**/*.tspec
+tspec files: tests/controllers/**/*.tcase
 source files: src/controllers/**/*.ts
 ```
 

@@ -12,13 +12,13 @@ npm install tspec-parser
 
 ### `generateTestCases(filePath, options)`
 
-Parse a `.tspec` file and generate executable test cases.
+Parse a `.tcase` file and generate executable test cases.
 
 **Parameters**:
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `filePath` | string | Yes | Path to the `.tspec` file |
+| `filePath` | string | Yes | Path to the `.tcase` file |
 | `options` | object | No | Generation options |
 | `options.params` | object | No | Input parameters (override variables) |
 | `options.env` | object | No | Environment variables |
@@ -31,7 +31,7 @@ Parse a `.tspec` file and generate executable test cases.
 ```javascript
 import { generateTestCases } from 'tspec-parser';
 
-const testCases = generateTestCases('./tests/login.http.tspec', {
+const testCases = generateTestCases('./tests/login.http.tcase', {
   params: { username: 'custom_user' },
   env: { 
     API_HOST: 'api.staging.example.com',
@@ -122,7 +122,7 @@ Run assertions against a response.
 ```javascript
 import { generateTestCases, assertResults } from 'tspec-parser';
 
-const testCases = generateTestCases('./test.http.tspec');
+const testCases = generateTestCases('./test.http.tcase');
 
 // Execute request (using your HTTP client)
 const response = {
@@ -230,7 +230,7 @@ Parse a YAML file.
 
 ```javascript
 import { parseYamlFile } from 'tspec-parser';
-const spec = parseYamlFile('./test.http.tspec');
+const spec = parseYamlFile('./test.http.tcase');
 ```
 
 ### `parseYamlString(content)`
@@ -284,7 +284,7 @@ Check if a file is a suite file.
 ```javascript
 import { isSuiteFile } from 'tspec-parser';
 console.log(isSuiteFile('./api.http.tsuite'));  // true
-console.log(isSuiteFile('./test.http.tspec'));  // false
+console.log(isSuiteFile('./test.http.tcase'));  // false
 ```
 
 ### `executeSuite(suitePath, options)`
@@ -372,7 +372,7 @@ import { generateTestCases, assertResults } from 'tspec-parser';
 
 async function runTests() {
   // 1. Generate test cases
-  const testCases = generateTestCases('./tests/api/login.http.tspec', {
+  const testCases = generateTestCases('./tests/api/login.http.tcase', {
     env: {
       API_HOST: process.env.API_HOST || 'localhost:3000',
       TEST_PASSWORD: process.env.TEST_PASSWORD

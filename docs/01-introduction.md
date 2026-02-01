@@ -61,7 +61,7 @@ Test cases are treated as first-class citizens alongside source code:
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────┐
-│                    .tspec File                          │
+│                    .tcase File                          │
 ├─────────────────────────────────────────────────────────┤
 │  version, description, metadata                         │
 │  ├── environment (runtime config)                       │

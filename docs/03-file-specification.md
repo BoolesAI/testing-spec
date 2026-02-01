@@ -2,18 +2,18 @@
 
 ## File Types
 
-TSpec supports two file types: test case files (`.tspec`) and test suite files (`.tsuite`).
+TSpec supports two file types: test case files (`.tcase`) and test suite files (`.tsuite`).
 
-### Test Case Files (`.tspec`)
+### Test Case Files (`.tcase`)
 
-Individual test case files use the `.tspec` extension with a protocol identifier:
+Individual test case files use the `.tcase` extension with a protocol identifier:
 
 | Extension | Protocol | Description |
 |-----------|----------|-------------|
-| `.http.tspec` | HTTP/HTTPS | REST API tests |
-| `.grpc.tspec` | gRPC | gRPC service tests |
-| `.graphql.tspec` | GraphQL | GraphQL API tests (reserved) |
-| `.websocket.tspec` | WebSocket | WebSocket tests (reserved) |
+| `.http.tcase` | HTTP/HTTPS | REST API tests |
+| `.grpc.tcase` | gRPC | gRPC service tests |
+| `.graphql.tcase` | GraphQL | GraphQL API tests (reserved) |
+| `.websocket.tcase` | WebSocket | WebSocket tests (reserved) |
 
 ### Test Suite Files (`.tsuite`)
 
@@ -34,16 +34,16 @@ See [Test Suites](./13-test-suites.md) for complete suite documentation.
 
 ### Test Case Files
 
-**Pattern**: `{business_scenario}_{test_type}_{description}.{protocol}.tspec`
+**Pattern**: `{business_scenario}_{test_type}_{description}.{protocol}.tcase`
 
 #### Examples
 
 ```
-login_functional_success.http.tspec
-login_functional_invalid_password.http.tspec
-user_integration_create_and_delete.http.tspec
-payment_security_sql_injection.http.tspec
-order_performance_bulk_create.grpc.tspec
+login_functional_success.http.tcase
+login_functional_invalid_password.http.tcase
+user_integration_create_and_delete.http.tcase
+payment_security_sql_injection.http.tcase
+order_performance_bulk_create.grpc.tcase
 ```
 
 ### Test Suite Files
@@ -169,7 +169,7 @@ headers:
 
 ### Single Test Per File
 
-Each `.tspec` file should contain exactly one test case. For data-driven tests, the data source generates multiple test instances from a single file.
+Each `.tcase` file should contain exactly one test case. For data-driven tests, the data source generates multiple test instances from a single file.
 
 ### Related Tests Together
 
@@ -180,18 +180,18 @@ testcases/
 ├── auth/
 │   ├── auth.http.tsuite              # Suite for auth tests
 │   ├── login/
-│   │   ├── success.http.tspec
-│   │   ├── invalid_password.http.tspec
-│   │   ├── locked_account.http.tspec
-│   │   └── rate_limited.http.tspec
+│   │   ├── success.http.tcase
+│   │   ├── invalid_password.http.tcase
+│   │   ├── locked_account.http.tcase
+│   │   └── rate_limited.http.tcase
 │   └── logout/
-│       └── success.http.tspec
+│       └── success.http.tcase
 ├── users/
 │   ├── users.http.tsuite             # Suite for user tests
-│   ├── create.http.tspec
-│   ├── read.http.tspec
-│   ├── update.http.tspec
-│   └── delete.http.tspec
+│   ├── create.http.tcase
+│   ├── read.http.tcase
+│   ├── update.http.tcase
+│   └── delete.http.tcase
 ├── _templates/
 │   ├── base_http.yaml
 │   ├── base_auth.yaml

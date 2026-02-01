@@ -83,7 +83,7 @@ export class TSpecTestProvider implements vscode.Disposable {
   }
 
   /**
-   * Discover all .tspec test files in workspace
+   * Discover all .tcase test files in workspace
    */
   async discoverAllTests(): Promise<void> {
     const files = await this.testParser.findAllTestFiles();
