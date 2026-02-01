@@ -28,6 +28,7 @@ Key features for developers:
 - Data-driven parameterization (`data`)
 - Variable system with built-in functions
 - Modular assertion libraries
+- Test suites for organizing related tests
 
 ### Protocol Extensibility
 
@@ -44,6 +45,21 @@ Test cases are treated as first-class citizens alongside source code:
 ## Architecture
 
 ```
+┌─────────────────────────────────────────────────────────┐
+│                    .tsuite File                          │
+├─────────────────────────────────────────────────────────┤
+│  suite:                                                  │
+│  ├── name, description, version                          │
+│  ├── metadata (AI context)                               │
+│  ├── environment (runtime config)                        │
+│  ├── variables (suite-level)                             │
+│  ├── lifecycle (setup/teardown)                          │
+│  ├── before_each/after_each (per-test hooks)            │
+│  ├── tests (test file references)                        │
+│  └── suites (nested suite references)                    │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           ▼
 ┌─────────────────────────────────────────────────────────┐
 │                    .tspec File                          │
 ├─────────────────────────────────────────────────────────┤
@@ -63,7 +79,7 @@ Test cases are treated as first-class citizens alongside source code:
 ┌─────────────────────────────────────────────────────────┐
 │                   TSpec Parser                          │
 ├─────────────────────────────────────────────────────────┤
-│  1. Parse YAML                                          │
+│  1. Parse YAML (suite or test)                          │
 │  2. Apply template inheritance                          │
 │  3. Generate parameterized cases                        │
 │  4. Replace variables                                   │
@@ -74,12 +90,16 @@ Test cases are treated as first-class citizens alongside source code:
 ┌─────────────────────────────────────────────────────────┐
 │                 Test Execution Engine                    │
 ├─────────────────────────────────────────────────────────┤
-│  1. Execute lifecycle.setup                             │
-│  2. Send request (HTTP/gRPC)                           │
-│  3. Run assertions                                      │
-│  4. Extract variables                                   │
-│  5. Execute lifecycle.teardown                          │
-│  6. Generate report                                     │
+│  1. Execute suite lifecycle.setup (if suite)            │
+│  2. Execute before_each hooks (if suite)                │
+│  3. Execute test lifecycle.setup                        │
+│  4. Send request (HTTP/gRPC)                           │
+│  5. Run assertions                                      │
+│  6. Extract variables                                   │
+│  7. Execute test lifecycle.teardown                     │
+│  8. Execute after_each hooks (if suite)                 │
+│  9. Execute suite lifecycle.teardown (if suite)         │
+│  10. Generate report                                    │
 └─────────────────────────────────────────────────────────┘
 ```
 

@@ -1,9 +1,17 @@
 import { Command } from 'commander';
 import ora from 'ora';
 import chalk from 'chalk';
-import { parseTestCases, scheduler, clearTemplateCache } from '@boolesai/tspec';
+import { 
+  parseTestCases, 
+  scheduler, 
+  clearTemplateCache,
+  executeSuite,
+  isSuiteFile,
+  type SuiteResult,
+  type SuiteTestResult
+} from '@boolesai/tspec';
 import type { TestCase, TestResult } from '@boolesai/tspec';
-import { discoverTSpecFiles, type TSpecFileDescriptor } from '../utils/files.js';
+import { discoverTSpecFiles, discoverAllTestFiles, type TSpecFileDescriptor, type TSuiteFileDescriptor } from '../utils/files.js';
 import { formatTestResults, formatJson, type FormattedTestResult, type TestResultSummary } from '../utils/formatter.js';
 import { logger, setLoggerOptions } from '../utils/logger.js';
 import type { OutputFormat } from '../utils/formatter.js';
@@ -136,13 +144,13 @@ export async function executeRun(params: RunParams): Promise<RunExecutionResult>
   const verbose = params.verbose ?? false;
   const quiet = params.quiet ?? false;
   
-  // Discover files
-  const { files: fileDescriptors, errors: resolveErrors } = await discoverTSpecFiles(params.files);
+  // Discover both .tspec and .tsuite files
+  const { tspecFiles, suiteFiles, errors: resolveErrors } = await discoverAllTestFiles(params.files);
   
-  if (fileDescriptors.length === 0) {
+  if (tspecFiles.length === 0 && suiteFiles.length === 0) {
     return {
       success: false,
-      output: 'No .tspec files found',
+      output: 'No .tspec or .tsuite files found',
       data: {
         results: [],
         summary: { total: 0, passed: 0, failed: 0, passRate: 0, duration: 0 },
@@ -150,6 +158,50 @@ export async function executeRun(params: RunParams): Promise<RunExecutionResult>
       }
     };
   }
+  
+  // If there are suite files, execute them
+  if (suiteFiles.length > 0) {
+    return executeSuiteRun(suiteFiles, tspecFiles, { 
+      env, 
+      params: paramValues, 
+      concurrency, 
+      failFast, 
+      output, 
+      verbose, 
+      quiet 
+    });
+  }
+  
+  // Otherwise, execute tspec files directly
+  return executeTspecRun(tspecFiles, { 
+    env, 
+    params: paramValues, 
+    concurrency, 
+    failFast, 
+    output, 
+    verbose, 
+    quiet 
+  });
+}
+
+interface ExecuteOptions {
+  env: Record<string, string>;
+  params: Record<string, string>;
+  concurrency: number;
+  failFast: boolean;
+  output: OutputFormat;
+  verbose: boolean;
+  quiet: boolean;
+}
+
+/**
+ * Execute .tspec files directly (original behavior)
+ */
+async function executeTspecRun(
+  fileDescriptors: TSpecFileDescriptor[],
+  options: ExecuteOptions
+): Promise<RunExecutionResult> {
+  const { env, params: paramValues, concurrency, failFast, output, verbose, quiet } = options;
   
   // Parse and execute one file at a time
   const allResults: TestResult[] = [];
@@ -227,6 +279,144 @@ export async function executeRun(params: RunParams): Promise<RunExecutionResult>
     success: failed === 0,
     output: outputStr,
     data: { results: formattedResults, summary, parseErrors }
+  };
+}
+
+/**
+ * Execute .tsuite files
+ */
+async function executeSuiteRun(
+  suiteFiles: TSuiteFileDescriptor[],
+  additionalTspecFiles: TSpecFileDescriptor[],
+  options: ExecuteOptions
+): Promise<RunExecutionResult> {
+  const { env, params: paramValues, failFast, output, verbose, quiet } = options;
+  
+  const allResults: FormattedTestResult[] = [];
+  const parseErrors: Array<{ file: string; error: string }> = [];
+  let totalTests = 0;
+  let totalPassed = 0;
+  let totalFailed = 0;
+  let stopped = false;
+  
+  // Execute suite files
+  for (const suiteDescriptor of suiteFiles) {
+    if (stopped) break;
+    
+    // Skip template files
+    if (suiteDescriptor.isTemplate) continue;
+    
+    try {
+      const suiteResult = await executeSuite(suiteDescriptor.path, {
+        env,
+        params: paramValues,
+        onSuiteStart: (name) => {
+          if (!quiet) logger.log(chalk.blue(`\nSuite: ${name}`));
+        },
+        onTestStart: (file) => {
+          if (verbose) logger.log(chalk.gray(`  Running: ${file}`));
+        },
+        onTestComplete: (file, result) => {
+          const statusIcon = result.status === 'passed' ? chalk.green('✓') : chalk.red('✗');
+          if (!quiet) logger.log(`  ${statusIcon} ${result.name} (${result.duration}ms)`);
+        }
+      });
+      
+      // Aggregate results
+      totalTests += suiteResult.stats.total;
+      totalPassed += suiteResult.stats.passed;
+      totalFailed += suiteResult.stats.failed + suiteResult.stats.error;
+      
+      // Convert suite test results to formatted results
+      for (const testResult of suiteResult.tests) {
+        allResults.push({
+          testCaseId: testResult.name,
+          passed: testResult.status === 'passed',
+          duration: testResult.duration,
+          assertions: (testResult.assertions || []).map(a => ({
+            passed: a.passed,
+            type: a.type,
+            message: a.message || ''
+          }))
+        });
+      }
+      
+      // Handle nested suites
+      if (suiteResult.suites) {
+        for (const nestedSuite of suiteResult.suites) {
+          totalTests += nestedSuite.stats.total;
+          totalPassed += nestedSuite.stats.passed;
+          totalFailed += nestedSuite.stats.failed + nestedSuite.stats.error;
+          
+          for (const testResult of nestedSuite.tests) {
+            allResults.push({
+              testCaseId: `${nestedSuite.name}/${testResult.name}`,
+              passed: testResult.status === 'passed',
+              duration: testResult.duration,
+              assertions: (testResult.assertions || []).map(a => ({
+                passed: a.passed,
+                type: a.type,
+                message: a.message || ''
+              }))
+            });
+          }
+        }
+      }
+      
+      if (failFast && (suiteResult.status === 'failed' || suiteResult.status === 'error')) {
+        stopped = true;
+      }
+      
+    } catch (err) {
+      parseErrors.push({ 
+        file: suiteDescriptor.path, 
+        error: err instanceof Error ? err.message : String(err) 
+      });
+    }
+  }
+  
+  // Also run any additional tspec files not in suites
+  if (additionalTspecFiles.length > 0 && !stopped) {
+    const tspecResult = await executeTspecRun(additionalTspecFiles, options);
+    allResults.push(...tspecResult.data.results);
+    parseErrors.push(...tspecResult.data.parseErrors);
+    totalTests += tspecResult.data.summary.total;
+    totalPassed += tspecResult.data.summary.passed;
+    totalFailed += tspecResult.data.summary.failed;
+  }
+  
+  // Calculate summary
+  const summary: TestResultSummary = {
+    total: totalTests,
+    passed: totalPassed,
+    failed: totalFailed,
+    passRate: totalTests > 0 ? (totalPassed / totalTests) * 100 : 0,
+    duration: 0
+  };
+  
+  // Generate output string
+  let outputStr: string;
+  if (output === 'json') {
+    outputStr = formatJson({ results: allResults, summary, parseErrors });
+  } else {
+    const parts: string[] = [];
+    if (!quiet) {
+      parts.push('\n' + chalk.bold('Results:'));
+      parts.push(formatTestResults(allResults, summary, { format: output, verbose }));
+    } else {
+      parts.push(`${summary.passed}/${summary.total} tests passed (${summary.passRate.toFixed(1)}%)`);
+    }
+    if (parseErrors.length > 0) {
+      parts.push(`\n${parseErrors.length} file(s) failed to parse:`);
+      parseErrors.forEach(({ file, error }) => parts.push(`  ${file}: ${error}`));
+    }
+    outputStr = parts.join('\n');
+  }
+  
+  return {
+    success: totalFailed === 0 && parseErrors.length === 0,
+    output: outputStr,
+    data: { results: allResults, summary, parseErrors }
   };
 }
 

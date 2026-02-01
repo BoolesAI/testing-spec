@@ -1,13 +1,13 @@
 ---
 name: tspec-run
-description: Execute TSpec test cases and report results. Use for running API tests, checking endpoint functionality, and verifying test assertions. Supports HTTP and gRPC protocols with concurrent execution, environment variables, and multiple output formats. Keywords: run tests, execute tspec, test api, run http tests, run grpc tests, smoke test, regression test
+description: Execute TSpec test cases and suites. Use for running API tests, checking endpoint functionality, and verifying test assertions. Supports HTTP and gRPC protocols, test suites with lifecycle hooks, concurrent execution, environment variables, and multiple output formats. Keywords: run tests, execute tspec, test api, run http tests, run grpc tests, smoke test, regression test, test suite, tsuite
 ---
 
 # TSpec Run
 
 ## Overview
 
-Execute TSpec test cases against API endpoints and report results. This skill runs `.tspec` test files, validates responses against assertions, and provides detailed pass/fail reporting in text or JSON format.
+Execute TSpec test cases and suites against API endpoints and report results. This skill runs `.tspec` test files and `.tsuite` suite files, validates responses against assertions, and provides detailed pass/fail reporting in text or JSON format. Suites support lifecycle hooks (setup/teardown/before_each/after_each) with proper execution order.
 
 ## MCP Tool Integration
 
@@ -17,7 +17,7 @@ Execute TSpec test cases against API endpoints and report results. This skill ru
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `files` | `string[]` | Yes | Files or glob patterns to run (e.g., `["tests/*.tspec"]`) |
+| `files` | `string[]` | Yes | Files or glob patterns to run (`.tspec` or `.tsuite`) |
 | `concurrency` | `number` | No | Max concurrent tests (default: 5) |
 | `env` | `object` | No | Environment variables as key-value pairs |
 | `params` | `object` | No | Parameters as key-value pairs |
@@ -33,6 +33,16 @@ Execute TSpec test cases against API endpoints and report results. This skill ru
   "env": { "API_HOST": "localhost", "API_PORT": "3000" },
   "params": { "timeout": "5000" },
   "failFast": false,
+  "output": "text"
+}
+```
+
+### Running a Suite
+
+```json
+{
+  "files": ["tests/api.http.tsuite"],
+  "env": { "API_HOST": "localhost:3000" },
   "output": "text"
 }
 ```
@@ -104,6 +114,18 @@ tspec run "tests/**/*.tspec"
 tspec run tests/login_success.http.tspec
 ```
 
+### Run a Test Suite
+
+```bash
+tspec run tests/api.http.tsuite
+```
+
+### Run Multiple Suites
+
+```bash
+tspec run "tests/**/*.tsuite"
+```
+
 ### CI/CD Integration
 
 ```bash
@@ -114,6 +136,44 @@ tspec run tests/*.tspec --output json > results.json
 
 ```bash
 tspec run tests/*.tspec -e API_HOST=staging.example.com
+```
+
+## Test Suites
+
+Test suites (`.tsuite` files) organize related tests with shared configuration and lifecycle hooks.
+
+### Suite Lifecycle Execution Order
+
+1. Suite `lifecycle.setup` runs once before all tests
+2. For each test:
+   - `before_each` hooks run
+   - Test executes
+   - `after_each` hooks run
+3. Suite `lifecycle.teardown` runs once after all tests
+
+### Example Suite
+
+```yaml
+suite:
+  name: "API Tests"
+  
+  lifecycle:
+    setup:
+      - action: "log"
+        message: "Starting test suite"
+    teardown:
+      - action: "log"
+        message: "Completed test suite"
+        
+  before_each:
+    - action: "http"
+      request:
+        method: "POST"
+        path: "/auth/token"
+        
+  tests:
+    - file: "create_user.http.tspec"
+    - files: "users/*.http.tspec"
 ```
 
 ## Exit Codes

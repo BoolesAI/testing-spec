@@ -1,0 +1,224 @@
+{
+  "TSuite Basic Template": {
+    "prefix": "tsuite",
+    "body": [
+      "suite:",
+      "  name: \"${1:Suite Name}\"",
+      "  description: \"${2:Suite description}\"",
+      "  version: \"1.0\"",
+      "",
+      "  metadata:",
+      "    prompt: |",
+      "      ${3:Describe what this suite tests}",
+      "    tags: [\"${4:tag1}\"]",
+      "    test_category: \"${5|functional,integration,performance,security|}\"",
+      "    risk_level: \"${6|low,medium,high,critical|}\"",
+      "    priority: \"${7|low,medium,high|}\"",
+      "",
+      "  environment:",
+      "    scheme: \"${8|http,https|}\"",
+      "    host: \"\\${API_HOST|${9:localhost:3000}}\"",
+      "",
+      "  variables:",
+      "    ${10:api_version}: \"${11:v1}\"",
+      "",
+      "  tests:",
+      "    - file: \"${12:test.http.tspec}\"",
+      "$0"
+    ],
+    "description": "Create a basic TSuite test suite file"
+  },
+  "TSuite with Lifecycle": {
+    "prefix": "tsuite-lifecycle",
+    "body": [
+      "suite:",
+      "  name: \"${1:Suite Name}\"",
+      "  description: \"${2:Suite description}\"",
+      "  version: \"1.0\"",
+      "",
+      "  metadata:",
+      "    prompt: |",
+      "      ${3:Describe what this suite tests}",
+      "    tags: [\"${4:tag1}\"]",
+      "    test_category: \"${5|functional,integration,performance,security|}\"",
+      "    risk_level: \"${6|low,medium,high,critical|}\"",
+      "    priority: \"${7|low,medium,high|}\"",
+      "",
+      "  environment:",
+      "    scheme: \"${8|http,https|}\"",
+      "    host: \"\\${API_HOST|${9:localhost:3000}}\"",
+      "",
+      "  lifecycle:",
+      "    setup:",
+      "      - action: \"log\"",
+      "        message: \"Starting ${1:Suite Name}\"",
+      "        level: \"info\"",
+      "    teardown:",
+      "      - action: \"log\"",
+      "        message: \"Completed ${1:Suite Name}\"",
+      "        level: \"info\"",
+      "",
+      "  before_each:",
+      "    - action: \"${10|log,http,extract|}\"",
+      "      ${11:message}: \"${12:Before each test}\"",
+      "",
+      "  tests:",
+      "    - file: \"${13:test.http.tspec}\"",
+      "$0"
+    ],
+    "description": "Create a TSuite with lifecycle hooks"
+  },
+  "TSuite with Nested Suites": {
+    "prefix": "tsuite-nested",
+    "body": [
+      "suite:",
+      "  name: \"${1:Suite Name}\"",
+      "  description: \"${2:Suite description}\"",
+      "",
+      "  tests:",
+      "    - files: \"${3:*.http.tspec}\"",
+      "",
+      "  suites:",
+      "    - file: \"${4:child.http.tsuite}\"",
+      "    - file: \"${5:another.http.tsuite}\"",
+      "$0"
+    ],
+    "description": "Create a TSuite with nested suites"
+  },
+  "Suite Test Reference - Single File": {
+    "prefix": "suite-test-file",
+    "body": [
+      "- file: \"${1:test.http.tspec}\"",
+      "  ${2:timeout}: \"${3:10s}\"$0"
+    ],
+    "description": "Add single test file reference"
+  },
+  "Suite Test Reference - Glob Pattern": {
+    "prefix": "suite-test-files",
+    "body": [
+      "- files: \"${1:*.http.tspec}\"",
+      "  ${2:skip}: ${3:false}$0"
+    ],
+    "description": "Add glob pattern test reference"
+  },
+  "Suite Lifecycle Setup": {
+    "prefix": "suite-lifecycle-setup",
+    "body": [
+      "lifecycle:",
+      "  setup:",
+      "    - action: \"${1|log,script,http|}\"",
+      "      ${2:message}: \"${3:Setup starting}\"",
+      "  teardown:",
+      "    - action: \"${4|log,script,http|}\"",
+      "      ${5:message}: \"${6:Teardown complete}\"$0"
+    ],
+    "description": "Add lifecycle setup/teardown block"
+  },
+  "Suite Before Each": {
+    "prefix": "suite-before-each",
+    "body": [
+      "before_each:",
+      "  - action: \"${1|http,log,extract|}\"",
+      "    ${2:request}:",
+      "      method: \"${3|POST,GET|}\"",
+      "      path: \"${4:/auth/token}\"$0"
+    ],
+    "description": "Add before_each hooks"
+  },
+  "Suite After Each": {
+    "prefix": "suite-after-each",
+    "body": [
+      "after_each:",
+      "  - action: \"${1|output,log|}\"",
+      "    ${2:config}:",
+      "      save_response_on_failure: ${3:true}$0"
+    ],
+    "description": "Add after_each hooks"
+  },
+  "Suite Execution Config": {
+    "prefix": "suite-execution",
+    "body": [
+      "execution:",
+      "  parallel_tests: ${1|true,false|}",
+      "  parallel_suites: ${2|false,true|}",
+      "  concurrency: ${3:3}",
+      "  order: \"${4|defined,random|}\"",
+      "  fail_fast: ${5|false,true|}",
+      "  timeout: \"${6:10m}\"$0"
+    ],
+    "description": "Add execution configuration"
+  },
+  "Suite Dependencies": {
+    "prefix": "suite-depends",
+    "body": [
+      "depends_on:",
+      "  - \"${1:auth.http.tsuite}\"",
+      "  - \"${2:setup.http.tsuite}\"$0"
+    ],
+    "description": "Add suite dependencies"
+  },
+  "Suite Lifecycle Action - HTTP": {
+    "prefix": "suite-action-http",
+    "body": [
+      "- action: \"http\"",
+      "  request:",
+      "    method: \"${1|POST,GET,PUT,DELETE|}\"",
+      "    path: \"${2:/api/endpoint}\"",
+      "    ${3:body}:",
+      "      json:",
+      "        ${4:key}: \"${5:value}\"$0"
+    ],
+    "description": "Add HTTP lifecycle action"
+  },
+  "Suite Lifecycle Action - Log": {
+    "prefix": "suite-action-log",
+    "body": [
+      "- action: \"log\"",
+      "  message: \"${1:Log message}\"",
+      "  level: \"${2|info,debug,warn,error|}\"$0"
+    ],
+    "description": "Add log lifecycle action"
+  },
+  "Suite Lifecycle Action - Wait": {
+    "prefix": "suite-action-wait",
+    "body": [
+      "- action: \"wait\"",
+      "  duration: \"${1:2s}\"$0"
+    ],
+    "description": "Add wait lifecycle action"
+  },
+  "Suite Lifecycle Action - Extract": {
+    "prefix": "suite-action-extract",
+    "body": [
+      "- action: \"extract\"",
+      "  scope: \"${1|suite,test|}\"",
+      "  vars:",
+      "    ${2:variable_name}: \"${3:\\$.data.field}\"$0"
+    ],
+    "description": "Add extract lifecycle action"
+  },
+  "Suite Lifecycle Action - Script": {
+    "prefix": "suite-action-script",
+    "body": [
+      "- action: \"script\"",
+      "  source: \"${1:scripts/setup.sh}\"$0"
+    ],
+    "description": "Add script lifecycle action"
+  },
+  "Suite Metadata Block": {
+    "prefix": "suite-metadata",
+    "body": [
+      "metadata:",
+      "  prompt: |",
+      "    ${1:Describe what this suite tests}",
+      "  related_code:",
+      "    - \"${2:src/path/to/code.ts}\"",
+      "  test_category: \"${3|functional,integration,performance,security|}\"",
+      "  risk_level: \"${4|low,medium,high,critical|}\"",
+      "  tags: [\"${5:tag1}\"]",
+      "  priority: \"${6|low,medium,high|}\"",
+      "  owner: \"${7:team-name}\"$0"
+    ],
+    "description": "Add suite metadata block"
+  }
+}

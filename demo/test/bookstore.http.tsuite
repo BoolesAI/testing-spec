@@ -1,0 +1,46 @@
+suite:
+  name: "Bookstore API Tests"
+  description: "End-to-end tests for the bookstore REST API"
+  version: "1.0"
+  
+  metadata:
+    prompt: "Test suite for bookstore API CRUD operations"
+    tags: ["api", "bookstore", "integration"]
+    test_category: "integration"
+    risk_level: "high"
+    priority: "high"
+    
+  environment:
+    scheme: "http"
+    host: "${API_HOST|localhost:3000}"
+    
+  variables:
+    api_version: "v1"
+    
+  lifecycle:
+    setup:
+      - action: "log"
+        message: "Starting Bookstore API test suite"
+        level: "info"
+    teardown:
+      - action: "log"
+        message: "Completed Bookstore API test suite"
+        level: "info"
+        
+  before_each:
+    - action: "log"
+      message: "Running test..."
+      level: "debug"
+      
+  execution:
+    parallel_tests: false
+    concurrency: 1
+    order: "defined"
+    fail_fast: false
+    timeout: "5m"
+    
+  tests:
+    - file: "create_book.http.tspec"
+    - file: "get_book.http.tspec"
+    - files: "*.http.tspec"
+      skip: false

@@ -106,6 +106,71 @@ export const OUTPUT_CONFIG_FIELDS: SchemaField[] = [
   { key: 'notifications', required: false, type: 'array', description: 'Notification configuration' },
 ];
 
+// Suite-specific schema definitions
+export const SUITE_TOP_LEVEL_FIELDS: SchemaField[] = [
+  { key: 'suite', required: true, type: 'object', description: 'Suite definition block' },
+];
+
+export const SUITE_FIELDS: SchemaField[] = [
+  { key: 'name', required: true, type: 'string', description: 'Suite name' },
+  { key: 'description', required: false, type: 'string', description: 'Suite description' },
+  { key: 'version', required: false, type: 'string', description: 'Suite version' },
+  { key: 'extends', required: false, type: 'string', description: 'Template file to extend' },
+  { key: 'depends_on', required: false, type: 'array', description: 'Suite dependencies' },
+  { key: 'metadata', required: false, type: 'object', description: 'Suite metadata' },
+  { key: 'environment', required: false, type: 'object', description: 'Environment configuration' },
+  { key: 'variables', required: false, type: 'object', description: 'Suite-level variables' },
+  { key: 'lifecycle', required: false, type: 'object', description: 'Suite setup and teardown hooks' },
+  { key: 'before_each', required: false, type: 'array', description: 'Hooks to run before each test' },
+  { key: 'after_each', required: false, type: 'array', description: 'Hooks to run after each test' },
+  { key: 'execution', required: false, type: 'object', description: 'Execution configuration' },
+  { key: 'tests', required: false, type: 'array', description: 'Test file references' },
+  { key: 'suites', required: false, type: 'array', description: 'Nested suite references' },
+];
+
+export const SUITE_METADATA_FIELDS: SchemaField[] = [
+  { key: 'prompt', required: false, type: 'string', description: 'AI context for suite' },
+  { key: 'related_code', required: false, type: 'array', description: 'Related source files' },
+  { key: 'test_category', required: false, type: 'enum', description: 'Test category', values: ['functional', 'integration', 'performance', 'security'] },
+  { key: 'risk_level', required: false, type: 'enum', description: 'Risk level', values: ['low', 'medium', 'high', 'critical'] },
+  { key: 'tags', required: false, type: 'array', description: 'Tags for filtering' },
+  { key: 'priority', required: false, type: 'enum', description: 'Suite priority', values: ['low', 'medium', 'high'] },
+  { key: 'timeout', required: false, type: 'string', description: 'Suite-level timeout' },
+  { key: 'owner', required: false, type: 'string', description: 'Suite owner/team' },
+];
+
+export const SUITE_EXECUTION_FIELDS: SchemaField[] = [
+  { key: 'parallel_tests', required: false, type: 'boolean', description: 'Run tests in parallel' },
+  { key: 'parallel_suites', required: false, type: 'boolean', description: 'Run nested suites in parallel' },
+  { key: 'concurrency', required: false, type: 'number', description: 'Max concurrent items' },
+  { key: 'order', required: false, type: 'enum', description: 'Execution order', values: ['defined', 'random'] },
+  { key: 'fail_fast', required: false, type: 'boolean', description: 'Stop on first failure' },
+  { key: 'timeout', required: false, type: 'string', description: 'Suite-level timeout' },
+  { key: 'retry', required: false, type: 'object', description: 'Retry configuration' },
+];
+
+export const SUITE_TEST_REFERENCE_FIELDS: SchemaField[] = [
+  { key: 'file', required: false, type: 'string', description: 'Single test file path' },
+  { key: 'files', required: false, type: 'string', description: 'Glob pattern for test files' },
+  { key: 'skip', required: false, type: 'boolean', description: 'Skip this test reference' },
+  { key: 'only', required: false, type: 'boolean', description: 'Run only this test reference' },
+  { key: 'variables', required: false, type: 'object', description: 'Test-specific variables' },
+  { key: 'timeout', required: false, type: 'string', description: 'Test-specific timeout' },
+];
+
+export const SUITE_LIFECYCLE_ACTION_FIELDS: SchemaField[] = [
+  { key: 'action', required: true, type: 'enum', description: 'Action type', values: ['script', 'http', 'grpc', 'extract', 'output', 'wait', 'log'] },
+  { key: 'source', required: false, type: 'string', description: 'Script source (for script action)' },
+  { key: 'request', required: false, type: 'object', description: 'HTTP/gRPC request (for http/grpc action)' },
+  { key: 'vars', required: false, type: 'object', description: 'Variables to extract (for extract action)' },
+  { key: 'scope', required: false, type: 'enum', description: 'Extraction scope', values: ['suite', 'test'] },
+  { key: 'config', required: false, type: 'object', description: 'Output configuration (for output action)' },
+  { key: 'duration', required: false, type: 'string', description: 'Wait duration (for wait action)' },
+  { key: 'message', required: false, type: 'string', description: 'Log message (for log action)' },
+  { key: 'level', required: false, type: 'enum', description: 'Log level (for log action)', values: ['debug', 'info', 'warn', 'error'] },
+  { key: 'extract', required: false, type: 'object', description: 'Variable extraction from response' },
+];
+
 export const VARIABLE_FUNCTIONS = [
   { name: 'uuid', description: 'Generate UUID v4' },
   { name: 'timestamp', description: 'Current Unix timestamp in milliseconds' },

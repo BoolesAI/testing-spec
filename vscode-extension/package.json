@@ -27,7 +27,8 @@
     "yaml"
   ],
   "activationEvents": [
-    "onLanguage:tspec"
+    "onLanguage:tspec",
+    "onLanguage:tsuite"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -42,6 +43,17 @@
           ".tspec"
         ],
         "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "tsuite",
+        "aliases": [
+          "TSuite",
+          "tsuite"
+        ],
+        "extensions": [
+          ".tsuite"
+        ],
+        "configuration": "./language-configuration.json"
       }
     ],
     "grammars": [
@@ -49,12 +61,21 @@
         "language": "tspec",
         "scopeName": "source.tspec",
         "path": "./syntaxes/tspec.tmLanguage.json"
+      },
+      {
+        "language": "tsuite",
+        "scopeName": "source.tsuite",
+        "path": "./syntaxes/tsuite.tmLanguage.json"
       }
     ],
     "snippets": [
       {
         "language": "tspec",
         "path": "./snippets/tspec.json"
+      },
+      {
+        "language": "tsuite",
+        "path": "./snippets/tsuite.json"
       }
     ],
     "commands": [
@@ -113,7 +134,7 @@
         "tspec.testing.watchMode": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically refresh tests when .tspec files change"
+          "description": "Automatically refresh tests when .tspec or .tsuite files change"
         },
         "tspec.testing.envVars": {
           "type": "object",

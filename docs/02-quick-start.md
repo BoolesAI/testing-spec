@@ -130,3 +130,4 @@ my-service/
 - [Field Reference](./05-field-reference.md) - Detailed field definitions
 - [Variables and Expressions](./06-variables-expressions.md) - Variable system
 - [Assertions](./08-assertions.md) - Validation rules
+- [Test Suites](./13-test-suites.md) - Organizing tests with suites

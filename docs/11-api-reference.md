@@ -254,6 +254,57 @@ if (!valid) {
 }
 ```
 
+### `validateSuite(suite)`
+
+Validate a parsed suite object.
+
+```javascript
+import { validateSuite } from 'tspec-parser';
+const { valid, errors } = validateSuite(suite);
+if (!valid) {
+  console.error('Suite validation errors:', errors);
+}
+```
+
+### `parseSuiteFile(filePath)`
+
+Parse a `.tsuite` file.
+
+```javascript
+import { parseSuiteFile } from 'tspec-parser';
+const suite = parseSuiteFile('./tests/api.http.tsuite');
+console.log(suite.suite.name);     // Suite name
+console.log(suite.suite.tests);    // Test references
+```
+
+### `isSuiteFile(filePath)`
+
+Check if a file is a suite file.
+
+```javascript
+import { isSuiteFile } from 'tspec-parser';
+console.log(isSuiteFile('./api.http.tsuite'));  // true
+console.log(isSuiteFile('./test.http.tspec'));  // false
+```
+
+### `executeSuite(suitePath, options)`
+
+Execute a test suite.
+
+```javascript
+import { executeSuite } from 'tspec-parser';
+
+const result = await executeSuite('./tests/api.http.tsuite', {
+  env: { API_HOST: 'localhost:3000' },
+  parallel: true,
+  concurrency: 3
+});
+
+console.log(result.suiteName);     // Suite name
+console.log(result.passed);        // Overall pass/fail
+console.log(result.testResults);   // Individual test results
+```
+
 ### `replaceVariables(obj, context)`
 
 Replace variables in an object.

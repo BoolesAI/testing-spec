@@ -1,8 +1,12 @@
 # 3. File Specification
 
-## File Extension
+## File Types
 
-TSpec files use the `.tspec` extension with a protocol identifier:
+TSpec supports two file types: test case files (`.tspec`) and test suite files (`.tsuite`).
+
+### Test Case Files (`.tspec`)
+
+Individual test case files use the `.tspec` extension with a protocol identifier:
 
 | Extension | Protocol | Description |
 |-----------|----------|-------------|
@@ -11,11 +15,28 @@ TSpec files use the `.tspec` extension with a protocol identifier:
 | `.graphql.tspec` | GraphQL | GraphQL API tests (reserved) |
 | `.websocket.tspec` | WebSocket | WebSocket tests (reserved) |
 
+### Test Suite Files (`.tsuite`)
+
+Test suite files organize related tests with shared configuration:
+
+| Extension | Description |
+|-----------|-------------|
+| `*.http.tsuite` | HTTP test suite |
+| `*.grpc.tsuite` | gRPC test suite |
+| `*.graphql.tsuite` | GraphQL test suite (reserved) |
+| `*.ws.tsuite` | WebSocket test suite (reserved) |
+| `*.tsuite` | Mixed protocol suite |
+| `*.tsuite.yaml` | Suite template |
+
+See [Test Suites](./13-test-suites.md) for complete suite documentation.
+
 ## Naming Convention
+
+### Test Case Files
 
 **Pattern**: `{business_scenario}_{test_type}_{description}.{protocol}.tspec`
 
-### Examples
+#### Examples
 
 ```
 login_functional_success.http.tspec
@@ -23,6 +44,20 @@ login_functional_invalid_password.http.tspec
 user_integration_create_and_delete.http.tspec
 payment_security_sql_injection.http.tspec
 order_performance_bulk_create.grpc.tspec
+```
+
+### Test Suite Files
+
+**Pattern**: `{domain}.{protocol}.tsuite` or `{domain}_{description}.{protocol}.tsuite`
+
+#### Examples
+
+```
+auth.http.tsuite
+bookstore.http.tsuite
+user_api.http.tsuite
+order_service.grpc.tsuite
+api.tsuite                     # Mixed protocol
 ```
 
 ### Components
@@ -143,6 +178,7 @@ Group related tests in directories:
 ```
 testcases/
 ├── auth/
+│   ├── auth.http.tsuite              # Suite for auth tests
 │   ├── login/
 │   │   ├── success.http.tspec
 │   │   ├── invalid_password.http.tspec
@@ -151,13 +187,16 @@ testcases/
 │   └── logout/
 │       └── success.http.tspec
 ├── users/
+│   ├── users.http.tsuite             # Suite for user tests
 │   ├── create.http.tspec
 │   ├── read.http.tspec
 │   ├── update.http.tspec
 │   └── delete.http.tspec
-└── _templates/
-    ├── base_http.yaml
-    └── base_auth.yaml
+├── _templates/
+│   ├── base_http.yaml
+│   ├── base_auth.yaml
+│   └── api-suite.tsuite.yaml         # Suite template
+└── api.tsuite                        # Root suite
 ```
 
 ### Template Organization
@@ -169,6 +208,7 @@ _templates/
 ├── base_http.yaml        # Base HTTP configuration
 ├── base_auth.yaml        # Authentication defaults
 ├── base_grpc.yaml        # Base gRPC configuration
+├── api-suite.tsuite.yaml # Suite template
 └── assertions/
     └── common.yaml       # Reusable assertion definitions
 ```

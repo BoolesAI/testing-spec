@@ -1,13 +1,13 @@
 ---
 name: tspec-parse
-description: Parse and display test case information without executing tests. Use for exploring test structure, debugging variable substitution, understanding template inheritance, and inspecting request payloads. Keywords: parse tspec, inspect test, explore tspec, debug variables, view test structure, template inheritance, dry run
+description: Parse and display test case and suite information without executing tests. Use for exploring test structure, debugging variable substitution, understanding template inheritance, and inspecting request payloads. Keywords: parse tspec, inspect test, explore tspec, debug variables, view test structure, template inheritance, dry run, parse suite, tsuite
 ---
 
 # TSpec Parse
 
 ## Overview
 
-Parse and display TSpec test case information without executing any requests. This skill resolves variables, expands templates, and shows the final test configuration. Use it for debugging variable substitution, understanding template inheritance, and inspecting request payloads before actual execution.
+Parse and display TSpec test case and suite information without executing any requests. This skill resolves variables, expands templates, and shows the final test configuration. Use it for debugging variable substitution, understanding template inheritance, inspecting request payloads, and exploring suite structure before actual execution.
 
 ## MCP Tool Integration
 
@@ -67,6 +67,9 @@ tspec parse <files...> [options]
 ```bash
 # Parse and display test cases
 tspec parse tests/login.http.tspec
+
+# Parse suite file
+tspec parse tests/api.http.tsuite
 
 # JSON output for inspection
 tspec parse tests/*.tspec --output json
