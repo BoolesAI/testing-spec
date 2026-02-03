@@ -30,8 +30,59 @@ TSpec (Test Specification) is a YAML-based domain-specific language for defining
 | [@boolesai/tspec](https://www.npmjs.com/package/@boolesai/tspec) | Core library for parsing, running, and asserting TSpec files |
 | [@boolesai/tspec-cli](https://www.npmjs.com/package/@boolesai/tspec-cli) | Command-line interface for TSpec |
 | [vscode-tspec](./vscode-extension/README.md) | Visual Studio Code extension for TSpec language support |
+| [plugins](./plugins/README.md) | Protocol plugins for HTTP, Web UI, and custom protocols |
 | [skills](./skills) | AI agent skills for TSpec MCP integration |
 | [demo](./demo/README.md) | Bookstore API demo for TSpec functionality demonstration |
+
+## Plugin Architecture
+
+TSpec uses a plugin system to support multiple protocols. Each plugin provides:
+
+- **Protocol Implementation**: Execute tests for specific protocols (HTTP, Web UI, etc.)
+- **Schema Validation**: JSON Schema for protocol-specific request blocks
+- **Custom Runners**: Protocol-specific test execution logic
+
+### Official Plugins
+
+| Plugin | Protocol | Description | Package |
+|--------|----------|-------------|----------|
+| [tspec-protocol-http](./plugins/tspec-protocol-http) | `http`, `https` | HTTP/HTTPS API testing with axios | `@tspec/http` |
+| [tspec-protocol-web](./plugins/tspec-protocol-web) | `web` | Web browser UI testing with Puppeteer | `@tspec/web` |
+
+### Using Plugins
+
+**Install plugins:**
+```bash
+npm install -D @tspec/http @tspec/web
+```
+
+**Configure plugins** in `tspec.config.js`:
+```javascript
+module.exports = {
+  plugins: [
+    '@tspec/http',
+    '@tspec/web'
+  ],
+  pluginOptions: {
+    '@tspec/http': {
+      timeout: 30000,
+      followRedirects: true
+    },
+    '@tspec/web': {
+      headless: true,
+      timeout: 30000
+    }
+  }
+};
+```
+
+**Run tests:**
+```bash
+tspec run tests/**/*.http.tcase  # HTTP tests
+tspec run tests/**/*.web.tcase   # Web UI tests
+```
+
+For plugin development and custom protocol support, see [plugins/README.md](./plugins/README.md).
 
 ## Quick Start
 
@@ -155,12 +206,15 @@ extract:
 
 TSpec uses protocol-specific file extensions:
 
-| Extension | Protocol |
-|-----------|----------|
-| `.http.tcase` | HTTP/HTTPS |
-| `.grpc.tcase` | gRPC |
-| `.graphql.tcase` | GraphQL (reserved) |
-| `.ws.tcase` | WebSocket (reserved) |
+| Extension | Protocol | Plugin |
+|-----------|----------|--------|
+| `.http.tcase` | HTTP/HTTPS | `@tspec/http` |
+| `.web.tcase` | Web UI | `@tspec/web` |
+| `.grpc.tcase` | gRPC | (reserved) |
+| `.graphql.tcase` | GraphQL | (reserved) |
+| `.ws.tcase` | WebSocket | (reserved) |
+
+Custom plugins can register additional file extensions. See [plugins/README.md](./plugins/README.md) for details.
 
 ## Documentation
 

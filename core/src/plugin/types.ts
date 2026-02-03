@@ -163,6 +163,12 @@ export interface PluginLoadSummary {
   loaded: number;
   failed: number;
   errors: Array<{ plugin: string; error: string }>;
+  /** Number of plugins auto-installed */
+  installed?: number;
+  /** Plugins that were already installed */
+  alreadyInstalled?: string[];
+  /** Errors during plugin installation */
+  installErrors?: Array<{ plugin: string; error: string }>;
 }
 
 /**

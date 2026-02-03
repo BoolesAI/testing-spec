@@ -1,5 +1,6 @@
 import type { TestCase } from '../parser/index.js';
-import type { Response } from '../assertion/types.js';
+import type { Assertion } from '../parser/types.js';
+import type { Response, AssertionResult } from '../assertion/types.js';
 import type { ProtocolType } from '../parser/types.js';
 import { runAssertions, getAssertionSummary } from '../assertion/index.js';
 import type { TestRunner, TestResult, RunnerOptions, HttpRunnerOptions } from './types.js';
@@ -9,6 +10,21 @@ import { executeLifecycleActions, createLifecycleContext } from '../lifecycle/in
 
 // Register built-in executors
 registry.register('http', HttpRunner);
+
+/**
+ * Check if response indicates a network error (status 0 = connection failure)
+ */
+function isNetworkError(response: Response): boolean {
+  const status = response.status ?? response.statusCode ?? response._envelope?.status;
+  return status === 0;
+}
+
+/**
+ * Check if test case has an exception assertion (expects network errors)
+ */
+function hasExceptionAssertion(assertions: Assertion[]): boolean {
+  return assertions.some(a => a.type === 'exception');
+}
 
 export function createRunner(protocol: ProtocolType | null, options: RunnerOptions = {}): TestRunner {
   if (!protocol) {
@@ -43,6 +59,33 @@ export async function executeTestCase(testCase: TestCase, options: RunnerOptions
   const response = await runner.execute(testCase);
   lifecycleContext.response = response;
   const duration = Date.now() - startTime;
+  
+  // Check for network errors - auto-fail unless test expects exception
+  if (isNetworkError(response) && !hasExceptionAssertion(testCase.assertions)) {
+    const errorBody = response.body as { error?: string; name?: string } | undefined;
+    const networkErrorAssertion: AssertionResult = {
+      passed: false,
+      type: 'network_error',
+      message: `Network error: ${errorBody?.error || 'Connection failed'}`,
+      expected: 'Successful connection',
+      actual: `status: 0 (${errorBody?.name || 'Error'})`
+    };
+    
+    // Execute teardown actions - test scope
+    if (testCase.lifecycle?.teardown) {
+      await executeLifecycleActions(testCase.lifecycle.teardown, 'test', lifecycleContext);
+    }
+    
+    return {
+      testCaseId: testCase.id,
+      passed: false,
+      assertions: [networkErrorAssertion],
+      summary: { total: 1, passed: 0, failed: 1, passRate: 0 },
+      extracted: lifecycleContext.extractedVars,
+      response,
+      duration
+    };
+  }
   
   // Execute teardown actions - run scope
   if (testCase.lifecycle?.teardown) {

@@ -17,6 +17,120 @@ Or run directly with npx:
 npx @boolesai/tspec-cli <command>
 ```
 
+## Plugin Installation
+
+TSpec uses a plugin architecture to support different protocols. Plugins can be installed automatically or manually.
+
+### Installing Plugins via CLI
+
+The easiest way to install plugins is using the `plugin:install` command:
+
+```bash
+# Install HTTP/HTTPS protocol plugin
+tspec plugin:install @tspec/http
+
+# Install Web browser UI testing plugin  
+tspec plugin:install @tspec/web
+
+# Install and add to global config
+tspec plugin:install @tspec/http --global
+```
+
+### Manual Installation
+
+You can also install plugins manually as npm packages:
+
+```bash
+# Install HTTP/HTTPS protocol plugin
+npm install -D @tspec/http
+
+# Install Web browser UI testing plugin
+npm install -D @tspec/web
+
+# Install multiple plugins at once
+npm install -D @tspec/http @tspec/web
+```
+
+### Plugin Configuration
+
+TSpec uses JSON configuration files. Create a `tspec.config.json` file in your project root:
+
+```json
+{
+  "plugins": [
+    "@tspec/http",
+    "@tspec/web"
+  ],
+  "pluginOptions": {
+    "@tspec/http": {
+      "timeout": 30000,
+      "followRedirects": true,
+      "maxRedirects": 5
+    },
+    "@tspec/web": {
+      "headless": true,
+      "timeout": 30000,
+      "slowMo": 0
+    }
+  }
+}
+```
+
+#### Configuration Locations
+
+TSpec supports dual configuration with local taking precedence:
+
+| Location | Path | Priority |
+|----------|------|----------|
+| Local | `./tspec.config.json` (searched upward) | Higher |
+| Global | `~/.tspec/tspec.config.json` | Lower |
+
+When both configs exist, they are merged with local values overriding global ones.
+
+#### Auto-Installation
+
+When running `tspec run`, missing plugins in your config are automatically installed to `~/.tspec/plugins/`. Use `--no-auto-install` to disable this behavior.
+
+### Available Official Plugins
+
+| Plugin | Protocol | Description | Package |
+|--------|----------|-------------|----------|
+| HTTP/HTTPS | `http`, `https` | REST API testing with axios | `@tspec/http` |
+| Web UI | `web` | Browser testing with Puppeteer | `@tspec/web` |
+
+### Using Plugins
+
+Once installed and configured, plugins are automatically loaded when running tests:
+
+```bash
+# Run HTTP tests
+tspec run tests/**/*.http.tcase
+
+# Run Web UI tests
+tspec run tests/**/*.web.tcase
+
+# List loaded plugins and supported protocols
+tspec list
+```
+
+### Custom Plugins
+
+You can also install custom third-party plugins or create your own:
+
+```bash
+# Install custom plugin from npm
+tspec plugin:install my-custom-tspec-plugin
+
+# Or use a local plugin path in tspec.config.json:
+{
+  "plugins": [
+    "./plugins/my-custom-protocol"
+  ]
+}
+```
+
+For plugin development details, see the [Plugin Development Guide](../plugins/DEVELOPMENT.md).
+
 ## Commands
 
 ### `tspec validate`
@@ -59,6 +173,8 @@ tspec run <files...> [options]
 - `-v, --verbose` - Verbose output
 - `-q, --quiet` - Only output summary
 - `--fail-fast` - Stop on first failure
+- `--config <path>` - Path to tspec.config.json
+- `--no-auto-install` - Skip automatic plugin installation
 
 **Examples:**
 ```bash
@@ -129,6 +245,62 @@ tspec list
 
 # JSON output
 tspec list --output json
+```
+
+### `tspec plugin:install`
+
+Install a TSpec plugin and add it to configuration.
+
+```bash
+tspec plugin:install <plugin> [options]
+```
+
+**Options:**
+- `-o, --output <format>` - Output format: `json`, `text` (default: `text`)
+- `-g, --global` - Add plugin to global config (`~/.tspec/tspec.config.json`)
+- `-c, --config <path>` - Path to specific config file to update
+
+**Examples:**
+```bash
+# Install plugin (adds to local config if exists, otherwise global)
+tspec plugin:install @tspec/http
+
+# Install and add to global config
+tspec plugin:install @tspec/web --global
+
+# Install and add to specific config file
+tspec plugin:install @tspec/http --config ./tspec.config.json
+```
+
+### `tspec plugin:list`
+
+List all installed TSpec plugins and configuration sources.
+
+```bash
+tspec plugin:list [options]
+```
+
+**Alias:** `tspec plugins`
+
+**Options:**
+- `-o, --output <format>` - Output format: `json`, `text` (default: `text`)
+- `-v, --verbose` - Show detailed plugin information
+- `--health` - Run health checks on all plugins
+- `-c, --config <path>` - Path to tspec.config.json
+
+**Examples:**
+```bash
+# List installed plugins
+tspec plugin:list
+
+# Show detailed information
+tspec plugin:list --verbose
+
+# Check plugin health status
+tspec plugin:list --health
+
+# JSON output
+tspec plugin:list --output json
 ```
 
 ### `tspec mcp`

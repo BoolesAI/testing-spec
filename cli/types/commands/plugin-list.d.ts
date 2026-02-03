@@ -20,6 +20,11 @@ export interface PluginListResult {
         }>;
         protocols: string[];
         configPath?: string;
+        configSources?: {
+            local?: string;
+            global?: string;
+        };
+        pluginsDir: string;
         health?: Array<{
             plugin: string;
             healthy: boolean;

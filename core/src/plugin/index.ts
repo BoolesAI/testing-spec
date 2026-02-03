@@ -23,7 +23,8 @@ export type {
 export { 
   PluginManager, 
   getPluginManager, 
-  resetPluginManager 
+  resetPluginManager,
+  type PluginManagerInitOptions
 } from './manager.js';
 
 // Plugin loader
@@ -32,11 +33,32 @@ export { PluginLoader } from './loader.js';
 // Configuration
 export { 
   loadConfig, 
-  findConfigFile, 
+  findConfigFile,
+  findLocalConfigFile,
+  findGlobalConfigFile,
+  loadJsonConfig,
+  mergeConfigs,
+  ensureGlobalConfigDir,
   getPluginOptions,
   resolvePluginPath,
-  type TSpecConfig 
+  CONFIG_FILE_NAME,
+  GLOBAL_CONFIG_DIR,
+  GLOBAL_CONFIG_PATH,
+  PLUGINS_DIR,
+  type TSpecConfig,
+  type LoadedConfig
 } from './config.js';
+
+// Plugin installer
+export {
+  ensurePluginsDirectory,
+  getPluginsNodeModulesPath,
+  isPluginInstalled,
+  installPlugin,
+  installMissingPlugins,
+  type InstallResult,
+  type InstallSummary
+} from './installer.js';
 
 // Protocol registry
 export { 

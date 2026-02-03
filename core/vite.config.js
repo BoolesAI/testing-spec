@@ -31,6 +31,8 @@ export default defineConfig({
         'url',
         'crypto',
         'readline',
+        'os',
+        'child_process',
         /^node:/
       ]
     },

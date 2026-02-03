@@ -15,8 +15,17 @@ import type {
   ProtocolSchema
 } from './types.js';
 import { PluginLoader } from './loader.js';
-import { loadConfig, getPluginOptions, resolvePluginPath, type TSpecConfig } from './config.js';
+import { loadConfig, getPluginOptions, resolvePluginPath, type TSpecConfig, type LoadedConfig } from './config.js';
+import { installMissingPlugins, type InstallSummary } from './installer.js';
 import { dirname } from 'path';
+
+/**
+ * Options for plugin manager initialization
+ */
+export interface PluginManagerInitOptions {
+  /** Skip automatic plugin installation */
+  skipAutoInstall?: boolean;
+}
 
 /**
  * Central plugin manager
@@ -39,7 +48,7 @@ export class PluginManager {
   /**
    * Initialize plugin manager by loading plugins from config
    */
-  async initialize(configPath?: string): Promise<PluginLoadSummary> {
+  async initialize(configPath?: string, options?: PluginManagerInitOptions): Promise<PluginLoadSummary> {
     if (this.initialized) {
       return {
         total: this.plugins.size,
@@ -50,7 +59,33 @@ export class PluginManager {
     }
     
     const config = await loadConfig(configPath);
+    
+    // Auto-install missing plugins unless disabled
+    let installSummary: InstallSummary | undefined;
+    if (!options?.skipAutoInstall && config.plugins && config.plugins.length > 0) {
+      this.logger.info('Checking for missing plugins...');
+      installSummary = await installMissingPlugins(config.plugins);
+      
+      if (installSummary.installed.length > 0) {
+        this.logger.info(`Installed plugins: ${installSummary.installed.join(', ')}`);
+      }
+      
+      if (installSummary.failed.length > 0) {
+        for (const failure of installSummary.failed) {
+          this.logger.warn(`Failed to install ${failure.plugin}: ${failure.error}`);
+        }
+      }
+    }
+    
     const summary = await this.loadPluginsFromConfig(config, configPath);
+    
+    // Add installation info to summary
+    if (installSummary) {
+      summary.installed = installSummary.installed.length;
+      summary.alreadyInstalled = installSummary.alreadyInstalled;
+      summary.installErrors = installSummary.failed;
+    }
+    
     this.initialized = true;
     
     return summary;

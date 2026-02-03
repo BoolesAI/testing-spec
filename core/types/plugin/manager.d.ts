@@ -7,6 +7,13 @@ import type { TestRunner, RunnerOptions } from '../runner/types.js';
 import type { TSpecPlugin, PluginMetadata, PluginLogger, PluginLoadSummary, PluginHealthReport, ProtocolSchema } from './types.js';
 import { type TSpecConfig } from './config.js';
 /**
+ * Options for plugin manager initialization
+ */
+export interface PluginManagerInitOptions {
+    /** Skip automatic plugin installation */
+    skipAutoInstall?: boolean;
+}
+/**
  * Central plugin manager
  */
 export declare class PluginManager {
@@ -21,7 +28,7 @@ export declare class PluginManager {
     /**
      * Initialize plugin manager by loading plugins from config
      */
-    initialize(configPath?: string): Promise<PluginLoadSummary>;
+    initialize(configPath?: string, options?: PluginManagerInitOptions): Promise<PluginLoadSummary>;
     /**
      * Load plugins from configuration
      */

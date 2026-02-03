@@ -239,7 +239,12 @@ export class CLIAdapter {
       throw new Error('No JSON found in output');
     }
 
-    const parsed = JSON.parse(jsonMatch[0]) as CLIOutput;
+    const parsed = JSON.parse(jsonMatch[0]) as CLIOutput & { error?: string };
+    
+    // Handle error response from CLI
+    if (parsed.error) {
+      throw new Error(parsed.error);
+    }
     
     // Validate structure
     if (!parsed.results || !Array.isArray(parsed.results)) {

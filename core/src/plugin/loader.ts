@@ -5,7 +5,7 @@
  */
 
 import { existsSync } from 'fs';
-import { resolve, dirname } from 'path';
+import { resolve, dirname, join } from 'path';
 import { pathToFileURL } from 'url';
 import type { 
   TSpecPlugin, 
@@ -14,6 +14,7 @@ import type {
   PluginFactory,
   PluginValidationResult 
 } from './types.js';
+import { getPluginsNodeModulesPath } from './installer.js';
 
 /**
  * Plugin loader - loads and initializes plugins
@@ -96,7 +97,26 @@ export class PluginLoader {
       return await import(fileUrl);
     }
     
-    // Otherwise try to import as npm package
+    // For npm packages, first try the global plugins directory
+    const globalPluginPath = join(getPluginsNodeModulesPath(), pluginPath);
+    if (existsSync(globalPluginPath)) {
+      // Try to find the entry point
+      let importPath = globalPluginPath;
+      if (existsSync(join(globalPluginPath, 'dist', 'index.js'))) {
+        importPath = join(globalPluginPath, 'dist', 'index.js');
+      } else if (existsSync(join(globalPluginPath, 'index.js'))) {
+        importPath = join(globalPluginPath, 'index.js');
+      }
+      
+      try {
+        const fileUrl = pathToFileURL(importPath).href;
+        return await import(fileUrl);
+      } catch {
+        // Fall through to standard import
+      }
+    }
+    
+    // Otherwise try standard npm package resolution
     try {
       return await import(pluginPath);
     } catch (error) {

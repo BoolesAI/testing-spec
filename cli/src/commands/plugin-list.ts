@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { PluginManager, version } from '@boolesai/tspec';
-import { findConfigFile } from '@boolesai/tspec/plugin';
+import { findConfigFile, findLocalConfigFile, findGlobalConfigFile, PLUGINS_DIR } from '@boolesai/tspec/plugin';
 import { logger } from '../utils/logger.js';
 import type { OutputFormat } from '../utils/formatter.js';
 
@@ -33,6 +33,11 @@ export interface PluginListResult {
     }>;
     protocols: string[];
     configPath?: string;
+    configSources?: {
+      local?: string;
+      global?: string;
+    };
+    pluginsDir: string;
     health?: Array<{
       plugin: string;
       healthy: boolean;
@@ -48,8 +53,10 @@ export async function executePluginList(params: PluginListParams): Promise<Plugi
   const output = params.output ?? 'text';
   const pluginManager = new PluginManager(version);
   
-  // Find and load config
-  const configPath = params.config || findConfigFile();
+  // Find config sources
+  const localConfigPath = findLocalConfigFile();
+  const globalConfigPath = findGlobalConfigFile();
+  const configPath = params.config || localConfigPath || globalConfigPath;
   
   let loadSummary;
   if (configPath) {
@@ -75,6 +82,11 @@ export async function executePluginList(params: PluginListParams): Promise<Plugi
     })),
     protocols,
     configPath: configPath || undefined,
+    configSources: {
+      local: localConfigPath || undefined,
+      global: globalConfigPath || undefined
+    },
+    pluginsDir: PLUGINS_DIR,
     health: healthReports
   };
   
@@ -96,23 +108,41 @@ export async function executePluginList(params: PluginListParams): Promise<Plugi
 function formatPluginListText(
   data: PluginListResult['data'], 
   verbose: boolean,
-  loadSummary?: { total: number; loaded: number; failed: number; errors: Array<{ plugin: string; error: string }> }
+  loadSummary?: { total: number; loaded: number; failed: number; errors: Array<{ plugin: string; error: string }>; installed?: number; installErrors?: Array<{ plugin: string; error: string }> }
 ): string {
   const lines: string[] = [];
   
   lines.push(chalk.bold('\nTSpec Plugins\n'));
   
-  if (data.configPath) {
-    lines.push(chalk.gray(`Config: ${data.configPath}`));
+  // Show config sources
+  lines.push(chalk.bold('Config:'));
+  if (data.configSources?.local) {
+    lines.push(chalk.gray(`  Local:  ${data.configSources.local}`));
   } else {
-    lines.push(chalk.gray('Config: No tspec.config.js found'));
+    lines.push(chalk.gray('  Local:  (none)'));
   }
+  if (data.configSources?.global) {
+    lines.push(chalk.gray(`  Global: ${data.configSources.global}`));
+  } else {
+    lines.push(chalk.gray('  Global: (none)'));
+  }
+  lines.push(chalk.gray(`  Plugins dir: ${data.pluginsDir}`));
   
   if (loadSummary) {
+    lines.push('');
     lines.push(chalk.gray(`Discovered: ${loadSummary.total}, Loaded: ${loadSummary.loaded}`));
+    if (loadSummary.installed && loadSummary.installed > 0) {
+      lines.push(chalk.green(`Installed: ${loadSummary.installed} plugin(s)`));
+    }
     if (loadSummary.failed > 0) {
       lines.push(chalk.red(`Failed: ${loadSummary.failed}`));
       for (const error of loadSummary.errors) {
+        lines.push(chalk.red(`  ${error.plugin}: ${error.error}`));
+      }
+    }
+    if (loadSummary.installErrors && loadSummary.installErrors.length > 0) {
+      lines.push(chalk.red(`Install failures:`));
+      for (const error of loadSummary.installErrors) {
         lines.push(chalk.red(`  ${error.plugin}: ${error.error}`));
       }
     }
@@ -122,10 +152,10 @@ function formatPluginListText(
   
   if (data.plugins.length === 0) {
     lines.push(chalk.yellow('No plugins loaded.'));
-    lines.push(chalk.gray('Add plugins to your tspec.config.js:'));
-    lines.push(chalk.gray('  module.exports = {'));
-    lines.push(chalk.gray('    plugins: ["@tspec/http", "@tspec/web"]'));
-    lines.push(chalk.gray('  };'));
+    lines.push(chalk.gray('Add plugins to your tspec.config.json:'));
+    lines.push(chalk.gray('  {'));
+    lines.push(chalk.gray('    "plugins": ["@tspec/http", "@tspec/web"]'));
+    lines.push(chalk.gray('  }'));
   } else {
     for (const plugin of data.plugins) {
       lines.push(`${chalk.cyan(plugin.name)} ${chalk.gray(`v${plugin.version}`)}`);
@@ -180,7 +210,7 @@ export const pluginListCommand = new Command('plugin:list')
   .option('-o, --output <format>', 'Output format: json, text', 'text')
   .option('-v, --verbose', 'Show detailed plugin information')
   .option('--health', 'Run health checks on all plugins')
-  .option('-c, --config <path>', 'Path to tspec.config.js')
+  .option('-c, --config <path>', 'Path to tspec.config.json')
   .action(async (options: PluginListOptions) => {
     try {
       const result = await executePluginList({
