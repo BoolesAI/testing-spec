@@ -2,7 +2,7 @@
  * Web Runner using Puppeteer
  */
 
-import puppeteer, { Browser, Page, PuppeteerLaunchOptions } from 'puppeteer';
+import puppeteer, { Browser, Page } from 'puppeteer';
 import type { 
   WebRequest, 
   WebAction, 
@@ -66,9 +66,8 @@ export class WebRunner implements TestRunner {
   }
 
   private async setupBrowser(request: WebRequest): Promise<void> {
-    const launchOptions: PuppeteerLaunchOptions = {
+    const launchOptions: Parameters<typeof puppeteer.launch>[0] = {
       headless: request.headless ?? this.options.headless,
-      slowMo: this.options.slowMo,
       args: this.options.args || ['--no-sandbox', '--disable-setuid-sandbox']
     };
 
@@ -108,8 +107,8 @@ export class WebRunner implements TestRunner {
     });
 
     // Listen to page errors
-    this.page?.on('pageerror', error => {
-      errors.push(error.message);
+    this.page?.on('pageerror', (error) => {
+      errors.push((error as Error).message);
     });
 
     // Navigate to initial URL if provided
@@ -138,10 +137,17 @@ export class WebRunner implements TestRunner {
       extracted,
       console: consoleMessages,
       errors: errors.length > 0 ? errors : undefined,
+      body: {
+        extracted,
+        console: consoleMessages,
+        screenshots: screenshots.length > 0 ? screenshots : undefined,
+        errors: errors.length > 0 ? errors : undefined
+      },
       _envelope: {
         status: 200,
         url,
         title,
+        header: {},
         body: { extracted, console: consoleMessages },
         responseTime: 0
       }
@@ -185,7 +191,9 @@ export class WebRunner implements TestRunner {
       case 'check':
         const checkbox = await page.$(action.selector);
         if (checkbox) {
-          const isChecked = await checkbox.evaluate((el: Element) => (el as HTMLInputElement).checked);
+          const isChecked = await checkbox.evaluate((el) => {
+            return (el as any).checked;
+          });
           if (!isChecked) {
             await checkbox.click();
           }
@@ -195,7 +203,9 @@ export class WebRunner implements TestRunner {
       case 'uncheck':
         const uncheckBox = await page.$(action.selector);
         if (uncheckBox) {
-          const isChecked = await uncheckBox.evaluate((el: Element) => (el as HTMLInputElement).checked);
+          const isChecked = await uncheckBox.evaluate((el) => {
+            return (el as any).checked;
+          });
           if (isChecked) {
             await uncheckBox.click();
           }
@@ -246,12 +256,12 @@ export class WebRunner implements TestRunner {
 
       case 'scroll':
         if (action.selector) {
-          await page.$eval(action.selector, (el: Element) => {
+          await page.$eval(action.selector, (el) => {
             el.scrollIntoView({ behavior: 'auto', block: 'center' });
           });
         } else {
           await page.evaluate(({ x, y }) => {
-            window.scrollTo(x || 0, y || 0);
+            (globalThis as any).window.scrollTo(x || 0, y || 0);
           }, { x: action.x, y: action.y });
         }
         break;

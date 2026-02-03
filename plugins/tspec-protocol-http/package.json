@@ -1,5 +1,5 @@
 {
-  "name": "@tspec/http",
+  "name": "@boolesai/tspec-plugin-http",
   "version": "1.0.0",
   "description": "HTTP/HTTPS protocol plugin for TSpec",
   "type": "module",
@@ -49,7 +49,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/boolesai/testing-spec.git",
+    "url": "git+https://github.com/boolesai/testing-spec.git",
     "directory": "plugins/tspec-protocol-http"
   },
   "engines": {

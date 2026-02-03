@@ -254,10 +254,17 @@ export interface WebResponse {
   console: ConsoleMessage[];
   errors?: string[];
   duration: number;
+  body: {
+    extracted: Record<string, unknown>;
+    console: ConsoleMessage[];
+    screenshots?: ScreenshotInfo[];
+    errors?: string[];
+  };
   _envelope?: {
     status: number;
     url: string;
     title: string;
+    header: Record<string, string>;
     body: {
       extracted: Record<string, unknown>;
       console: ConsoleMessage[];

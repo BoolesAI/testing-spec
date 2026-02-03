@@ -1,5 +1,5 @@
 {
-  "name": "@tspec/web",
+  "name": "@boolesai/tspec-plugin-web",
   "version": "1.0.0",
   "description": "Web browser UI testing plugin for TSpec using Puppeteer",
   "type": "module",
@@ -37,7 +37,7 @@
     "@boolesai/tspec": "^1.2.0"
   },
   "dependencies": {
-    "puppeteer": "^22.0.0"
+    "puppeteer": "^24.15.0"
   },
   "devDependencies": {
     "@boolesai/tspec": "^1.2.0",
