@@ -14,6 +14,7 @@ export default defineConfig({
     rollupOptions: {
       external: [
         '@boolesai/tspec',
+        '@boolesai/tspec/plugin',
         'commander',
         'chalk',
         'glob',
@@ -21,6 +22,8 @@ export default defineConfig({
         'fs',
         'path',
         'url',
+        'os',
+        'child_process',
         /^node:/
       ]
     },

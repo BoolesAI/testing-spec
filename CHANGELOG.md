@@ -5,6 +5,133 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-02-03
+
+### Added
+
+#### @boolesai/tspec (Core Library)
+
+- **Plugin System**: Complete plugin architecture for extensible protocol support
+  - `PluginManager` - Load, register, and manage plugins with lifecycle control
+  - `PluginLoader` - Dynamic plugin import and initialization with validation
+  - `ProtocolRegistry` - Runtime protocol registration and detection system
+  - Plugin configuration via `tspec.config.json` with local and global support
+  - Plugin health checks and detailed metadata reporting
+  - Automatic plugin installation from configuration files
+  - Support for custom protocol implementations as npm packages
+- **Web Protocol Support**: New `web` protocol for browser automation testing
+  - Browser UI testing capabilities via Puppeteer integration
+  - Rich action set: navigate, click, fill, select, hover, scroll, screenshot
+  - Context control for viewport, locale, timezone, and color scheme
+  - Data extraction from page elements and JavaScript execution
+  - Comprehensive web-specific request schema and types
+- **Plugin Configuration System**:
+  - Dual configuration support: local (`./tspec.config.json`) and global (`~/.tspec/tspec.config.json`)
+  - Configuration merging with local precedence over global
+  - Plugin-specific options via `pluginOptions` field
+  - Automatic config directory creation and management
+- **Enhanced Runner Module**:
+  - Network error detection for response status 0 (connection failures)
+  - Explicit failure handling for network errors without exception assertions
+  - Improved error messaging for network-related test failures
+
+#### @boolesai/tspec-cli (Command Line Interface)
+
+- **Plugin Management Commands**:
+  - `plugin:install` - Install plugins and automatically update configuration
+  - `plugin:list` - List installed plugins with health status, sources, and detailed info
+  - `--no-auto-install` flag for `run` command to disable automatic plugin installation
+- **Enhanced MCP Server Documentation**:
+  - Comprehensive MCP server overview and integration guide
+  - Standard tools documentation with parameter references
+  - OS-specific configuration paths for Claude Desktop
+  - JSON configuration examples for multiple installation methods
+  - Troubleshooting section for common MCP integration issues
+- **Improved Error Handling**:
+  - Better error reporting in run command with JSON output support
+  - Enhanced plugin initialization error messages
+
+#### Plugins
+
+- **@tspec/http** (`tspec-protocol-http`): Official HTTP/HTTPS protocol plugin
+  - Full HTTP methods support: GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS
+  - Authentication support: Bearer tokens, API keys, custom headers
+  - Multiple body formats: JSON, form data, text, binary
+  - Configurable timeouts, redirects, and retry logic
+  - Request/response handling with query parameters, headers, and cookies
+  - Base URL configuration and centralized endpoint management
+  - JSONPath assertions for response validation
+  - Comprehensive request schema with axios integration
+- **@tspec/web** (`tspec-protocol-web`): Official Web UI testing plugin
+  - Browser automation via Puppeteer (Chromium)
+  - Rich action set: navigate, fill, click, check, select, hover, press, upload
+  - Smart waiting strategies: selector, navigation, timeout, network idle
+  - Screenshot capture (full page or specific elements)
+  - Data extraction from page elements and attributes
+  - JavaScript execution in browser context
+  - Viewport, locale, timezone, and color scheme control
+  - Enhanced web response types with detailed body and header fields
+  - Improved scroll action implementation and type assertions
+
+#### Documentation
+
+- **Plugin Architecture Documentation**:
+  - Comprehensive plugin system overview in main README
+  - Plugin development guide (`plugins/DEVELOPMENT.md`) with detailed examples
+  - Plugin API reference with interfaces and types
+  - Installation and configuration instructions
+  - Custom plugin creation guidelines
+- **Enhanced CLI Documentation**:
+  - Plugin installation and management command documentation
+  - Configuration file format and precedence rules
+  - Auto-install behavior and control options
+  - MCP server setup and troubleshooting guide
+- **Plugin READMEs**:
+  - Complete HTTP plugin documentation with usage examples
+  - Complete Web plugin documentation with action reference
+  - Configuration options and common use cases
+  - Request schema documentation and response structure
+
+#### Examples & Configuration
+
+- **Configuration Template**: `tspec.config.example.json` with plugin examples
+- Enhanced documentation website (`docs.html`) with improved layout
+- Updated README with plugin architecture overview and quick start
+
+### Changed
+
+- **Breaking**: Plugin-based architecture replaces hardcoded protocol support
+  - HTTP/HTTPS protocols now provided by `@tspec/http` plugin (must be installed)
+  - Web protocol now provided by `@tspec/web` plugin (must be installed)
+  - Protocol detection now dynamic through plugin registry
+  - Existing projects need to install plugins and add `tspec.config.json`
+- **Configuration Format**: Migrated from `tspec.config.js` to `tspec.config.json`
+  - JSON format for better compatibility and validation
+  - Support for both local and global configuration files
+  - Plugin list specified in `plugins` array
+  - Plugin-specific options in `pluginOptions` object
+- **Plugin Namespace**: Official plugins use `@tspec/` namespace
+  - `@tspec/http` for HTTP protocol support
+  - `@tspec/web` for Web UI testing support
+- **Build Configuration**:
+  - Added Node.js built-in modules (`os`, `child_process`) to build externals
+  - Improved module resolution for plugin system
+- **Web Plugin Implementation**:
+  - Refactored Puppeteer launch options and page event handlers
+  - Enhanced error handling and type safety
+  - Improved scroll action with better element detection
+- **VS Code Extension**:
+  - Updated CLI adapter to support plugin system
+  - Enhanced CodeLens provider with plugin-aware test detection
+
+### Fixed
+
+- Plugin loader now correctly resolves from global plugins directory (`~/.tspec/plugins`)
+- Enhanced plugin resolution with fallback to npm package resolution
+- Support for loading plugins from nested `dist/index.js` or `index.js` entry points
+- Improved error handling for missing or incompatible plugins
+- Better network error detection and reporting in test execution
+
 ## [1.2.0] - 2026-02-01
 
 ### Added

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { TSpecTestProvider } from './testProvider';
 
 /**
- * Provides CodeLens "Run Test" buttons in .tcase files
+ * Provides CodeLens "Run Test" buttons in .tcase and .tsuite files
  */
 export class TSpecCodeLensProvider implements vscode.CodeLensProvider {
   private testProvider: TSpecTestProvider;
@@ -14,24 +14,32 @@ export class TSpecCodeLensProvider implements vscode.CodeLensProvider {
   }
 
   /**
-   * Provide CodeLens for .tcase files
+   * Provide CodeLens for .tcase and .tsuite files
    */
   provideCodeLenses(
     document: vscode.TextDocument,
     token: vscode.CancellationToken
   ): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
-    if (document.languageId !== 'tspec') {
+    if (document.languageId !== 'tspec' && document.languageId !== 'tsuite') {
       return [];
     }
 
     const codeLenses: vscode.CodeLens[] = [];
 
-    // Find the version line (usually first meaningful line)
+    // Find first meaningful line based on file type
     const text = document.getText();
-    const versionMatch = text.match(/^version:\s*/m);
+    let match: RegExpMatchArray | null;
+    
+    if (document.languageId === 'tspec') {
+      // .tcase files start with "version:"
+      match = text.match(/^version:\s*/m);
+    } else {
+      // .tsuite files start with "suite:"
+      match = text.match(/^suite:\s*/m);
+    }
 
-    if (versionMatch) {
-      const startPos = document.positionAt(versionMatch.index || 0);
+    if (match) {
+      const startPos = document.positionAt(match.index || 0);
       const range = new vscode.Range(startPos, startPos);
 
       // Run Test CodeLens
@@ -76,10 +84,18 @@ export function registerCodeLens(
   // Create CodeLens provider
   const codeLensProvider = new TSpecCodeLensProvider(testProvider);
 
-  // Register CodeLens provider for tspec files
+  // Register CodeLens provider for tspec files (.tcase)
   disposables.push(
     vscode.languages.registerCodeLensProvider(
       { language: 'tspec', scheme: 'file' },
+      codeLensProvider
+    )
+  );
+
+  // Register CodeLens provider for tsuite files (.tsuite)
+  disposables.push(
+    vscode.languages.registerCodeLensProvider(
+      { language: 'tsuite', scheme: 'file' },
       codeLensProvider
     )
   );

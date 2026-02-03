@@ -1,0 +1,16 @@
+{
+  "plugins": [
+    "@tspec/http"
+  ],
+  "pluginOptions": {
+    "@tspec/http": {
+      "timeout": 30000,
+      "followRedirects": true,
+      "maxRedirects": 5
+    },
+    "@tspec/web": {
+      "headless": true,
+      "timeout": 30000
+    }
+  }
+}

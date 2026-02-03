@@ -12,7 +12,8 @@ export default defineConfig({
         'parser/index': resolve(__dirname, 'src/parser/index.ts'),
         'assertion/index': resolve(__dirname, 'src/assertion/index.ts'),
         'runner/index': resolve(__dirname, 'src/runner/index.ts'),
-        'scheduler/index': resolve(__dirname, 'src/scheduler/index.ts')
+        'scheduler/index': resolve(__dirname, 'src/scheduler/index.ts'),
+        'plugin/index': resolve(__dirname, 'src/plugin/index.ts')
       },
       formats: ['es', 'cjs'],
       fileName: (format, entryName) => {
@@ -27,8 +28,11 @@ export default defineConfig({
         'jsonpath-plus',
         'fs',
         'path',
+        'url',
         'crypto',
         'readline',
+        'os',
+        'child_process',
         /^node:/
       ]
     },

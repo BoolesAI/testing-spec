@@ -7,9 +7,13 @@ import {
   clearTemplateCache,
   executeSuite,
   isSuiteFile,
+  getPluginManager,
+  registry,
+  version,
   type SuiteResult,
   type SuiteTestResult
 } from '@boolesai/tspec';
+import { findConfigFile } from '@boolesai/tspec/plugin';
 import type { TestCase, TestResult } from '@boolesai/tspec';
 import { discoverTSpecFiles, discoverAllTestFiles, type TSpecFileDescriptor, type TSuiteFileDescriptor } from '../utils/files.js';
 import { formatTestResults, formatJson, type FormattedTestResult, type TestResultSummary } from '../utils/formatter.js';
@@ -22,6 +26,8 @@ interface RunOptions {
   verbose?: boolean;
   quiet?: boolean;
   failFast?: boolean;
+  config?: string;
+  noAutoInstall?: boolean;
   env: Record<string, string>;
   params: Record<string, string>;
 }
@@ -33,6 +39,8 @@ export interface RunParams {
   verbose?: boolean;
   quiet?: boolean;
   failFast?: boolean;
+  config?: string;
+  noAutoInstall?: boolean;
   env?: Record<string, string>;
   params?: Record<string, string>;
 }
@@ -135,6 +143,16 @@ async function runFileTestCasesInternal(
  */
 export async function executeRun(params: RunParams): Promise<RunExecutionResult> {
   clearTemplateCache();
+  
+  // Initialize plugin manager if config file exists
+  const configPath = params.config || findConfigFile();
+  if (configPath) {
+    const pluginManager = getPluginManager(version);
+    await pluginManager.initialize(configPath, { 
+      skipAutoInstall: params.noAutoInstall 
+    });
+    registry.enablePluginManager();
+  }
   
   const concurrency = params.concurrency ?? 5;
   const env = params.env ?? {};
@@ -430,6 +448,8 @@ export const runCommand = new Command('run')
   .option('-v, --verbose', 'Verbose output')
   .option('-q, --quiet', 'Only output summary')
   .option('--fail-fast', 'Stop on first failure')
+  .option('--config <path>', 'Path to tspec.config.json for plugin loading')
+  .option('--no-auto-install', 'Skip automatic plugin installation')
   .action(async (files: string[], options: RunOptions) => {
     setLoggerOptions({ verbose: options.verbose, quiet: options.quiet });
     
@@ -443,6 +463,8 @@ export const runCommand = new Command('run')
         verbose: options.verbose,
         quiet: options.quiet,
         failFast: options.failFast,
+        config: options.config,
+        noAutoInstall: options.noAutoInstall,
         env: options.env,
         params: options.params
       });
@@ -467,9 +489,22 @@ export const runCommand = new Command('run')
       
       process.exit(result.success ? 0 : 1);
     } catch (err) {
-      spinner?.fail('Execution failed');
+      spinner?.stop();
       const message = err instanceof Error ? err.message : String(err);
-      logger.error(message);
+      
+      if (options.output === 'json') {
+        // Output JSON error for programmatic consumers (VSCode extension, etc.)
+        const errorOutput = formatJson({
+          results: [],
+          summary: { total: 0, passed: 0, failed: 0, passRate: 0, duration: 0 },
+          parseErrors: [],
+          error: message
+        });
+        logger.log(errorOutput);
+      } else {
+        spinner?.fail('Execution failed');
+        logger.error(message);
+      }
       process.exit(2);
     }
   });

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation - TESTING-SPEC</title>
+  <meta name="description" content="TSpec documentation - A YAML-based domain-specific language for defining API test cases.">
+  <link rel="icon" type="image/png" href="https://github.com/BoolesAI/testing-spec/blob/main/assets/logo.png?raw=true">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Layout */
+    .docs-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: #161b22;
+      border-right: 1px solid #21262d;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid #21262d;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sidebar-header img {
+      width: 32px;
+      height: 32px;
+    }
+
+    .sidebar-header a {
+      color: #e6edf3;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .sidebar-header a:hover {
+      color: #58a6ff;
+    }
+
+    .sidebar-nav {
+      padding: 16px 0;
+    }
+
+    .nav-section {
+      padding: 8px 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-item {
+      display: block;
+      padding: 8px 20px;
+      color: #c9d1d9;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      border-left: 2px solid transparent;
+    }
+
+    .nav-item:hover {
+      color: #58a6ff;
+      background: rgba(88, 166, 255, 0.1);
+    }
+
+    .nav-item.active {
+      color: #58a6ff;
+      background: rgba(88, 166, 255, 0.1);
+      border-left-color: #58a6ff;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      margin-left: 280px;
+      min-width: 0;
+    }
+
+    .content-header {
+      position: sticky;
+      top: 0;
+      background: #0d1117;
+      border-bottom: 1px solid #21262d;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 50;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid #30363d;
+      color: #e6edf3;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .menu-toggle:hover {
+      background: #21262d;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #8b949e;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: #58a6ff;
+    }
+
+    .back-link svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .content-body {
+      max-width: 900px;
+      padding: 32px;
+    }
+
+    /* Loading State */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+      color: #8b949e;
+    }
+
+    .loading::after {
+      content: '';
+      width: 24px;
+      height: 24px;
+      border: 2px solid #30363d;
+      border-top-color: #58a6ff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 12px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Error State */
+    .error {
+      padding: 40px;
+      text-align: center;
+      color: #f85149;
+    }
+
+    .error h2 {
+      margin-bottom: 12px;
+    }
+
+    .error p {
+      color: #8b949e;
+    }
+
+    /* Markdown Styles */
+    .markdown-body {
+      color: #e6edf3;
+    }
+
+    .markdown-body h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #21262d;
+      color: #e6edf3;
+    }
+
+    .markdown-body h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-top: 32px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #21262d;
+      color: #e6edf3;
+    }
+
+    .markdown-body h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      color: #e6edf3;
+    }
+
+    .markdown-body h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 20px;
+      margin-bottom: 8px;
+      color: #e6edf3;
+    }
+
+    .markdown-body p {
+      margin-bottom: 16px;
+    }
+
+    .markdown-body a {
+      color: #58a6ff;
+      text-decoration: none;
+    }
+
+    .markdown-body a:hover {
+      text-decoration: underline;
+    }
+
+    .markdown-body ul,
+    .markdown-body ol {
+      margin-bottom: 16px;
+      padding-left: 24px;
+    }
+
+    .markdown-body li {
+      margin-bottom: 4px;
+    }
+
+    .markdown-body code {
+      font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.875em;
+      background: #161b22;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #7ee787;
+    }
+
+    .markdown-body pre {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      margin-bottom: 16px;
+    }
+
+    .markdown-body pre code {
+      background: transparent;
+      padding: 0;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: #e6edf3;
+    }
+
+    .markdown-body blockquote {
+      border-left: 4px solid #30363d;
+      padding-left: 16px;
+      margin: 16px 0;
+      color: #8b949e;
+    }
+
+    .markdown-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+    }
+
+    .markdown-body th,
+    .markdown-body td {
+      border: 1px solid #21262d;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .markdown-body th {
+      background: #161b22;
+      font-weight: 600;
+    }
+
+    .markdown-body tr:nth-child(even) {
+      background: rgba(22, 27, 34, 0.5);
+    }
+
+    .markdown-body hr {
+      border: none;
+      border-top: 1px solid #21262d;
+      margin: 24px 0;
+    }
+
+    .markdown-body img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    /* Mobile Overlay */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 90;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay.open {
+        display: block;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .menu-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .content-body {
+        padding: 24px 16px;
+      }
+
+      .markdown-body h1 {
+        font-size: 1.5rem;
+      }
+
+      .markdown-body h2 {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="docs-layout">
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="https://github.com/BoolesAI/testing-spec/blob/main/assets/logo.png?raw=true" alt="TSpec">
+        <a href="index.html">TESTING-SPEC</a>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">Documentation</div>
+        <a href="#readme" class="nav-item" data-file="README.md">Overview</a>
+        <a href="#01-introduction" class="nav-item" data-file="01-introduction.md">1. Introduction</a>
+        <a href="#02-quick-start" class="nav-item" data-file="02-quick-start.md">2. Quick Start</a>
+        <a href="#03-file-specification" class="nav-item" data-file="03-file-specification.md">3. File Specification</a>
+        <a href="#04-core-structure" class="nav-item" data-file="04-core-structure.md">4. Core Structure</a>
+        <a href="#05-field-reference" class="nav-item" data-file="05-field-reference.md">5. Field Reference</a>
+        <a href="#06-variables-expressions" class="nav-item" data-file="06-variables-expressions.md">6. Variables & Expressions</a>
+        <a href="#07-data-driven-testing" class="nav-item" data-file="07-data-driven-testing.md">7. Data-Driven Testing</a>
+        <a href="#08-assertions" class="nav-item" data-file="08-assertions.md">8. Assertions</a>
+        <a href="#09-template-inheritance" class="nav-item" data-file="09-template-inheritance.md">9. Template Inheritance</a>
+        <a href="#10-protocol-reference" class="nav-item" data-file="10-protocol-reference.md">10. Protocol Reference</a>
+        <a href="#11-api-reference" class="nav-item" data-file="11-api-reference.md">11. API Reference</a>
+        <a href="#12-examples" class="nav-item" data-file="12-examples.md">12. Examples</a>
+        <a href="#13-test-suites" class="nav-item" data-file="13-test-suites.md">13. Test Suites</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="content-header">
+        <button class="menu-toggle" id="menuToggle">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 4.5A.5.5 0 012.5 4h15a.5.5 0 010 1h-15a.5.5 0 01-.5-.5zm0 5A.5.5 0 012.5 9h15a.5.5 0 010 1h-15a.5.5 0 01-.5-.5zm0 5a.5.5 0 01.5-.5h15a.5.5 0 010 1h-15a.5.5 0 01-.5-.5z"/>
+          </svg>
+          Menu
+        </button>
+        <a href="index.html" class="back-link">
+          <svg viewBox="0 0 16 16" fill="currentColor">
+            <path fill-rule="evenodd" d="M7.78 12.53a.75.75 0 01-1.06 0L2.47 8.28a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 1.06L4.81 7h7.44a.75.75 0 010 1.5H4.81l2.97 2.97a.75.75 0 010 1.06z"/>
+          </svg>
+          Back to Home
+        </a>
+      </header>
+      <article class="content-body">
+        <div id="content" class="markdown-body">
+          <div class="loading">Loading documentation</div>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@11.0.0/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    // Configure marked
+    marked.setOptions({
+      gfm: true,
+      breaks: true,
+      highlight: function(code, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+          try {
+            return hljs.highlight(code, { language: lang }).value;
+          } catch (e) {}
+        }
+        return hljs.highlightAuto(code).value;
+      }
+    });
+
+    // DOM elements
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const menuToggle = document.getElementById('menuToggle');
+    const contentEl = document.getElementById('content');
+    const navItems = document.querySelectorAll('.nav-item');
+
+    // Cache for loaded markdown
+    const cache = {};
+
+    // Toggle mobile sidebar
+    function toggleSidebar() {
+      sidebar.classList.toggle('open');
+      sidebarOverlay.classList.toggle('open');
+    }
+
+    menuToggle.addEventListener('click', toggleSidebar);
+    sidebarOverlay.addEventListener('click', toggleSidebar);
+
+    // Get file from hash
+    function getFileFromHash(hash) {
+      if (!hash || hash === '#' || hash === '#readme') {
+        return 'README.md';
+      }
+      const navItem = document.querySelector(`.nav-item[href="${hash}"]`);
+      return navItem ? navItem.dataset.file : 'README.md';
+    }
+
+    // Update active nav item
+    function updateActiveNav(hash) {
+      navItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('href') === hash || 
+            (!hash && item.getAttribute('href') === '#readme') ||
+            (hash === '#' && item.getAttribute('href') === '#readme')) {
+          item.classList.add('active');
+        }
+      });
+    }
+
+    // Load markdown file
+    async function loadMarkdown(file) {
+      // Check cache
+      if (cache[file]) {
+        return cache[file];
+      }
+
+      try {
+        const response = await fetch(file);
+        if (!response.ok) {
+          throw new Error(`Failed to load ${file}`);
+        }
+        const markdown = await response.text();
+        cache[file] = markdown;
+        return markdown;
+      } catch (error) {
+        throw error;
+      }
+    }
+
+    // Render markdown content
+    async function renderContent(hash) {
+      const file = getFileFromHash(hash);
+      
+      // Show loading
+      contentEl.innerHTML = '<div class="loading">Loading documentation</div>';
+      
+      try {
+        const markdown = await loadMarkdown(file);
+        const html = marked.parse(markdown);
+        contentEl.innerHTML = html;
+        
+        // Apply syntax highlighting to code blocks
+        contentEl.querySelectorAll('pre code').forEach(block => {
+          hljs.highlightElement(block);
+        });
+
+        // Update nav
+        updateActiveNav(hash || '#readme');
+        
+        // Scroll to top
+        window.scrollTo(0, 0);
+        
+        // Close mobile sidebar
+        if (sidebar.classList.contains('open')) {
+          toggleSidebar();
+        }
+      } catch (error) {
+        contentEl.innerHTML = `
+          <div class="error">
+            <h2>Failed to load documentation</h2>
+            <p>${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // Handle hash change
+    window.addEventListener('hashchange', () => {
+      renderContent(window.location.hash);
+    });
+
+    // Handle nav clicks
+    navItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const hash = item.getAttribute('href');
+        window.location.hash = hash;
+      });
+    });
+
+    // Initial load
+    renderContent(window.location.hash);
+  </script>
+</body>
+</html>

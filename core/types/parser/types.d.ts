@@ -35,6 +35,7 @@ export interface TSpec {
     grpc?: GrpcRequest;
     graphql?: GraphqlRequest;
     websocket?: WebsocketRequest;
+    web?: WebRequest;
     extends?: string;
     variables?: Record<string, unknown>;
     environment?: EnvironmentConfig;
@@ -86,6 +87,166 @@ export interface WebsocketRequest {
     url: string;
     messages: unknown[];
 }
+/**
+ * Web action types for browser automation
+ */
+export type WebActionType = 'navigate' | 'click' | 'fill' | 'select' | 'check' | 'uncheck' | 'hover' | 'press' | 'wait' | 'screenshot' | 'scroll' | 'evaluate' | 'upload' | 'extract';
+/**
+ * Web action base interface
+ */
+export interface WebActionBase {
+    action: WebActionType;
+    timeout?: number;
+}
+/**
+ * Navigate to a URL
+ */
+export interface WebNavigateAction extends WebActionBase {
+    action: 'navigate';
+    url: string;
+    waitUntil?: 'load' | 'domcontentloaded' | 'networkidle';
+}
+/**
+ * Click on an element
+ */
+export interface WebClickAction extends WebActionBase {
+    action: 'click';
+    selector: string;
+    button?: 'left' | 'right' | 'middle';
+    clickCount?: number;
+}
+/**
+ * Fill a form field
+ */
+export interface WebFillAction extends WebActionBase {
+    action: 'fill';
+    selector: string;
+    value: string;
+    clear?: boolean;
+}
+/**
+ * Select option from dropdown
+ */
+export interface WebSelectAction extends WebActionBase {
+    action: 'select';
+    selector: string;
+    value?: string | string[];
+    label?: string | string[];
+}
+/**
+ * Check/uncheck a checkbox
+ */
+export interface WebCheckAction extends WebActionBase {
+    action: 'check' | 'uncheck';
+    selector: string;
+}
+/**
+ * Hover over an element
+ */
+export interface WebHoverAction extends WebActionBase {
+    action: 'hover';
+    selector: string;
+}
+/**
+ * Press a key or key combination
+ */
+export interface WebPressAction extends WebActionBase {
+    action: 'press';
+    key: string;
+    selector?: string;
+}
+/**
+ * Wait for condition
+ */
+export interface WebWaitAction extends WebActionBase {
+    action: 'wait';
+    for: 'selector' | 'timeout' | 'navigation' | 'load_state' | 'function';
+    selector?: string;
+    state?: 'attached' | 'detached' | 'visible' | 'hidden';
+    duration?: number;
+    loadState?: 'load' | 'domcontentloaded' | 'networkidle';
+    function?: string;
+}
+/**
+ * Take a screenshot
+ */
+export interface WebScreenshotAction extends WebActionBase {
+    action: 'screenshot';
+    path?: string;
+    fullPage?: boolean;
+    selector?: string;
+    type?: 'png' | 'jpeg';
+    quality?: number;
+}
+/**
+ * Scroll the page
+ */
+export interface WebScrollAction extends WebActionBase {
+    action: 'scroll';
+    selector?: string;
+    x?: number;
+    y?: number;
+    behavior?: 'auto' | 'smooth';
+}
+/**
+ * Evaluate JavaScript in the page
+ */
+export interface WebEvaluateAction extends WebActionBase {
+    action: 'evaluate';
+    script: string;
+    args?: Record<string, unknown>;
+    extract?: string;
+}
+/**
+ * Upload files
+ */
+export interface WebUploadAction extends WebActionBase {
+    action: 'upload';
+    selector: string;
+    files: string | string[];
+}
+/**
+ * Extract data from page
+ */
+export interface WebExtractAction extends WebActionBase {
+    action: 'extract';
+    name: string;
+    selector: string;
+    attribute?: string;
+    property?: string;
+}
+/**
+ * Union of all web actions
+ */
+export type WebAction = WebNavigateAction | WebClickAction | WebFillAction | WebSelectAction | WebCheckAction | WebHoverAction | WebPressAction | WebWaitAction | WebScreenshotAction | WebScrollAction | WebEvaluateAction | WebUploadAction | WebExtractAction;
+/**
+ * Web request configuration
+ */
+export interface WebRequest {
+    /** Initial URL to navigate to */
+    url?: string;
+    /** Browser viewport size */
+    viewport?: {
+        width: number;
+        height: number;
+    };
+    /** Run browser in headless mode */
+    headless?: boolean;
+    /** Browser context options */
+    context?: {
+        locale?: string;
+        timezone?: string;
+        colorScheme?: 'light' | 'dark' | 'no-preference';
+        storageState?: string;
+    };
+    /** Wait configuration */
+    wait?: {
+        timeout?: number;
+        waitUntil?: 'load' | 'domcontentloaded' | 'networkidle';
+    };
+    /** Actions to perform */
+    actions: WebAction[];
+}
 export interface EnvironmentConfig {
     scheme?: string;
     host?: string;
@@ -125,7 +286,7 @@ export interface ValidationResult {
     valid: boolean;
     errors: string[];
 }
-export type ProtocolType = 'http' | 'grpc' | 'graphql' | 'websocket';
+export type ProtocolType = 'http' | 'grpc' | 'graphql' | 'websocket' | 'web';
 /**
  * Extended lifecycle action types for suite-level hooks
  */

@@ -6,6 +6,7 @@ import { replaceVariables, buildVariableContext, getBuiltinFunctions } from './v
 import { generateParameterizedCases, loadDataFile, parseCSV } from './data-driver.js';
 import type { 
   TSpec, TSpecMetadata, ProtocolType, HttpRequest, GrpcRequest, GraphqlRequest, WebsocketRequest, 
+  WebRequest,
   Assertion, ValidationResult, EnvironmentConfig, DataConfig, OutputConfig, LifecycleConfig, 
   LifecycleAction, LifecycleScope, LifecycleActionType, LineRange, RelatedCodeReference,
   // Suite types
@@ -21,7 +22,7 @@ export interface TestCase {
   description: string;
   metadata: TSpecMetadata;
   protocol: ProtocolType | null;
-  request: HttpRequest | GrpcRequest | GraphqlRequest | WebsocketRequest | undefined;
+  request: HttpRequest | GrpcRequest | GraphqlRequest | WebsocketRequest | WebRequest | undefined;
   assertions: Assertion[];
   lifecycle?: TSpec['lifecycle'];
   environment?: EnvironmentConfig;

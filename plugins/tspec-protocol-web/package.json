@@ -1,0 +1,59 @@
+{
+  "name": "@boolesai/tspec-plugin-web",
+  "version": "1.0.0",
+  "description": "Web browser UI testing plugin for TSpec using Puppeteer",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build && tsc --emitDeclarationOnly --outDir dist",
+    "dev": "vite build --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "tspec",
+    "tspec-plugin",
+    "web",
+    "browser",
+    "puppeteer",
+    "e2e",
+    "ui-testing"
+  ],
+  "tspec": {
+    "plugin": true
+  },
+  "peerDependencies": {
+    "@boolesai/tspec": "^1.2.0"
+  },
+  "dependencies": {
+    "puppeteer": "^24.15.0"
+  },
+  "devDependencies": {
+    "@boolesai/tspec": "^1.2.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^7.0.0",
+    "vitest": "^2.1.9"
+  },
+  "author": "TSpec Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/boolesai/testing-spec.git",
+    "directory": "plugins/tspec-protocol-web"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -17,6 +17,120 @@ Or run directly with npx:
 npx @boolesai/tspec-cli <command>
 ```
 
+## Plugin Installation
+
+TSpec uses a plugin architecture to support different protocols. Plugins can be installed automatically or manually.
+
+### Installing Plugins via CLI
+
+The easiest way to install plugins is using the `plugin:install` command:
+
+```bash
+# Install HTTP/HTTPS protocol plugin
+tspec plugin:install @tspec/http
+
+# Install Web browser UI testing plugin  
+tspec plugin:install @tspec/web
+
+# Install and add to global config
+tspec plugin:install @tspec/http --global
+```
+
+### Manual Installation
+
+You can also install plugins manually as npm packages:
+
+```bash
+# Install HTTP/HTTPS protocol plugin
+npm install -D @tspec/http
+
+# Install Web browser UI testing plugin
+npm install -D @tspec/web
+
+# Install multiple plugins at once
+npm install -D @tspec/http @tspec/web
+```
+
+### Plugin Configuration
+
+TSpec uses JSON configuration files. Create a `tspec.config.json` file in your project root:
+
+```json
+{
+  "plugins": [
+    "@tspec/http",
+    "@tspec/web"
+  ],
+  "pluginOptions": {
+    "@tspec/http": {
+      "timeout": 30000,
+      "followRedirects": true,
+      "maxRedirects": 5
+    },
+    "@tspec/web": {
+      "headless": true,
+      "timeout": 30000,
+      "slowMo": 0
+    }
+  }
+}
+```
+
+#### Configuration Locations
+
+TSpec supports dual configuration with local taking precedence:
+
+| Location | Path | Priority |
+|----------|------|----------|
+| Local | `./tspec.config.json` (searched upward) | Higher |
+| Global | `~/.tspec/tspec.config.json` | Lower |
+
+When both configs exist, they are merged with local values overriding global ones.
+
+#### Auto-Installation
+
+When running `tspec run`, missing plugins in your config are automatically installed to `~/.tspec/plugins/`. Use `--no-auto-install` to disable this behavior.
+
+### Available Official Plugins
+
+| Plugin | Protocol | Description | Package |
+|--------|----------|-------------|----------|
+| HTTP/HTTPS | `http`, `https` | REST API testing with axios | `@tspec/http` |
+| Web UI | `web` | Browser testing with Puppeteer | `@tspec/web` |
+
+### Using Plugins
+
+Once installed and configured, plugins are automatically loaded when running tests:
+
+```bash
+# Run HTTP tests
+tspec run tests/**/*.http.tcase
+
+# Run Web UI tests
+tspec run tests/**/*.web.tcase
+
+# List loaded plugins and supported protocols
+tspec list
+```
+
+### Custom Plugins
+
+You can also install custom third-party plugins or create your own:
+
+```bash
+# Install custom plugin from npm
+tspec plugin:install my-custom-tspec-plugin
+
+# Or use a local plugin path in tspec.config.json:
+{
+  "plugins": [
+    "./plugins/my-custom-protocol"
+  ]
+}
+```
+
+For plugin development details, see the [Plugin Development Guide](../plugins/DEVELOPMENT.md).
+
 ## Commands
 
 ### `tspec validate`
@@ -59,6 +173,8 @@ tspec run <files...> [options]
 - `-v, --verbose` - Verbose output
 - `-q, --quiet` - Only output summary
 - `--fail-fast` - Stop on first failure
+- `--config <path>` - Path to tspec.config.json
+- `--no-auto-install` - Skip automatic plugin installation
 
 **Examples:**
 ```bash
@@ -131,6 +247,62 @@ tspec list
 tspec list --output json
 ```
 
+### `tspec plugin:install`
+
+Install a TSpec plugin and add it to configuration.
+
+```bash
+tspec plugin:install <plugin> [options]
+```
+
+**Options:**
+- `-o, --output <format>` - Output format: `json`, `text` (default: `text`)
+- `-g, --global` - Add plugin to global config (`~/.tspec/tspec.config.json`)
+- `-c, --config <path>` - Path to specific config file to update
+
+**Examples:**
+```bash
+# Install plugin (adds to local config if exists, otherwise global)
+tspec plugin:install @tspec/http
+
+# Install and add to global config
+tspec plugin:install @tspec/web --global
+
+# Install and add to specific config file
+tspec plugin:install @tspec/http --config ./tspec.config.json
+```
+
+### `tspec plugin:list`
+
+List all installed TSpec plugins and configuration sources.
+
+```bash
+tspec plugin:list [options]
+```
+
+**Alias:** `tspec plugins`
+
+**Options:**
+- `-o, --output <format>` - Output format: `json`, `text` (default: `text`)
+- `-v, --verbose` - Show detailed plugin information
+- `--health` - Run health checks on all plugins
+- `-c, --config <path>` - Path to tspec.config.json
+
+**Examples:**
+```bash
+# List installed plugins
+tspec plugin:list
+
+# Show detailed information
+tspec plugin:list --verbose
+
+# Check plugin health status
+tspec plugin:list --health
+
+# JSON output
+tspec plugin:list --output json
+```
+
 ### `tspec mcp`
 
 Start MCP (Model Context Protocol) server for AI tool integration.
@@ -143,7 +315,15 @@ This starts an MCP server over stdio that exposes TSpec commands as tools for AI
 
 ## MCP Integration
 
-TSpec CLI can run as an MCP server, exposing all commands as tools for AI assistants.
+TSpec CLI can run as an MCP (Model Context Protocol) server, exposing all commands as tools for AI assistants. This enables AI assistants like Claude to execute TSpec commands directly through the MCP protocol.
+
+### Overview
+
+The MCP server runs over stdio, providing a standardized interface for AI tools to:
+- Execute test cases with customizable parameters
+- Validate test case files for schema correctness
+- Parse test specifications without execution
+- Query supported protocols and configurations
 
 ### Available Tools
 
@@ -154,12 +334,17 @@ TSpec CLI can run as an MCP server, exposing all commands as tools for AI assist
 | `tspec_parse` | Parse and display test case information |
 | `tspec_list` | List supported protocols |
 
-### Claude Desktop Configuration
+### Configuration
+
+#### Claude Desktop
 
 Add the following to your Claude Desktop configuration file:
 
 **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+**Linux:** `~/.config/Claude/claude_desktop_config.json`
+
+**Option 1: Using npx (recommended for always getting the latest version):**
 
 ```json
 {
@@ -172,7 +357,7 @@ Add the following to your Claude Desktop configuration file:
 }
 ```
 
-Or if installed globally:
+**Option 2: Using global installation:**
 
 ```json
 {
@@ -185,15 +370,56 @@ Or if installed globally:
 }
 ```
 
+**Option 3: Using absolute path (for development or specific versions):**
+
+```json
+{
+  "mcpServers": {
+    "tspec": {
+      "command": "/path/to/tspec/cli/bin/tspec.js",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+#### Other MCP Clients
+
+For other MCP-compatible clients, start the server with:
+
+```bash
+tspec mcp
+```
+
+The server will communicate via stdio, waiting for JSON-RPC 2.0 formatted requests.
+
+### Server Behavior
+
+- **Transport:** stdio (reads from stdin, writes to stdout)
+- **Protocol:** JSON-RPC 2.0 over MCP
+- **Lifecycle:** Runs indefinitely until explicitly terminated (Ctrl+C or SIGTERM)
+- **Logging:** Error logs are written to stderr to avoid polluting stdio transport
+
 ### Tool Parameters
 
 #### tspec_run
 
+Execute test cases with optional configuration.
+
+**Parameters:**
+- `files` (required): Array of file paths or glob patterns
+- `concurrency` (optional): Maximum concurrent test execution (default: 5)
+- `env` (optional): Environment variables as key-value object
+- `params` (optional): Test parameters as key-value object
+- `failFast` (optional): Stop on first failure (default: false)
+- `output` (optional): Output format - "json" or "text" (default: "text")
+
+**Example:**
 ```json
 {
   "files": ["tests/*.tcase"],
   "concurrency": 5,
-  "env": { "API_HOST": "localhost" },
+  "env": { "API_HOST": "localhost", "API_PORT": "8080" },
   "params": { "timeout": "5000" },
   "failFast": false,
   "output": "text"
@@ -202,6 +428,13 @@ Or if installed globally:
 
 #### tspec_validate
 
+Validate test case files for schema correctness.
+
+**Parameters:**
+- `files` (required): Array of file paths or glob patterns
+- `output` (optional): Output format - "json" or "text" (default: "text")
+
+**Example:**
 ```json
 {
   "files": ["tests/*.tcase"],
@@ -211,6 +444,16 @@ Or if installed globally:
 
 #### tspec_parse
 
+Parse test case files without execution.
+
+**Parameters:**
+- `files` (required): Array of file paths or glob patterns
+- `env` (optional): Environment variables for variable substitution
+- `params` (optional): Parameters for variable substitution
+- `verbose` (optional): Show detailed information (default: false)
+- `output` (optional): Output format - "json" or "text" (default: "text")
+
+**Example:**
 ```json
 {
   "files": ["tests/*.tcase"],
@@ -223,11 +466,34 @@ Or if installed globally:
 
 #### tspec_list
 
+List supported protocols and configuration.
+
+**Parameters:**
+- `output` (optional): Output format - "json" or "text" (default: "text")
+
+**Example:**
 ```json
 {
   "output": "text"
 }
 ```
+
+### Troubleshooting
+
+**Server doesn't appear in Claude Desktop:**
+- Verify the configuration file path is correct for your OS
+- Check JSON syntax is valid (use a JSON validator)
+- Restart Claude Desktop after configuration changes
+- Check Claude Desktop logs for connection errors
+
+**Server hangs or doesn't respond:**
+- Ensure Node.js >= 18.0.0 is installed
+- Verify `@boolesai/tspec-cli` is accessible (try running `tspec --version`)
+- Check stderr output for error messages
+
+**Permission errors:**
+- Ensure the tspec executable has proper permissions
+- For global installation, verify npm global bin directory is in PATH
 
 ## Exit Codes
 
