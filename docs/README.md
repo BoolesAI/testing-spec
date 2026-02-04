@@ -21,6 +21,7 @@ A multi-protocol testing DSL designed for Developer + AI collaboration.
 11. [API Reference](./11-api-reference.md)
 12. [Examples](./12-examples.md)
 13. [Test Suites](./13-test-suites.md)
+14. [Proxy Server](./14-proxy-server.md)
 
 ---
 
@@ -40,6 +41,7 @@ TSpec (Test Specification) is a YAML-based domain-specific language for defining
 - Comprehensive assertion types
 - Lifecycle hooks for setup/teardown
 - Test suites for organizing related tests with shared configuration
+- Proxy server support for remote test execution
 
 ### File Extensions
 

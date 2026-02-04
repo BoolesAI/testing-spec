@@ -60,6 +60,9 @@ tspec validate <files...> [options]
 |--------|-------------|
 | `-o, --output <format>` | Output format: `json`, `text` (default: `text`) |
 | `-q, --quiet` | Only output errors |
+| `--config <path>` | Path to tspec.config.json |
+| `--no-proxy` | Disable proxy for this execution |
+| `--proxy-url <url>` | Override proxy URL for this execution |
 
 ### CLI Examples
 
@@ -151,6 +154,18 @@ tspec validate tests/*.tcase && tspec run tests/*.tcase
 | `0` | All files valid |
 | `1` | Validation errors found |
 | `2` | Error (invalid input/file not found) |
+
+## Proxy Execution
+
+Validation can be performed on a remote proxy server by configuring proxy settings in `tspec.config.json`. See [tspec-run](../tspec-run/SKILL.md#proxy-execution) for configuration details.
+
+```bash
+# Validate through a specific proxy server
+tspec validate tests/*.tcase --proxy-url http://localhost:8080
+
+# Disable proxy and validate locally
+tspec validate tests/*.tcase --no-proxy
+```
 
 ## Related Skills
 

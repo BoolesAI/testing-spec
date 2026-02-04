@@ -11,7 +11,15 @@ import {
   registry,
   version,
   type SuiteResult,
-  type SuiteTestResult
+  type SuiteTestResult,
+  ProxyClient,
+  loadConfig,
+  isProxyEnabled,
+  getProxyConfig,
+  readTestFiles,
+  type ProxyTestResult,
+  type ProxyAssertionResult,
+  type ProxyParseError
 } from '@boolesai/tspec';
 import { findConfigFile } from '@boolesai/tspec/plugin';
 import type { TestCase, TestResult } from '@boolesai/tspec';
@@ -28,6 +36,8 @@ interface RunOptions {
   failFast?: boolean;
   config?: string;
   noAutoInstall?: boolean;
+  noProxy?: boolean;
+  proxyUrl?: string;
   env: Record<string, string>;
   params: Record<string, string>;
 }
@@ -41,6 +51,8 @@ export interface RunParams {
   failFast?: boolean;
   config?: string;
   noAutoInstall?: boolean;
+  noProxy?: boolean;
+  proxyUrl?: string;
   env?: Record<string, string>;
   params?: Record<string, string>;
 }
@@ -146,6 +158,32 @@ export async function executeRun(params: RunParams): Promise<RunExecutionResult>
   
   // Initialize plugin manager if config file exists
   const configPath = params.config || findConfigFile();
+  
+  // Check for proxy configuration
+  if (!params.noProxy) {
+    const config = await loadConfig(configPath || undefined);
+    const proxyUrl = params.proxyUrl;
+    
+    // Use CLI-provided proxy URL or check config
+    if (proxyUrl || isProxyEnabled(config, 'run')) {
+      const proxyConfig = proxyUrl 
+        ? { url: proxyUrl, timeout: 30000, headers: {}, enabled: true, operations: ['run' as const, 'validate' as const, 'parse' as const] }
+        : getProxyConfig(config);
+      
+      if (proxyConfig) {
+        return executeRunViaProxy(params, proxyConfig);
+      }
+    }
+  }
+  
+  // Local execution
+  if (configPath) {
+    const pluginManager = getPluginManager(version);
+    await pluginManager.initialize(configPath, { 
+      skipAutoInstall: params.noAutoInstall 
+    });
+    registry.enablePluginManager();
+  }
   if (configPath) {
     const pluginManager = getPluginManager(version);
     await pluginManager.initialize(configPath, { 
@@ -438,6 +476,132 @@ async function executeSuiteRun(
   };
 }
 
+/**
+ * Execute tests via proxy server
+ */
+async function executeRunViaProxy(
+  params: RunParams,
+  proxyConfig: { url: string; timeout?: number; headers?: Record<string, string> }
+): Promise<RunExecutionResult> {
+  const output = params.output ?? 'text';
+  
+  // Discover files first
+  const { tspecFiles, suiteFiles } = await discoverAllTestFiles(params.files);
+  const allFiles = [...tspecFiles.map(f => f.path), ...suiteFiles.map(f => f.path)];
+  
+  if (allFiles.length === 0) {
+    return {
+      success: false,
+      output: 'No .tcase or .tsuite files found',
+      data: {
+        results: [],
+        summary: { total: 0, passed: 0, failed: 0, passRate: 0, duration: 0 },
+        parseErrors: []
+      }
+    };
+  }
+  
+  // Read file contents
+  const fileResult = readTestFiles(allFiles);
+  
+  if (fileResult.errors.length > 0 && Object.keys(fileResult.fileContents).length === 0) {
+    return {
+      success: false,
+      output: `Failed to read test files: ${fileResult.errors.map(e => e.error).join(', ')}`,
+      data: {
+        results: [],
+        summary: { total: 0, passed: 0, failed: 0, passRate: 0, duration: 0 },
+        parseErrors: fileResult.errors.map(e => ({ file: e.file, error: e.error }))
+      }
+    };
+  }
+  
+  // Create proxy client and execute
+  const client = new ProxyClient({
+    url: proxyConfig.url,
+    timeout: proxyConfig.timeout,
+    headers: proxyConfig.headers
+  });
+  
+  const result = await client.executeRun(
+    allFiles,
+    fileResult.fileContents,
+    {
+      concurrency: params.concurrency,
+      failFast: params.failFast,
+      env: params.env,
+      params: params.params
+    }
+  );
+  
+  if (!result.success || !result.data) {
+    const errorMsg = result.error 
+      ? `${result.error.code}: ${result.error.message}${result.error.details ? ` (${result.error.details})` : ''}`
+      : 'Unknown proxy error';
+    
+    return {
+      success: false,
+      output: output === 'json' 
+        ? formatJson({ error: errorMsg, results: [], summary: { total: 0, passed: 0, failed: 0, passRate: 0, duration: 0 }, parseErrors: [] })
+        : `Proxy error: ${errorMsg}`,
+      data: {
+        results: [],
+        summary: { total: 0, passed: 0, failed: 0, passRate: 0, duration: 0 },
+        parseErrors: []
+      }
+    };
+  }
+  
+  // Transform proxy response to local format
+  const proxyResponse = result.data;
+  const formattedResults: FormattedTestResult[] = (proxyResponse.results || []).map(r => ({
+    testCaseId: r.testCaseId,
+    passed: r.passed,
+    duration: r.duration,
+    assertions: (r.assertions || []).map(a => ({
+      passed: a.passed,
+      type: a.type,
+      message: a.message || ''
+    }))
+  }));
+  
+  const summary: TestResultSummary = proxyResponse.summary 
+    ? {
+        total: proxyResponse.summary.total,
+        passed: proxyResponse.summary.passed,
+        failed: proxyResponse.summary.failed,
+        passRate: proxyResponse.summary.passRate,
+        duration: proxyResponse.summary.duration
+      }
+    : { total: 0, passed: 0, failed: 0, passRate: 0, duration: 0 };
+  
+  const parseErrors = (proxyResponse.parseErrors || []).map(e => ({
+    file: e.file,
+    error: e.message
+  }));
+  
+  // Generate output
+  let outputStr: string;
+  if (output === 'json') {
+    outputStr = formatJson({ results: formattedResults, summary, parseErrors });
+  } else {
+    const parts: string[] = [];
+    parts.push(chalk.cyan(`[Proxy: ${proxyConfig.url}]`));
+    parts.push(formatTestResults(formattedResults, summary, { format: output, verbose: params.verbose }));
+    if (parseErrors.length > 0) {
+      parts.push(`\n${parseErrors.length} file(s) failed to parse:`);
+      parseErrors.forEach(({ file, error }) => parts.push(`  ${file}: ${error}`));
+    }
+    outputStr = parts.join('\n');
+  }
+  
+  return {
+    success: summary.failed === 0 && parseErrors.length === 0,
+    output: outputStr,
+    data: { results: formattedResults, summary, parseErrors }
+  };
+}
+
 export const runCommand = new Command('run')
   .description('Execute test cases and report results')
   .argument('<files...>', 'Files or glob patterns to run')
@@ -450,6 +614,8 @@ export const runCommand = new Command('run')
   .option('--fail-fast', 'Stop on first failure')
   .option('--config <path>', 'Path to tspec.config.json for plugin loading')
   .option('--no-auto-install', 'Skip automatic plugin installation')
+  .option('--no-proxy', 'Disable proxy for this execution')
+  .option('--proxy-url <url>', 'Override proxy URL for this execution')
   .action(async (files: string[], options: RunOptions) => {
     setLoggerOptions({ verbose: options.verbose, quiet: options.quiet });
     
@@ -465,6 +631,8 @@ export const runCommand = new Command('run')
         failFast: options.failFast,
         config: options.config,
         noAutoInstall: options.noAutoInstall,
+        noProxy: options.noProxy,
+        proxyUrl: options.proxyUrl,
         env: options.env,
         params: options.params
       });

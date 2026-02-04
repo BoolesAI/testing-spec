@@ -41,12 +41,18 @@ export {
   ensureGlobalConfigDir,
   getPluginOptions,
   resolvePluginPath,
+  isProxyEnabled,
+  getProxyConfig,
+  expandEnvVars,
+  expandProxyHeaders,
   CONFIG_FILE_NAME,
   GLOBAL_CONFIG_DIR,
   GLOBAL_CONFIG_PATH,
   PLUGINS_DIR,
   type TSpecConfig,
-  type LoadedConfig
+  type LoadedConfig,
+  type ProxyConfig,
+  type ProxyOperation
 } from './config.js';
 
 // Plugin installer

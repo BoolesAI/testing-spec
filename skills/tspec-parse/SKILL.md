@@ -61,6 +61,9 @@ tspec parse <files...> [options]
 | `-q, --quiet` | Minimal output |
 | `-e, --env <key=value>` | Environment variables (repeatable) |
 | `-p, --params <key=value>` | Parameters (repeatable) |
+| `--config <path>` | Path to tspec.config.json |
+| `--no-proxy` | Disable proxy for this execution |
+| `--proxy-url <url>` | Override proxy URL for this execution |
 
 ### CLI Examples
 
@@ -140,6 +143,18 @@ tspec parse tests/*.tcase -e API_HOST=staging.example.com
 | `0` | Parse successful |
 | `1` | Parse errors (invalid syntax, unresolved variables) |
 | `2` | Error (file not found) |
+
+## Proxy Execution
+
+Parsing can be performed on a remote proxy server by configuring proxy settings in `tspec.config.json`. See [tspec-run](../tspec-run/SKILL.md#proxy-execution) for configuration details.
+
+```bash
+# Parse through a specific proxy server
+tspec parse tests/*.tcase --proxy-url http://localhost:8080
+
+# Disable proxy and parse locally
+tspec parse tests/*.tcase --no-proxy
+```
 
 ## Related Skills
 

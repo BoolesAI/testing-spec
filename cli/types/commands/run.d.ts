@@ -10,6 +10,8 @@ export interface RunParams {
     failFast?: boolean;
     config?: string;
     noAutoInstall?: boolean;
+    noProxy?: boolean;
+    proxyUrl?: string;
     env?: Record<string, string>;
     params?: Record<string, string>;
 }
