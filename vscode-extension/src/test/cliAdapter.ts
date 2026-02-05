@@ -233,24 +233,33 @@ export class CLIAdapter {
    * Parse JSON output from CLI
    */
   parseOutput(stdout: string): CLIOutput {
+    console.log('[TSpec] parseOutput - raw stdout length:', stdout.length);
+    console.log('[TSpec] parseOutput - stdout preview:', stdout.substring(0, 200));
+    
     // Find JSON in output (may have other text before/after)
     const jsonMatch = stdout.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.log('[TSpec] parseOutput - no JSON match found');
       throw new Error('No JSON found in output');
     }
 
+    console.log('[TSpec] parseOutput - JSON match length:', jsonMatch[0].length);
+    
     const parsed = JSON.parse(jsonMatch[0]) as CLIOutput & { error?: string };
     
     // Handle error response from CLI
     if (parsed.error) {
+      console.log('[TSpec] parseOutput - CLI error:', parsed.error);
       throw new Error(parsed.error);
     }
     
     // Validate structure
     if (!parsed.results || !Array.isArray(parsed.results)) {
+      console.log('[TSpec] parseOutput - invalid structure, results:', parsed.results);
       throw new Error('Invalid CLI output: missing results array');
     }
 
+    console.log('[TSpec] parseOutput - success, results count:', parsed.results.length);
     return parsed;
   }
 

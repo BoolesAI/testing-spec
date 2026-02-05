@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { TSpecTestMetadata, TestItemData, TSpecAssertion } from './types';
+import { TestParser } from './testParser';
 
 /**
  * Manages TestItem hierarchy for the Test Explorer
@@ -9,6 +10,9 @@ export class TestItemManager {
   private controller: vscode.TestController;
   private testItemData: WeakMap<vscode.TestItem, TestItemData> = new WeakMap();
   private fileToTestItem: Map<string, vscode.TestItem> = new Map();
+  // Suite tracking maps
+  private suiteChildrenMap: Map<string, Set<string>> = new Map();  // suite path -> child paths
+  private fileToSuiteMap: Map<string, string> = new Map();         // child path -> suite path
 
   constructor(controller: vscode.TestController) {
     this.controller = controller;
@@ -26,6 +30,108 @@ export class TestItemManager {
    */
   getByFilePath(filePath: string): vscode.TestItem | undefined {
     return this.fileToTestItem.get(filePath);
+  }
+
+  /**
+   * Check if a file is managed by a suite (should not appear at root level)
+   */
+  isFileManagedBySuite(filePath: string): boolean {
+    return this.fileToSuiteMap.has(filePath);
+  }
+
+  /**
+   * Create a suite with its child test files
+   */
+  async createSuiteWithChildren(
+    suiteUri: vscode.Uri,
+    suiteMetadata: TSpecTestMetadata,
+    childUris: vscode.Uri[],
+    parser: TestParser
+  ): Promise<vscode.TestItem> {
+    // Check for existing suite item
+    const existingItem = this.fileToTestItem.get(suiteUri.fsPath);
+    if (existingItem) {
+      // Update existing suite - remove old children first
+      existingItem.children.forEach(child => {
+        const data = this.testItemData.get(child);
+        if (data?.type === 'suite-child') {
+          existingItem.children.delete(child.id);
+        }
+      });
+      existingItem.label = suiteMetadata.description;
+    }
+
+    // Create folder hierarchy
+    const parentItem = this.getOrCreateFolderItem(suiteUri);
+
+    // Create or reuse suite item
+    const suiteItem = existingItem || this.controller.createTestItem(
+      suiteMetadata.testCaseId,
+      suiteMetadata.description,
+      suiteUri
+    );
+
+    // Set tags based on metadata
+    if (suiteMetadata.priority) {
+      suiteItem.tags = [new vscode.TestTag(suiteMetadata.priority)];
+    }
+
+    // Store suite data
+    this.testItemData.set(suiteItem, {
+      type: 'suite',
+      uri: suiteUri,
+      metadata: suiteMetadata,
+    });
+
+    // Track suite's children
+    const childPaths = new Set<string>();
+
+    // Create child items for each referenced .tcase file
+    for (const childUri of childUris) {
+      const childMetadata = await parser.parseFile(childUri);
+      if (!childMetadata) continue;
+
+      const childItem = this.controller.createTestItem(
+        `${suiteMetadata.testCaseId}:${childMetadata.testCaseId}`,
+        childMetadata.description,
+        childUri
+      );
+
+      // Store suite-child data
+      this.testItemData.set(childItem, {
+        type: 'suite-child',
+        uri: childUri,
+        metadata: childMetadata,
+        suiteUri: suiteUri,
+        childFilePath: childUri.fsPath,
+      });
+
+      // Add assertion children to the suite-child
+      this.updateAssertionChildren(childItem, childMetadata);
+
+      // Add child to suite
+      suiteItem.children.add(childItem);
+
+      // Track membership
+      childPaths.add(childUri.fsPath);
+      this.fileToSuiteMap.set(childUri.fsPath, suiteUri.fsPath);
+    }
+
+    this.suiteChildrenMap.set(suiteUri.fsPath, childPaths);
+
+    // Add suite to parent (folder or root)
+    if (!existingItem) {
+      if (parentItem) {
+        parentItem.children.add(suiteItem);
+      } else {
+        this.controller.items.add(suiteItem);
+      }
+    }
+
+    // Store mapping
+    this.fileToTestItem.set(suiteUri.fsPath, suiteItem);
+
+    return suiteItem;
   }
 
   /**
@@ -82,7 +188,7 @@ export class TestItemManager {
   /**
    * Update assertion sub-items for a test
    */
-  private updateAssertionChildren(testItem: vscode.TestItem, metadata: TSpecTestMetadata): void {
+  updateAssertionChildren(testItem: vscode.TestItem, metadata: TSpecTestMetadata): void {
     // Clear existing assertion children
     testItem.children.forEach((child) => {
       const data = this.testItemData.get(child);
@@ -256,10 +362,13 @@ export class TestItemManager {
   clear(): void {
     this.controller.items.replace([]);
     this.fileToTestItem.clear();
+    this.suiteChildrenMap.clear();
+    this.fileToSuiteMap.clear();
   }
 
   /**
    * Get all file-level test items (not folders, not assertions)
+   * Includes 'file', 'suite', and 'suite-child' types
    */
   getAllFileTestItems(): vscode.TestItem[] {
     const items: vscode.TestItem[] = [];
@@ -267,7 +376,7 @@ export class TestItemManager {
     const collectItems = (collection: vscode.TestItemCollection): void => {
       collection.forEach((item) => {
         const data = this.testItemData.get(item);
-        if (data?.type === 'file') {
+        if (data?.type === 'file' || data?.type === 'suite' || data?.type === 'suite-child') {
           items.push(item);
         }
         collectItems(item.children);

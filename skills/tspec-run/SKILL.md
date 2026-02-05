@@ -74,6 +74,9 @@ tspec run <files...> [options]
 | `-v, --verbose` | Verbose output |
 | `-q, --quiet` | Only output summary |
 | `--fail-fast` | Stop on first failure |
+| `--config <path>` | Path to tspec.config.json |
+| `--no-proxy` | Disable proxy for this execution |
+| `--proxy-url <url>` | Override proxy URL for this execution |
 
 ### CLI Examples
 
@@ -183,6 +186,34 @@ suite:
 | `0` | All tests passed |
 | `1` | One or more tests failed |
 | `2` | Error (invalid input/configuration) |
+
+## Proxy Execution
+
+Tests can be executed on a remote proxy server by configuring proxy settings in `tspec.config.json`:
+
+```json
+{
+  "proxy": {
+    "url": "http://tspec-proxy.example.com:8080",
+    "timeout": 60000,
+    "headers": {
+      "Authorization": "Bearer ${TSPEC_PROXY_TOKEN}"
+    }
+  }
+}
+```
+
+### Proxy CLI Options
+
+```bash
+# Run tests through a specific proxy server
+tspec run tests/*.tcase --proxy-url http://localhost:8080
+
+# Disable proxy and run locally
+tspec run tests/*.tcase --no-proxy
+```
+
+When proxy is configured, tests are automatically forwarded to the remote server. The output includes a `[Proxy: <url>]` indicator.
 
 ## Related Skills
 

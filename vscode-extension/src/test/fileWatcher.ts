@@ -7,21 +7,27 @@ export interface FileWatcherHandler {
 }
 
 /**
- * File system watcher for .tcase files with debouncing
+ * File system watcher for .tcase and .tsuite files with debouncing
  */
 export class TSpecFileWatcher implements vscode.Disposable {
-  private watcher: vscode.FileSystemWatcher;
+  private tcaseWatcher: vscode.FileSystemWatcher;
+  private tsuiteWatcher: vscode.FileSystemWatcher;
   private handlers: FileWatcherHandler[] = [];
   private debounceTimers: Map<string, NodeJS.Timeout> = new Map();
   private debounceDelay = 300; // ms
 
   constructor() {
-    // Watch for all .tcase files in workspace
-    this.watcher = vscode.workspace.createFileSystemWatcher('**/*.tcase');
+    // Watch for all .tcase and .tsuite files in workspace
+    this.tcaseWatcher = vscode.workspace.createFileSystemWatcher('**/*.tcase');
+    this.tsuiteWatcher = vscode.workspace.createFileSystemWatcher('**/*.tsuite');
     
-    this.watcher.onDidCreate((uri) => this.handleEvent(uri, 'created'));
-    this.watcher.onDidChange((uri) => this.handleEvent(uri, 'changed'));
-    this.watcher.onDidDelete((uri) => this.handleEvent(uri, 'deleted'));
+    this.tcaseWatcher.onDidCreate((uri) => this.handleEvent(uri, 'created'));
+    this.tcaseWatcher.onDidChange((uri) => this.handleEvent(uri, 'changed'));
+    this.tcaseWatcher.onDidDelete((uri) => this.handleEvent(uri, 'deleted'));
+    
+    this.tsuiteWatcher.onDidCreate((uri) => this.handleEvent(uri, 'created'));
+    this.tsuiteWatcher.onDidChange((uri) => this.handleEvent(uri, 'changed'));
+    this.tsuiteWatcher.onDidDelete((uri) => this.handleEvent(uri, 'deleted'));
   }
 
   /**
@@ -92,7 +98,8 @@ export class TSpecFileWatcher implements vscode.Disposable {
 
   dispose(): void {
     this.clearPendingTimers();
-    this.watcher.dispose();
+    this.tcaseWatcher.dispose();
+    this.tsuiteWatcher.dispose();
     this.handlers = [];
   }
 }

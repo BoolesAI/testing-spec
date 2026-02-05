@@ -3,6 +3,9 @@ import type { OutputFormat } from '../utils/formatter.js';
 export interface ValidateParams {
     files: string[];
     output?: OutputFormat;
+    noProxy?: boolean;
+    proxyUrl?: string;
+    config?: string;
 }
 export interface ValidateExecutionResult {
     success: boolean;

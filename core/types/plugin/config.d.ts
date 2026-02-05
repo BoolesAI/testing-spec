@@ -5,6 +5,25 @@
  * Supports both local (project) and global (~/.tspec) configuration.
  */
 /**
+ * Proxy operation types that can be forwarded to remote server
+ */
+export type ProxyOperation = 'run' | 'validate' | 'parse';
+/**
+ * Proxy configuration for remote test execution
+ */
+export interface ProxyConfig {
+    /** Remote proxy server URL (http or https) */
+    url: string;
+    /** Request timeout in milliseconds (default: 30000) */
+    timeout?: number;
+    /** Custom HTTP headers (supports ${ENV_VAR} expansion) */
+    headers?: Record<string, string>;
+    /** Enable/disable proxy (default: true) */
+    enabled?: boolean;
+    /** Operations to proxy (default: ['run', 'validate', 'parse']) */
+    operations?: ProxyOperation[];
+}
+/**
  * Plugin configuration structure
  */
 export interface TSpecConfig {
@@ -12,6 +31,8 @@ export interface TSpecConfig {
     plugins?: string[];
     /** Plugin-specific options */
     pluginOptions?: Record<string, Record<string, unknown>>;
+    /** Proxy configuration for remote execution */
+    proxy?: ProxyConfig;
 }
 /**
  * Extended config with source metadata
@@ -77,3 +98,20 @@ export declare function getPluginOptions(config: TSpecConfig, pluginName: string
  * Resolve plugin path (handles both package names and relative paths)
  */
 export declare function resolvePluginPath(plugin: string, configDir?: string): string;
+/**
+ * Check if proxy is enabled for a specific operation
+ */
+export declare function isProxyEnabled(config: TSpecConfig, operation: ProxyOperation): boolean;
+/**
+ * Get proxy configuration with defaults applied
+ */
+export declare function getProxyConfig(config: TSpecConfig): ProxyConfig | null;
+/**
+ * Expand environment variables in a string
+ * Replaces ${VAR_NAME} with process.env.VAR_NAME
+ */
+export declare function expandEnvVars(value: string): string;
+/**
+ * Expand environment variables in proxy headers
+ */
+export declare function expandProxyHeaders(headers: Record<string, string>): Record<string, string>;

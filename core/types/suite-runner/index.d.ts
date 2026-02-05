@@ -17,6 +17,7 @@ export interface SuiteRunnerOptions {
     env?: Record<string, string>;
     extracted?: Record<string, unknown>;
     cwd?: string;
+    silent?: boolean;
     onTestStart?: (testFile: string) => void;
     onTestComplete?: (testFile: string, result: SuiteTestResult) => void;
     onSuiteStart?: (suiteName: string) => void;
@@ -29,11 +30,11 @@ export declare function createSuiteLifecycleContext(variables?: Record<string, u
 /**
  * Execute a single suite lifecycle action
  */
-export declare function executeSuiteLifecycleAction(action: SuiteLifecycleAction, context: SuiteLifecycleContext): Promise<void>;
+export declare function executeSuiteLifecycleAction(action: SuiteLifecycleAction, context: SuiteLifecycleContext, silent?: boolean): Promise<void>;
 /**
  * Execute all suite lifecycle actions
  */
-export declare function executeSuiteLifecycleActions(actions: SuiteLifecycleAction[] | undefined, context: SuiteLifecycleContext): Promise<HookResult>;
+export declare function executeSuiteLifecycleActions(actions: SuiteLifecycleAction[] | undefined, context: SuiteLifecycleContext, silent?: boolean): Promise<HookResult>;
 /**
  * Resolve test files from test references
  */

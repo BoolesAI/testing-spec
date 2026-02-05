@@ -11,6 +11,16 @@ export interface TSpecTestMetadata {
   tags?: string[];
   timeout?: string;
   assertions: TSpecAssertion[];
+  suiteTestRefs?: SuiteTestReference[];  // For .tsuite files: parsed test references
+}
+
+/**
+ * Reference to a test file in a .tsuite file
+ */
+export interface SuiteTestReference {
+  file?: string;    // Single file path (relative to suite)
+  files?: string;   // Glob pattern
+  skip?: boolean;   // Whether to skip this test
 }
 
 /**
@@ -97,11 +107,14 @@ export interface TSpecTestingConfig {
  * Custom data attached to TestItem via WeakMap
  */
 export interface TestItemData {
-  type: 'folder' | 'file' | 'assertion';
+  type: 'folder' | 'file' | 'assertion' | 'suite' | 'suite-child';
   uri?: vscode.Uri;
   metadata?: TSpecTestMetadata;
   assertion?: TSpecAssertion;
   assertionIndex?: number;
+  // For suite-child items
+  suiteUri?: vscode.Uri;        // Parent suite's URI
+  childFilePath?: string;       // Actual .tcase file path to execute
 }
 
 /**

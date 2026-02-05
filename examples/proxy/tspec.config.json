@@ -1,0 +1,12 @@
+{
+  "plugins": [],
+  "proxy": {
+    "url": "http://localhost:8080",
+    "timeout": 60000,
+    "headers": {
+      "Authorization": "Bearer ${TSPEC_PROXY_TOKEN}"
+    },
+    "enabled": true,
+    "operations": ["run", "validate", "parse"]
+  }
+}

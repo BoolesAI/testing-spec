@@ -6,6 +6,9 @@ export interface ParseParams {
     verbose?: boolean;
     env?: Record<string, string>;
     params?: Record<string, string>;
+    noProxy?: boolean;
+    proxyUrl?: string;
+    config?: string;
 }
 export interface ParseExecutionResult {
     success: boolean;

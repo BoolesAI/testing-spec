@@ -52,6 +52,25 @@ Execute TSpec test cases and suites against API endpoints. Use this skill to:
 - Run nested suites with proper hook execution order
 - Generate pass/fail reports with detailed assertion feedback
 - CI/CD test automation
+- Execute tests through remote proxy servers
+
+## Proxy Execution
+
+All execution skills (run, validate, parse) support remote proxy execution. Configure proxy in `tspec.config.json`:
+
+```json
+{
+  "proxy": {
+    "url": "http://tspec-proxy.example.com:8080",
+    "timeout": 60000,
+    "headers": {
+      "Authorization": "Bearer ${TSPEC_PROXY_TOKEN}"
+    }
+  }
+}
+```
+
+Use `--no-proxy` to disable or `--proxy-url <url>` to override. See [tspec-run](./tspec-run/SKILL.md#proxy-execution) for details.
 
 ### tspec-gen
 

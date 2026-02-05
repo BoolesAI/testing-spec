@@ -1,60 +1,49 @@
 version: "1.0"
-description: "Verify successful login with valid credentials"
+description: "List books with custom pagination and sorting"
 
 metadata:
   prompt: |
-    Test that a user with valid credentials can successfully login
-    and receive a JWT token in the response.
+    Test listing books with custom pagination and sorting.
+    Verify that the API accepts custom page size and sort parameters,
+    and returns correctly paginated and sorted results.
   related_code:
-    - "src/auth/login.js"
+    - "src/controllers/books.ts"
+    - "src/services/bookService.ts"
   test_category: "functional"
-  risk_level: "high"
-  tags: ["auth", "login", "smoke"]
-  priority: "high"
-  timeout: "10s"
+  risk_level: "medium"
+  tags: ["books", "list", "pagination", "sorting"]
+  priority: "medium"
+  timeout: "5s"
 
 environment:
-  name: "${ENV_NAME|staging}"
-  host: "${API_HOST|api.example.com}"
-  scheme: "https"
-
-variables:
-  username: "test_user_001"
-  request_id: "${uuid}"
+  name: "${ENV_NAME|local}"
+  host: "${API_HOST|localhost:3000}"
+  scheme: "http"
 
 http:
-  method: "POST"
-  path: "/v1/auth/login"
+  method: "GET"
+  path: "/api/v1/books"
+  query:
+    page: 1
+    limit: 5
+    sortBy: "title"
+    order: "asc"
   headers:
-    Content-Type: "application/json"
-    X-Request-ID: "req_${request_id}"
-  body:
-    json:
-      username: "${username}"
-      password: "${env.TEST_PASSWORD}"
+    Accept: "application/json"
 
 assertions:
   - type: "json_path"
     expression: "$.status"
     expected: 200
   - type: "json_path"
-    expression: "$.data.token"
-    operator: "exists"
+    expression: "$.pagination.page"
+    expected: 1
   - type: "json_path"
-    expression: "$.data.token"
-    operator: "matches"
-    pattern: "^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$"
+    expression: "$.pagination.limit"
+    expected: 5
+  - type: "json_path"
+    expression: "$.data"
+    operator: "length_lte"
+    expected: 5
   - type: "response_time"
-    max_ms: 1000
-
-lifecycle:
-  teardown:
-    - action: "extract"
-      scope: "assert"
-      vars:
-        token: "$.data.token"
-        user_id: "$.data.user.id"
-    - action: "output"
-      scope: "test"
-      config:
-        save_response_on_failure: true
+    max_ms: 2000
