@@ -347,6 +347,7 @@ async function executeSuiteRun(
   options: ExecuteOptions
 ): Promise<RunExecutionResult> {
   const { env, params: paramValues, failFast, output, verbose, quiet } = options;
+  const isJsonOutput = output === 'json';
   
   const allResults: FormattedTestResult[] = [];
   const parseErrors: Array<{ file: string; error: string }> = [];
@@ -366,13 +367,14 @@ async function executeSuiteRun(
       const suiteResult = await executeSuite(suiteDescriptor.path, {
         env,
         params: paramValues,
-        onSuiteStart: (name) => {
+        silent: isJsonOutput,
+        onSuiteStart: isJsonOutput ? undefined : (name) => {
           if (!quiet) logger.log(chalk.blue(`\nSuite: ${name}`));
         },
-        onTestStart: (file) => {
+        onTestStart: isJsonOutput ? undefined : (file) => {
           if (verbose) logger.log(chalk.gray(`  Running: ${file}`));
         },
-        onTestComplete: (file, result) => {
+        onTestComplete: isJsonOutput ? undefined : (file, result) => {
           const statusIcon = result.status === 'passed' ? chalk.green('✓') : chalk.red('✗');
           if (!quiet) logger.log(`  ${statusIcon} ${result.name} (${result.duration}ms)`);
         }
@@ -619,7 +621,7 @@ export const runCommand = new Command('run')
   .action(async (files: string[], options: RunOptions) => {
     setLoggerOptions({ verbose: options.verbose, quiet: options.quiet });
     
-    const spinner = options.quiet ? null : ora('Running tests...').start();
+    const spinner = (options.quiet || options.output === 'json') ? null : ora('Running tests...').start();
     
     try {
       const result = await executeRun({

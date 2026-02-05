@@ -40,7 +40,7 @@ export function error(message: string, ...args: unknown[]): void {
 }
 
 export function log(message: string, ...args: unknown[]): void {
-  console.error(message, ...args);
+  console.log(message, ...args);
 }
 
 export function newline(): void {

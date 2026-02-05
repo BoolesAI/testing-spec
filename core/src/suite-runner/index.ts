@@ -42,6 +42,7 @@ export interface SuiteRunnerOptions {
   env?: Record<string, string>;
   extracted?: Record<string, unknown>;
   cwd?: string;
+  silent?: boolean;  // Suppress console output from lifecycle actions
   onTestStart?: (testFile: string) => void;
   onTestComplete?: (testFile: string, result: SuiteTestResult) => void;
   onSuiteStart?: (suiteName: string) => void;
@@ -68,7 +69,8 @@ export function createSuiteLifecycleContext(
  */
 export async function executeSuiteLifecycleAction(
   action: SuiteLifecycleAction,
-  context: SuiteLifecycleContext
+  context: SuiteLifecycleContext,
+  silent?: boolean
 ): Promise<void> {
   switch (action.action) {
     case 'script':
@@ -90,7 +92,7 @@ export async function executeSuiteLifecycleAction(
       await executeWaitAction(action as { action: 'wait'; duration: string }, context);
       break;
     case 'log':
-      executeLogAction(action as { action: 'log'; message: string; level?: 'info' | 'warn' | 'error' | 'debug' }, context);
+      executeLogAction(action as { action: 'log'; message: string; level?: 'info' | 'warn' | 'error' | 'debug' }, context, silent);
       break;
     default:
       throw new Error(`Unknown suite lifecycle action type: ${(action as SuiteLifecycleAction).action}`);
@@ -102,7 +104,8 @@ export async function executeSuiteLifecycleAction(
  */
 export async function executeSuiteLifecycleActions(
   actions: SuiteLifecycleAction[] | undefined,
-  context: SuiteLifecycleContext
+  context: SuiteLifecycleContext,
+  silent?: boolean
 ): Promise<HookResult> {
   const startTime = Date.now();
   
@@ -115,7 +118,7 @@ export async function executeSuiteLifecycleActions(
 
   try {
     for (const action of actions) {
-      await executeSuiteLifecycleAction(action, context);
+      await executeSuiteLifecycleAction(action, context, silent);
     }
     return {
       status: 'passed',
@@ -268,8 +271,11 @@ async function executeWaitAction(
  */
 function executeLogAction(
   action: { action: 'log'; message: string; level?: 'info' | 'warn' | 'error' | 'debug' },
-  context: SuiteLifecycleContext
+  context: SuiteLifecycleContext,
+  silent?: boolean
 ): void {
+  if (silent) return;  // Skip all console output in silent mode
+  
   const level = action.level || 'info';
   const message = replaceVariablesInString(action.message, {
     ...context.variables,
@@ -366,7 +372,7 @@ export async function executeSuite(
   suitePath: string,
   options: SuiteRunnerOptions = {}
 ): Promise<SuiteResult> {
-  const { params = {}, env = {}, extracted = {}, cwd, onTestStart, onTestComplete, onSuiteStart, onSuiteComplete } = options;
+  const { params = {}, env = {}, extracted = {}, cwd, silent, onTestStart, onTestComplete, onSuiteStart, onSuiteComplete } = options;
   const baseDir = cwd || getBaseDir(suitePath);
   const startTime = Date.now();
   
@@ -403,7 +409,7 @@ export async function executeSuite(
   
   // Execute suite setup
   if (suiteDef.lifecycle?.setup) {
-    setupResult = await executeSuiteLifecycleActions(suiteDef.lifecycle.setup, context);
+    setupResult = await executeSuiteLifecycleActions(suiteDef.lifecycle.setup, context, silent);
     if (setupResult.status === 'failed') {
       // Setup failed, skip all tests
       return {
@@ -517,7 +523,7 @@ export async function executeSuite(
   
   // Execute suite teardown
   if (suiteDef.lifecycle?.teardown) {
-    teardownResult = await executeSuiteLifecycleActions(suiteDef.lifecycle.teardown, context);
+    teardownResult = await executeSuiteLifecycleActions(suiteDef.lifecycle.teardown, context, silent);
   }
   
   // Determine overall status
@@ -557,11 +563,12 @@ async function executeTestFile(
   options: SuiteRunnerOptions
 ): Promise<SuiteTestResult> {
   const startTime = Date.now();
+  const allAssertions: Array<{type: string; passed: boolean; message?: string; expected?: unknown; actual?: unknown}> = [];
   
   try {
     // Execute before_each hooks
     if (suiteDef.before_each) {
-      const beforeResult = await executeSuiteLifecycleActions(suiteDef.before_each, context);
+      const beforeResult = await executeSuiteLifecycleActions(suiteDef.before_each, context, options.silent);
       if (beforeResult.status === 'failed') {
         return {
           name: path.basename(testFile),
@@ -599,6 +606,17 @@ async function executeTestFile(
       
       const result = await executeTestCase(testCase, {});
       
+      // Collect assertions from ALL test cases
+      if (result.assertions) {
+        allAssertions.push(...result.assertions.map(a => ({
+          type: a.type,
+          passed: a.passed,
+          message: a.message,
+          expected: a.expected,
+          actual: a.actual
+        })));
+      }
+      
       // Merge extracted variables
       if (result.extracted) {
         Object.assign(context.extractedVars, result.extracted);
@@ -607,7 +625,7 @@ async function executeTestFile(
       // Execute after_each hooks
       if (suiteDef.after_each) {
         context.response = result.response;
-        await executeSuiteLifecycleActions(suiteDef.after_each, context);
+        await executeSuiteLifecycleActions(suiteDef.after_each, context, options.silent);
       }
       
       if (!result.passed) {
@@ -617,13 +635,7 @@ async function executeTestFile(
           status: 'failed',
           duration: Date.now() - startTime,
           error: result.assertions?.find(a => !a.passed)?.message || 'Assertion failed',
-          assertions: result.assertions?.map(a => ({
-            type: a.type,
-            passed: a.passed,
-            message: a.message,
-            expected: a.expected,
-            actual: a.actual
-          }))
+          assertions: allAssertions
         };
       }
     }
@@ -632,7 +644,8 @@ async function executeTestFile(
       name: testCases[0]?.description || path.basename(testFile),
       file: testFile,
       status: 'passed',
-      duration: Date.now() - startTime
+      duration: Date.now() - startTime,
+      assertions: allAssertions
     };
     
   } catch (error) {

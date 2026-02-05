@@ -83,18 +83,52 @@ export class TSpecTestProvider implements vscode.Disposable {
   }
 
   /**
-   * Discover all .tcase test files in workspace
+   * Discover all tests in workspace using two-pass approach:
+   * 1. First discover suites and their children
+   * 2. Then discover standalone .tcase files (not managed by any suite)
    */
   async discoverAllTests(): Promise<void> {
-    const files = await this.testParser.findAllTestFiles();
-    
-    for (const uri of files) {
-      await this.discoverTestsInFile(uri);
+    // Pass 1: Discover suites and their children
+    const suiteFiles = await vscode.workspace.findFiles('**/*.tsuite', '**/node_modules/**');
+    for (const suiteUri of suiteFiles) {
+      await this.discoverSuiteWithChildren(suiteUri);
+    }
+
+    // Pass 2: Discover ALL .tcase files as standalone (even if in a suite)
+    const tcaseFiles = await vscode.workspace.findFiles('**/*.tcase', '**/node_modules/**');
+    for (const tcaseUri of tcaseFiles) {
+      await this.discoverTestsInFile(tcaseUri);
     }
   }
 
   /**
-   * Discover tests in a single file
+   * Discover a suite and its child test files
+   */
+  async discoverSuiteWithChildren(suiteUri: vscode.Uri): Promise<void> {
+    const suiteMetadata = await this.testParser.parseFile(suiteUri);
+    if (!suiteMetadata?.suiteTestRefs || suiteMetadata.suiteTestRefs.length === 0) {
+      // No test references - treat as a regular file
+      this.testItemManager.createOrUpdateTestItem(suiteUri, suiteMetadata!);
+      return;
+    }
+
+    // Resolve test file references
+    const childUris = await this.testParser.resolveSuiteTestFiles(
+      suiteUri,
+      suiteMetadata.suiteTestRefs
+    );
+
+    // Create suite with children
+    await this.testItemManager.createSuiteWithChildren(
+      suiteUri,
+      suiteMetadata,
+      childUris,
+      this.testParser
+    );
+  }
+
+  /**
+   * Discover tests in a single file (always as standalone, even if in a suite)
    */
   async discoverTestsInFile(uri: vscode.Uri): Promise<void> {
     const metadata = await this.testParser.parseFile(uri);
@@ -117,10 +151,18 @@ export class TSpecTestProvider implements vscode.Disposable {
   private setupFileWatcher(): void {
     this.disposables.push(
       this.fileWatcher.onFileEvent(async (uri, event) => {
+        const isSuiteFile = uri.fsPath.endsWith('.tsuite');
+        
         switch (event) {
           case 'created':
           case 'changed':
-            await this.discoverTestsInFile(uri);
+            if (isSuiteFile) {
+              // Re-discover suite and its children
+              await this.discoverSuiteWithChildren(uri);
+            } else {
+              // .tcase files: always discover as standalone
+              await this.discoverTestsInFile(uri);
+            }
             break;
           case 'deleted':
             this.removeTestsForFile(uri);

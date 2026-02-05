@@ -31,12 +31,22 @@ export class TestRunner {
     token: vscode.CancellationToken
   ): Promise<void> {
     const run = controller.createTestRun(request);
+    console.log('[TSpec] runTests called');
+    console.log('[TSpec] request.include:', request.include?.length, 'items');
+    if (request.include) {
+      request.include.forEach(item => {
+        console.log('[TSpec] request.include item:', item.id, 'uri:', item.uri?.fsPath);
+      });
+    }
 
     try {
       // Get test items to run
       const testItems = this.getTestItemsToRun(request, controller);
+      console.log('[TSpec] runTests - testItems count:', testItems.length);
+      console.log('[TSpec] testItems:', testItems.map(i => ({ id: i.id, label: i.label, uri: i.uri?.fsPath })));
 
       if (testItems.length === 0) {
+        console.log('[TSpec] No test items found, ending run');
         run.end();
         return;
       }
@@ -62,8 +72,10 @@ export class TestRunner {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
+      console.log('[TSpec] runTests error:', errorMessage);
       vscode.window.showErrorMessage(`Test run failed: ${errorMessage}`);
     } finally {
+      console.log('[TSpec] runTests ending');
       run.end();
     }
   }
@@ -81,8 +93,19 @@ export class TestRunner {
       // Run specific tests
       for (const item of request.include) {
         const data = this.testItemManager.getData(item);
-        if (data?.type === 'file') {
+        console.log('[TSpec] getTestItemsToRun - item:', item.id, 'uri:', item.uri?.fsPath, 'data type:', data?.type);
+        
+        if (data?.type === 'file' || data?.type === 'suite-child') {
+          // Individual test file or suite child - run directly
           items.push(item);
+        } else if (data?.type === 'suite') {
+          // Suite - collect all suite-child items to run
+          item.children.forEach(child => {
+            const childData = this.testItemManager.getData(child);
+            if (childData?.type === 'suite-child') {
+              items.push(child);
+            }
+          });
         } else if (data?.type === 'folder') {
           // Collect all file tests in folder
           this.collectFileTests(item, items);
@@ -92,11 +115,25 @@ export class TestRunner {
           if (parent && !items.includes(parent)) {
             items.push(parent);
           }
+        } else if (!data && item.uri) {
+          // Fallback: if no data but has URI, check if it's a test file
+          const fsPath = item.uri.fsPath;
+          if (fsPath.endsWith('.tcase') || fsPath.endsWith('.tsuite')) {
+            console.log('[TSpec] getTestItemsToRun - using fallback for test file:', fsPath);
+            items.push(item);
+          }
         }
       }
     } else {
-      // Run all tests
-      items.push(...this.testItemManager.getAllFileTestItems());
+      // Run all tests - get all file-level items (excludes suites, includes suite-children)
+      const allItems = this.testItemManager.getAllFileTestItems();
+      for (const item of allItems) {
+        const data = this.testItemManager.getData(item);
+        // Only include individual runnable tests (file and suite-child), not suites themselves
+        if (data?.type === 'file' || data?.type === 'suite-child') {
+          items.push(item);
+        }
+      }
     }
 
     // Exclude tests if specified
@@ -114,8 +151,16 @@ export class TestRunner {
   private collectFileTests(item: vscode.TestItem, result: vscode.TestItem[]): void {
     item.children.forEach((child) => {
       const data = this.testItemManager.getData(child);
-      if (data?.type === 'file') {
+      if (data?.type === 'file' || data?.type === 'suite-child') {
         result.push(child);
+      } else if (data?.type === 'suite') {
+        // Collect suite children
+        child.children.forEach(suiteChild => {
+          const suiteChildData = this.testItemManager.getData(suiteChild);
+          if (suiteChildData?.type === 'suite-child') {
+            result.push(suiteChild);
+          }
+        });
       } else if (data?.type === 'folder') {
         this.collectFileTests(child, result);
       }
@@ -135,7 +180,7 @@ export class TestRunner {
       collection.forEach((testItem) => {
         if (testItem.children.get(item.id)) {
           const data = this.testItemManager.getData(testItem);
-          if (data?.type === 'file') {
+          if (data?.type === 'file' || data?.type === 'suite-child') {
             result = testItem;
           }
         } else {
@@ -160,20 +205,37 @@ export class TestRunner {
     token: vscode.CancellationToken
   ): Promise<void> {
     const data = this.testItemManager.getData(testItem);
-    if (!data?.uri) {
-      run.errored(testItem, new vscode.TestMessage('Test file URI not found'));
-      return;
+    
+    // Determine the file to execute based on item type
+    let fileToExecute: string | undefined;
+    
+    if (data?.type === 'suite-child' && data.childFilePath) {
+      // Suite child - execute the specific .tcase file
+      fileToExecute = data.childFilePath;
+    } else {
+      // Regular file or fallback
+      fileToExecute = data?.uri?.fsPath || testItem.uri?.fsPath;
     }
-
-    // Mark as started
+    
+    console.log('[TSpec] runSingleTest - testItem:', testItem.id, 'type:', data?.type, 'fileToExecute:', fileToExecute);
+    
+    // Mark as started FIRST - required before any result reporting
     run.started(testItem);
     const startTime = Date.now();
+    
+    if (!fileToExecute) {
+      console.log('[TSpec] runSingleTest - no file to execute, reporting error');
+      run.errored(testItem, new vscode.TestMessage('Test file path not found'));
+      return;
+    }
 
     try {
       // Execute test via CLI
       const config = this.cliAdapter.getConfig();
+      console.log('[TSpec] Executing CLI for file:', fileToExecute);
+      
       const output = await this.cliAdapter.execute(
-        [data.uri.fsPath],
+        [fileToExecute],
         {
           concurrency: config.concurrency,
           timeout: config.defaultTimeout,
@@ -182,20 +244,28 @@ export class TestRunner {
         token
       );
 
+      console.log('[TSpec] CLI output received, results count:', output.results.length);
+      console.log('[TSpec] Looking for testCaseId:', data?.metadata?.testCaseId);
+      console.log('[TSpec] Available testCaseIds:', output.results.map(r => r.testCaseId));
+
       // Find result for this test
       const result = output.results.find(
-        (r) => r.testCaseId === data.metadata?.testCaseId
+        (r) => r.testCaseId === data?.metadata?.testCaseId
       ) || output.results[0];
+
+      console.log('[TSpec] Selected result:', result ? result.testCaseId : 'none');
 
       if (result) {
         this.reportTestResult(testItem, result, run);
       } else {
+        console.log('[TSpec] No result found, reporting error');
         run.errored(testItem, new vscode.TestMessage('No result found for test'));
         // Store failed result for gutter decoration
-        this.storeTestResult(data.uri.fsPath, data.metadata?.testCaseId || '', false, Date.now() - startTime);
+        this.storeTestResult(fileToExecute, data?.metadata?.testCaseId || '', false, Date.now() - startTime);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
+      console.log('[TSpec] CLI execution error:', errorMessage);
       const duration = Date.now() - startTime;
       run.errored(
         testItem,
@@ -204,7 +274,7 @@ export class TestRunner {
       );
 
       // Store failed result for gutter decoration
-      this.storeTestResult(data.uri.fsPath, data.metadata?.testCaseId || '', false, duration);
+      this.storeTestResult(fileToExecute, data?.metadata?.testCaseId || '', false, duration);
 
       // Mark all assertion children as errored too
       const assertions = this.testItemManager.getAssertionItems(testItem);

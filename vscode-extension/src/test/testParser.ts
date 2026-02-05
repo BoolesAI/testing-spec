@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as yaml from 'js-yaml';
 import * as path from 'path';
-import { TSpecTestMetadata, TSpecAssertion } from './types';
+import { TSpecTestMetadata, TSpecAssertion, SuiteTestReference } from './types';
 
 /**
  * Parser for extracting test metadata from .tcase files
@@ -22,7 +22,7 @@ export class TestParser {
   }
 
   /**
-   * Parse .tcase content and extract metadata
+   * Parse .tcase or .tsuite content and extract metadata
    */
   parseContent(content: string, uri: vscode.Uri): TSpecTestMetadata | null {
     try {
@@ -32,6 +32,14 @@ export class TestParser {
         return null;
       }
 
+      const isSuiteFile = uri.fsPath.endsWith('.tsuite');
+      
+      // Handle .tsuite file format (has 'suite' root key)
+      if (isSuiteFile || doc.suite) {
+        return this.parseSuiteContent(doc, uri);
+      }
+
+      // Handle .tcase file format
       const testCaseId = this.generateTestId(uri.fsPath);
       const description = (doc.description as string) || path.basename(uri.fsPath, '.tcase');
       
@@ -58,6 +66,88 @@ export class TestParser {
       console.error(`YAML parse error for ${uri.fsPath}:`, error);
       return null;
     }
+  }
+
+  /**
+   * Parse .tsuite file content
+   */
+  private parseSuiteContent(doc: Record<string, unknown>, uri: vscode.Uri): TSpecTestMetadata | null {
+    const suite = (doc.suite as Record<string, unknown>) || doc;
+    
+    const testCaseId = this.generateTestId(uri.fsPath);
+    const description = (suite.description as string) || (suite.name as string) || path.basename(uri.fsPath, '.tsuite');
+    
+    // Extract metadata section
+    const metadata = suite.metadata as Record<string, unknown> | undefined;
+    const category = metadata?.test_category as string | undefined;
+    const priority = metadata?.priority as string | undefined;
+    const tags = metadata?.tags as string[] | undefined;
+    const timeout = (suite.execution as Record<string, unknown>)?.timeout as string | undefined;
+
+    // Extract test references
+    const suiteTestRefs = this.extractSuiteTestRefs(suite);
+
+    return {
+      testCaseId,
+      description,
+      category,
+      priority,
+      tags,
+      timeout,
+      assertions: [], // Suites don't have direct assertions
+      suiteTestRefs,
+    };
+  }
+
+  /**
+   * Extract test references from suite.tests array
+   */
+  private extractSuiteTestRefs(suite: Record<string, unknown>): SuiteTestReference[] {
+    const tests = suite.tests as Array<Record<string, unknown>> | undefined;
+    if (!Array.isArray(tests)) {
+      return [];
+    }
+
+    return tests
+      .map(t => ({
+        file: t.file as string | undefined,
+        files: t.files as string | undefined,
+        skip: t.skip as boolean | undefined,
+      }))
+      .filter(t => t.file || t.files);
+  }
+
+  /**
+   * Resolve suite test references to absolute file URIs
+   */
+  async resolveSuiteTestFiles(
+    suiteUri: vscode.Uri,
+    refs: SuiteTestReference[]
+  ): Promise<vscode.Uri[]> {
+    const baseDir = path.dirname(suiteUri.fsPath);
+    const resolved: vscode.Uri[] = [];
+
+    for (const ref of refs) {
+      if (ref.skip) continue;
+
+      if (ref.file) {
+        // Single file - resolve relative to suite directory
+        const filePath = path.resolve(baseDir, ref.file);
+        resolved.push(vscode.Uri.file(filePath));
+      } else if (ref.files) {
+        // Glob pattern - find matching files
+        const pattern = new vscode.RelativePattern(baseDir, ref.files);
+        const matches = await vscode.workspace.findFiles(pattern);
+        resolved.push(...matches);
+      }
+    }
+
+    // Deduplicate by file path
+    const uniqueMap = new Map<string, vscode.Uri>();
+    for (const uri of resolved) {
+      uniqueMap.set(uri.fsPath, uri);
+    }
+    return Array.from(uniqueMap.values());
   }
 
   /**
@@ -140,20 +230,23 @@ export class TestParser {
           const relativePath = path.relative(folder.uri.fsPath, filePath);
           // Remove extension and normalize path separators
           return relativePath
-            .replace(/\.(http|grpc|graphql|ws)?\.tcase$/, '')
+            .replace(/\.(http|grpc|graphql|ws)?\.(tcase|tsuite)$/, '')
             .replace(/\\/g, '/');
         }
       }
     }
     
     // Fallback to filename without extension
-    return path.basename(filePath, '.tcase').replace(/\.(http|grpc|graphql|ws)$/, '');
+    return path.basename(filePath)
+      .replace(/\.(http|grpc|graphql|ws)?\.(tcase|tsuite)$/, '');
   }
 
   /**
-   * Get all .tcase files in workspace
+   * Get all .tcase and .tsuite files in workspace
    */
   async findAllTestFiles(): Promise<vscode.Uri[]> {
-    return vscode.workspace.findFiles('**/*.tcase', '**/node_modules/**');
+    const tcaseFiles = await vscode.workspace.findFiles('**/*.tcase', '**/node_modules/**');
+    const tsuiteFiles = await vscode.workspace.findFiles('**/*.tsuite', '**/node_modules/**');
+    return [...tcaseFiles, ...tsuiteFiles];
   }
 }
