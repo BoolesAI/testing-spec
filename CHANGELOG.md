@@ -5,6 +5,90 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-02-05
+
+### Added
+
+#### @boolesai/tspec (Core Library)
+
+- **Proxy System**: Complete proxy server support for remote test execution
+  - `ProxyClient` - HTTP client for communicating with proxy servers
+  - `FileReader` - Read and prepare test files for proxy transmission
+  - Proxy configuration support in `tspec.config.json` with URL, timeout, headers, and operations
+  - Environment variable support in proxy headers for authentication tokens
+  - Configurable proxy operations: parse, run, validate
+  - Request/response types for proxy communication protocol
+- **Suite Runner Enhancements**:
+  - Silent mode support to suppress lifecycle log output when running in JSON mode
+  - Improved logging control for programmatic usage
+  - Better integration with external tools and VS Code extension
+
+#### @boolesai/tspec-cli (Command Line Interface)
+
+- **Proxy Execution Support**:
+  - `--no-proxy` flag to disable proxy execution for all commands
+  - `--proxy-url` option to override configured proxy URL
+  - Remote proxy execution for `parse` command with proxy configuration support
+  - Remote proxy execution for `run` command to forward test runs to proxy server
+  - Remote proxy execution for `validate` command with proxy-based validation
+  - Automatic proxy enablement detection based on configuration
+  - Fallback to local execution when proxy is unavailable
+- Improved logger output to use `console.log` instead of `console.error` for standard logging
+
+#### vscode-tspec (VS Code Extension)
+
+- **Test Suite Support Enhancements**:
+  - Extended file watcher to monitor `.tsuite` files alongside `.tcase` files
+  - Enhanced test parser to parse `.tsuite` files and extract suite metadata and child test references
+  - Resolving of suite test references including support for file globs
+  - Suite and suite-child test item types in TestItemManager with hierarchical management
+  - Two-pass discovery approach for suites and standalone tests
+  - Correct execution of suite child tests referencing individual `.tcase` files
+  - Proper test result handling for suite-child items with accurate reporting
+- **Proxy Configuration**:
+  - Proxy support flags and settings for user control
+  - Integration with proxy-enabled CLI commands
+
+#### Documentation
+
+- **New Documentation**: Proxy Server (14-proxy-server.md)
+  - Comprehensive guide for setting up and using proxy servers
+  - Proxy server implementation examples
+  - Authentication and security configuration
+  - API endpoints documentation
+  - Integration examples with tspec.config.json
+- Updated **Skills README** with proxy execution details and examples
+- Enhanced skill documentation:
+  - **tspec-parse**: Added proxy execution examples
+  - **tspec-run**: Added proxy execution details and usage
+  - **tspec-validate**: Added proxy execution examples
+
+#### Demo & Examples
+
+- **Proxy Server Demo**: Complete proxy server implementation
+  - Express-based proxy server with parse, run, and validate endpoints
+  - Authentication middleware with token-based security
+  - Error handling middleware for consistent error responses
+  - TypeScript implementation with full type safety
+  - README with setup and deployment instructions
+- **Proxy Examples**:
+  - Example proxy configuration in `examples/proxy/tspec.config.json`
+  - Proxy usage README with integration examples
+- Updated example test case to books listing API scenario with pagination and sorting
+
+### Changed
+
+- Enhanced plugin configuration utilities to include proxy settings retrieval
+- Improved CLI command options and parameters to support proxy-related fields
+- Re-exported proxy-related types and utilities in core plugin modules for public API access
+- Updated documentation links in docs/README.md to include proxy server guide
+
+### Fixed
+
+- Logger now correctly uses `console.log` for standard output instead of `console.error`
+- Improved suite runner lifecycle logging control for better integration with external tools
+- Better error handling in proxy client with fallback mechanisms
+
 ## [1.3.0] - 2026-02-03
 
 ### Added
