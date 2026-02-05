@@ -525,6 +525,23 @@
           hljs.highlightElement(block);
         });
 
+        // Intercept links in markdown content
+        contentEl.querySelectorAll('a').forEach(link => {
+          const href = link.getAttribute('href');
+          // Check if it's a relative markdown link
+          if (href && href.endsWith('.md') && !href.startsWith('http://') && !href.startsWith('https://')) {
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              // Find the nav item with this markdown file
+              const navItem = document.querySelector(`.nav-item[data-file="${href}"]`);
+              if (navItem) {
+                const hash = navItem.getAttribute('href');
+                window.location.hash = hash;
+              }
+            });
+          }
+        });
+
         // Update nav
         updateActiveNav(hash || '#readme');
         
