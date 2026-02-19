@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2026-02-19
+
+### Added
+
+#### Skills (MCP Integration)
+
+- **Unified TSpec Skill**: Combined separate skills into a single comprehensive testing toolkit
+  - Consolidated `tspec-list`, `tspec-parse`, `tspec-validate`, `tspec-run`, `tspec-gen`, and `tspec-coverage` into unified `tspec` skill
+  - Full testing lifecycle coverage: test generation, execution, parsing, validation, and coverage analysis
+  - Simplified skill listing with unified capability table
+  - Slash command triggers for individual capabilities under unified skill (`/tspec-list`, `/tspec-gen`, `/tspec-coverage`)
+  - Proxy execution configuration consolidated into unified skill documentation
+- **Enhanced Examples**: Comprehensive example file demonstrating all unified skill capabilities
+
+### Changed
+
+- **Documentation Restructuring**: Improved organization and maintainability
+  - Removed individual skill directories and examples to reduce duplication
+  - Restructured reference documentation files under unified `skills/tspec/` directory
+  - Updated main Skills README to reflect unified capability
+
 ## [1.3.1] - 2026-02-05
 
 ### Added
