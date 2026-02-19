@@ -1,13 +1,6 @@
----
-name: tspec-parse
-description: Parse and display test case and suite information without executing tests. Use for exploring test structure, debugging variable substitution, understanding template inheritance, and inspecting request payloads. Keywords: parse tspec, inspect test, explore tspec, debug variables, view test structure, template inheritance, dry run, parse suite, tsuite
----
+# tspec parse
 
-# TSpec Parse
-
-## Overview
-
-Parse and display TSpec test case and suite information without executing any requests. This skill resolves variables, expands templates, and shows the final test configuration. Use it for debugging variable substitution, understanding template inheritance, inspecting request payloads, and exploring suite structure before actual execution.
+Parse and display TSpec test case and suite information without executing any requests. This command resolves variables, expands templates, and shows the final test configuration. Use it for debugging variable substitution, understanding template inheritance, inspecting request payloads, and exploring suite structure before actual execution.
 
 ## MCP Tool Integration
 
@@ -146,7 +139,7 @@ tspec parse tests/*.tcase -e API_HOST=staging.example.com
 
 ## Proxy Execution
 
-Parsing can be performed on a remote proxy server by configuring proxy settings in `tspec.config.json`. See [tspec-run](../tspec-run/SKILL.md#proxy-execution) for configuration details.
+Parsing can be performed on a remote proxy server by configuring proxy settings in `tspec.config.json`. See [Proxy Execution](../SKILL.md#proxy-execution) for configuration details.
 
 ```bash
 # Parse through a specific proxy server
@@ -155,9 +148,3 @@ tspec parse tests/*.tcase --proxy-url http://localhost:8080
 # Disable proxy and parse locally
 tspec parse tests/*.tcase --no-proxy
 ```
-
-## Related Skills
-
-- [tspec-run](../tspec-run/SKILL.md) - Execute parsed tests
-- [tspec-validate](../tspec-validate/SKILL.md) - Validate before parsing
-- [tspec-list](../tspec-list/SKILL.md) - List supported protocols

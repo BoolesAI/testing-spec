@@ -1,13 +1,6 @@
----
-name: tspec-validate
-description: Validate .tcase and .tsuite files for schema correctness without executing tests. Use for syntax checking, pre-commit validation, and CI/CD linting. Validates YAML structure, required fields, protocol blocks, assertion formats, and suite structures. Keywords: validate tspec, check syntax, lint tspec, verify schema, tspec errors, pre-commit, schema validation, validate tsuite, suite validation
----
+# tspec validate
 
-# TSpec Validate
-
-## Overview
-
-Validate `.tcase` and `.tsuite` files for schema correctness without executing any tests. This skill checks YAML syntax, required fields, protocol block structure, assertion formats, and suite configuration. Use it for pre-commit hooks, CI/CD validation stages, and catching errors before test execution.
+Validate `.tcase` and `.tsuite` files for schema correctness without executing any tests. This command checks YAML syntax, required fields, protocol block structure, assertion formats, and suite configuration. Use it for pre-commit hooks, CI/CD validation stages, and catching errors before test execution.
 
 ## MCP Tool Integration
 
@@ -86,32 +79,6 @@ tspec validate tests/*.tcase --output json
 tspec validate tests/*.tcase -q
 ```
 
-## Common Use Cases
-
-### Validate All Test Files
-
-```bash
-tspec validate "tests/**/*.tcase"
-```
-
-### Pre-commit Hook Validation
-
-```bash
-tspec validate $(git diff --cached --name-only --diff-filter=ACM | grep '.tcase$')
-```
-
-### CI/CD Validation Stage
-
-```bash
-tspec validate tests/*.tcase --output json
-```
-
-### Validate Before Running Tests
-
-```bash
-tspec validate tests/*.tcase && tspec run tests/*.tcase
-```
-
 ## What Gets Validated
 
 ### Structure Validation
@@ -147,6 +114,32 @@ tspec validate tests/*.tcase && tspec run tests/*.tcase
 - Valid lifecycle action types: `script`, `http`, `grpc`, `extract`, `output`, `wait`, `log`
 - Valid execution configuration fields
 
+## Common Use Cases
+
+### Validate All Test Files
+
+```bash
+tspec validate "tests/**/*.tcase"
+```
+
+### Pre-commit Hook Validation
+
+```bash
+tspec validate $(git diff --cached --name-only --diff-filter=ACM | grep '.tcase$')
+```
+
+### CI/CD Validation Stage
+
+```bash
+tspec validate tests/*.tcase --output json
+```
+
+### Validate Before Running Tests
+
+```bash
+tspec validate tests/*.tcase && tspec run tests/*.tcase
+```
+
 ## Exit Codes
 
 | Code | Description |
@@ -157,7 +150,7 @@ tspec validate tests/*.tcase && tspec run tests/*.tcase
 
 ## Proxy Execution
 
-Validation can be performed on a remote proxy server by configuring proxy settings in `tspec.config.json`. See [tspec-run](../tspec-run/SKILL.md#proxy-execution) for configuration details.
+Validation can be performed on a remote proxy server by configuring proxy settings in `tspec.config.json`. See [Proxy Execution](../SKILL.md#proxy-execution) for configuration details.
 
 ```bash
 # Validate through a specific proxy server
@@ -166,9 +159,3 @@ tspec validate tests/*.tcase --proxy-url http://localhost:8080
 # Disable proxy and validate locally
 tspec validate tests/*.tcase --no-proxy
 ```
-
-## Related Skills
-
-- [tspec-run](../tspec-run/SKILL.md) - Execute validated test files
-- [tspec-parse](../tspec-parse/SKILL.md) - Inspect test structure after validation
-- [tspec-list](../tspec-list/SKILL.md) - List supported protocols

@@ -1,15 +1,8 @@
----
-name: tspec-gen
-description: Generate TSpec test cases from code changes. Use for creating tests from git diff, file changes, or new endpoints. Keywords: generate tests, create tspec, code to test, git diff tests, new endpoint tests, auto generate, test generation
----
-
-# TSpec Generate
-
-## Overview
+# tspec-gen
 
 Generate TSpec test cases from source code changes. This skill guides you through analyzing code (from git diff or explicit file paths) and creating corresponding `.tcase` test files with proper structure, metadata, and assertions.
 
-Use this skill when:
+Use this when:
 - New API endpoints are added
 - Existing endpoint behavior changes
 - You need to create test cases for uncovered code
@@ -274,10 +267,3 @@ After generating test files:
    ```bash
    tspec run "tests/*.tcase" -e API_HOST=localhost
    ```
-
-## Related Skills
-
-- [tspec-validate](../tspec-validate/SKILL.md) - Validate generated test files
-- [tspec-parse](../tspec-parse/SKILL.md) - Inspect test structure
-- [tspec-run](../tspec-run/SKILL.md) - Execute generated tests
-- [tspec-coverage](../tspec-coverage/SKILL.md) - Analyze test coverage

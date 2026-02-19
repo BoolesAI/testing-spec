@@ -1,13 +1,6 @@
----
-name: tspec-run
-description: Execute TSpec test cases and suites. Use for running API tests, checking endpoint functionality, and verifying test assertions. Supports HTTP and gRPC protocols, test suites with lifecycle hooks, concurrent execution, environment variables, and multiple output formats. Keywords: run tests, execute tspec, test api, run http tests, run grpc tests, smoke test, regression test, test suite, tsuite
----
+# tspec run
 
-# TSpec Run
-
-## Overview
-
-Execute TSpec test cases and suites against API endpoints and report results. This skill runs `.tcase` test files and `.tsuite` suite files, validates responses against assertions, and provides detailed pass/fail reporting in text or JSON format. Suites support lifecycle hooks (setup/teardown/before_each/after_each) with proper execution order.
+Execute TSpec test cases and suites against API endpoints and report results. This command runs `.tcase` test files and `.tsuite` suite files, validates responses against assertions, and provides detailed pass/fail reporting in text or JSON format. Suites support lifecycle hooks (setup/teardown/before_each/after_each) with proper execution order.
 
 ## MCP Tool Integration
 
@@ -103,44 +96,6 @@ tspec run tests/*.tcase --output json
 tspec run tests/*.tcase --fail-fast
 ```
 
-## Common Use Cases
-
-### Run All Tests in Directory
-
-```bash
-tspec run "tests/**/*.tcase"
-```
-
-### Run Specific Test File
-
-```bash
-tspec run tests/login_success.http.tcase
-```
-
-### Run a Test Suite
-
-```bash
-tspec run tests/api.http.tsuite
-```
-
-### Run Multiple Suites
-
-```bash
-tspec run "tests/**/*.tsuite"
-```
-
-### CI/CD Integration
-
-```bash
-tspec run tests/*.tcase --output json > results.json
-```
-
-### Run with Custom Host
-
-```bash
-tspec run tests/*.tcase -e API_HOST=staging.example.com
-```
-
 ## Test Suites
 
 Test suites (`.tsuite` files) organize related tests with shared configuration and lifecycle hooks.
@@ -179,6 +134,44 @@ suite:
     - files: "users/*.http.tcase"
 ```
 
+## Common Use Cases
+
+### Run All Tests in Directory
+
+```bash
+tspec run "tests/**/*.tcase"
+```
+
+### Run Specific Test File
+
+```bash
+tspec run tests/login_success.http.tcase
+```
+
+### Run a Test Suite
+
+```bash
+tspec run tests/api.http.tsuite
+```
+
+### Run Multiple Suites
+
+```bash
+tspec run "tests/**/*.tsuite"
+```
+
+### CI/CD Integration
+
+```bash
+tspec run tests/*.tcase --output json > results.json
+```
+
+### Run with Custom Host
+
+```bash
+tspec run tests/*.tcase -e API_HOST=staging.example.com
+```
+
 ## Exit Codes
 
 | Code | Description |
@@ -189,21 +182,7 @@ suite:
 
 ## Proxy Execution
 
-Tests can be executed on a remote proxy server by configuring proxy settings in `tspec.config.json`:
-
-```json
-{
-  "proxy": {
-    "url": "http://tspec-proxy.example.com:8080",
-    "timeout": 60000,
-    "headers": {
-      "Authorization": "Bearer ${TSPEC_PROXY_TOKEN}"
-    }
-  }
-}
-```
-
-### Proxy CLI Options
+Tests can be executed on a remote proxy server by configuring proxy settings in `tspec.config.json`. See [Proxy Execution](../SKILL.md#proxy-execution) for configuration details.
 
 ```bash
 # Run tests through a specific proxy server
@@ -214,9 +193,3 @@ tspec run tests/*.tcase --no-proxy
 ```
 
 When proxy is configured, tests are automatically forwarded to the remote server. The output includes a `[Proxy: <url>]` indicator.
-
-## Related Skills
-
-- [tspec-validate](../tspec-validate/SKILL.md) - Validate test files before running
-- [tspec-parse](../tspec-parse/SKILL.md) - Inspect test structure without execution
-- [tspec-list](../tspec-list/SKILL.md) - List supported protocols
