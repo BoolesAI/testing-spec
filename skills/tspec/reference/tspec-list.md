@@ -1,13 +1,6 @@
----
-name: tspec-list
-description: List supported protocols and TSpec configuration. Use for discovering available protocols, checking capabilities, and understanding what TSpec supports. Shows HTTP, gRPC, and other protocol availability. Keywords: list protocols, tspec capabilities, supported protocols, tspec features, available protocols
----
+# tspec list
 
-# TSpec List
-
-## Overview
-
-List supported protocols and TSpec configuration information. This skill displays what protocols are available (HTTP, gRPC, etc.), their status, and basic capability information. Use it to discover what TSpec supports and verify installation.
+List supported protocols and TSpec configuration information. This command displays what protocols are available (HTTP, gRPC, etc.), their status, and basic capability information. Use it to discover what TSpec supports and verify installation.
 
 ## MCP Tool Integration
 
@@ -111,9 +104,9 @@ Example output:
 }
 ```
 
-## MCP Tool Examples
+### MCP Tool Examples
 
-### Text Output
+#### Text Output
 
 ```json
 {
@@ -121,7 +114,7 @@ Example output:
 }
 ```
 
-### JSON Output
+#### JSON Output
 
 ```json
 {
@@ -135,9 +128,3 @@ Example output:
 |------|-------------|
 | `0` | Success |
 | `2` | Error |
-
-## Related Skills
-
-- [tspec-run](../tspec-run/SKILL.md) - Execute tests using listed protocols
-- [tspec-validate](../tspec-validate/SKILL.md) - Validate test files
-- [tspec-parse](../tspec-parse/SKILL.md) - Parse test files

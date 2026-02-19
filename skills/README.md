@@ -1,38 +1,29 @@
 # TSpec Skills
 
-This directory contains TSpec skills that provide specialized capabilities for working with `.tcase` test files and `.tsuite` suite files. Skills may correspond to MCP tools and CLI commands, or provide workflow guidance for test generation and analysis.
+This directory contains the unified TSpec skill that provides comprehensive capabilities for working with `.tcase` test files and `.tsuite` suite files. The skill covers the full testing lifecycle from test generation through execution and coverage analysis.
 
-## Available Skills
+## Unified Skill
 
-| Skill | Description | MCP Tool |
-|-------|-------------|----------|
-| [tspec-list](./tspec-list/SKILL.md) | List supported protocols and TSpec configuration | `tspec_list` |
-| [tspec-parse](./tspec-parse/SKILL.md) | Parse and display test case information without execution | `tspec_parse` |
-| [tspec-validate](./tspec-validate/SKILL.md) | Validate .tcase and .tsuite files for schema correctness | `tspec_validate` |
-| [tspec-run](./tspec-run/SKILL.md) | Execute TSpec test cases and suites | `tspec_run` |
-| [tspec-gen](./tspec-gen/SKILL.md) | Generate TSpec test cases from code changes | - |
-| [tspec-coverage](./tspec-coverage/SKILL.md) | Analyze test coverage from related_code metadata | - |
+| Skill | Description |
+|-------|-------------|
+| [tspec](./tspec/SKILL.md) | Comprehensive TSpec toolkit: list protocols, validate syntax, parse tests, run tests, generate test cases, and analyze coverage |
 
-## Skill Overview
+## Capabilities
 
-### tspec-list
+The **tspec** skill provides six integrated capabilities:
 
-List supported protocols and TSpec configuration information. Use this skill to:
+### 1. List Protocols (tspec list)
+
+List supported protocols and TSpec configuration information. Use this to:
 - Discover available protocols (HTTP, gRPC, etc.)
 - Verify TSpec installation
 - Check protocol capabilities and status
 
-### tspec-parse
+**MCP Tool:** `tspec_list`
 
-Parse and display TSpec test case information without executing any requests. Use this skill to:
-- Debug variable substitution
-- Inspect request payloads before execution
-- Understand template inheritance
-- Verify data-driven test expansion
+### 2. Validate Test Files (tspec validate)
 
-### tspec-validate
-
-Validate `.tcase` and `.tsuite` files for schema correctness without executing tests. Use this skill to:
+Validate `.tcase` and `.tsuite` files for schema correctness without executing tests. Use this to:
 - Check YAML syntax and structure
 - Validate required fields and protocol blocks
 - Verify assertion types and operators
@@ -40,12 +31,24 @@ Validate `.tcase` and `.tsuite` files for schema correctness without executing t
 - Pre-commit hook validation
 - CI/CD linting stages
 
+**MCP Tool:** `tspec_validate`
+
 **Supported Assertion Types:**
 - `json_path`, `string`, `number`, `regex`, `xml_path`, `response_time`, `javascript`, `file_exist`, `file_read`, `exception`
 
-### tspec-run
+### 3. Parse Test Files (tspec parse)
 
-Execute TSpec test cases and suites against API endpoints. Use this skill to:
+Parse and display TSpec test case information without executing any requests. Use this to:
+- Debug variable substitution
+- Inspect request payloads before execution
+- Understand template inheritance
+- Verify data-driven test expansion
+
+**MCP Tool:** `tspec_parse`
+
+### 4. Run Tests (tspec run)
+
+Execute TSpec test cases and suites against API endpoints. Use this to:
 - Run individual `.tcase` test files
 - Execute `.tsuite` files with lifecycle hooks
 - Validate responses against assertions
@@ -54,35 +57,19 @@ Execute TSpec test cases and suites against API endpoints. Use this skill to:
 - CI/CD test automation
 - Execute tests through remote proxy servers
 
-## Proxy Execution
+**MCP Tool:** `tspec_run`
 
-All execution skills (run, validate, parse) support remote proxy execution. Configure proxy in `tspec.config.json`:
+### 5. Generate Test Cases (tspec-gen)
 
-```json
-{
-  "proxy": {
-    "url": "http://tspec-proxy.example.com:8080",
-    "timeout": 60000,
-    "headers": {
-      "Authorization": "Bearer ${TSPEC_PROXY_TOKEN}"
-    }
-  }
-}
-```
-
-Use `--no-proxy` to disable or `--proxy-url <url>` to override. See [tspec-run](./tspec-run/SKILL.md#proxy-execution) for details.
-
-### tspec-gen
-
-Generate TSpec test cases from source code changes. Use this skill to:
+Generate TSpec test cases from source code changes. Use this to:
 - Create tests from git diff changes
 - Generate tests from explicit file paths
 - Build comprehensive test suites for new endpoints
 - Include proper `related_code` metadata for coverage tracking
 
-### tspec-coverage
+### 6. Analyze Test Coverage (tspec-coverage)
 
-Analyze TSpec test coverage based on `metadata.related_code`. Use this skill to:
+Analyze TSpec test coverage based on `metadata.related_code`. Use this to:
 - Generate coverage reports showing tested vs untested files
 - Identify coverage gaps at file and line level
 - Track coverage trends over time
@@ -109,33 +96,45 @@ tspec run        # Execute tests
 tspec-coverage   # Analyze coverage (optional)
 ```
 
+## Proxy Execution
+
+All execution capabilities (run, validate, parse) support remote proxy execution. Configure proxy in `tspec.config.json`:
+
+```json
+{
+  "proxy": {
+    "url": "http://tspec-proxy.example.com:8080",
+    "timeout": 60000,
+    "headers": {
+      "Authorization": "Bearer ${TSPEC_PROXY_TOKEN}"
+    }
+  }
+}
+```
+
+Use `--no-proxy` to disable or `--proxy-url <url>` to override. See [tspec skill documentation](./tspec/SKILL.md#proxy-execution) for details.
+
+## Slash Command Triggers
+
+The tspec skill responds to various triggers:
+- `/tspec-list` - List supported protocols
+- `/tspec-gen` - Generate test cases from code
+- `/tspec-coverage` - Analyze test coverage
+
 ## Directory Structure
 
 ```
 skills/
 ├── README.md                    # This file
-├── tspec-list/
-│   ├── SKILL.md                 # Skill documentation
-│   └── references/
-│       └── examples.md          # Usage examples
-├── tspec-parse/
-│   ├── SKILL.md
-│   └── references/
-│       └── examples.md
-├── tspec-validate/
-│   ├── SKILL.md
-│   └── references/
-│       └── examples.md
-├── tspec-run/
-│   ├── SKILL.md
-│   └── references/
-│       └── examples.md
-├── tspec-gen/
-│   ├── SKILL.md
-│   └── references/
-│       └── examples.md
-└── tspec-coverage/
-    ├── SKILL.md
-    └── references/
-        └── examples.md
+└── tspec/
+    ├── SKILL.md                 # Unified skill documentation
+    ├── reference/               # Detailed per-command documentation
+    │   ├── tspec-list.md
+    │   ├── tspec-validate.md
+    │   ├── tspec-parse.md
+    │   ├── tspec-run.md
+    │   ├── tspec-gen.md
+    │   └── tspec-coverage.md
+    └── examples/
+        └── example.md           # Comprehensive examples
 ```

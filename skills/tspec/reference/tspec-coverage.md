@@ -1,15 +1,8 @@
----
-name: tspec-coverage
-description: Analyze TSpec test coverage based on related_code metadata. Use for coverage reports, identifying untested code, and test gap analysis. Keywords: test coverage, coverage report, related code, untested files, coverage analysis, gap analysis
----
-
-# TSpec Coverage
-
-## Overview
+# tspec-coverage
 
 Analyze TSpec test coverage by examining the `metadata.related_code` field across all `.tcase` files. This skill guides you through generating coverage reports that show which source files and lines have corresponding tests.
 
-Use this skill when:
+Use this when:
 - Reviewing test coverage before release
 - Identifying untested code areas
 - Planning test creation efforts
@@ -191,7 +184,7 @@ Find areas needing more tests:
 1. Generate coverage report
 2. Focus on "Uncovered Files" section
 3. Check "Line Coverage Details" for partial coverage
-4. Create tests using `tspec-gen` skill
+4. Create tests using `tspec-gen` capability
 
 ### Track Coverage Trends
 
@@ -233,10 +226,3 @@ source files: src/controllers/**/*.ts
 The `related_code` analysis may show:
 - **Over-coverage**: Tests referencing utility files used by many endpoints
 - **Under-coverage**: Tests without `related_code` metadata
-
-## Related Skills
-
-- [tspec-gen](../tspec-gen/SKILL.md) - Generate tests for uncovered code
-- [tspec-parse](../tspec-parse/SKILL.md) - Parse tspec files to extract metadata
-- [tspec-validate](../tspec-validate/SKILL.md) - Validate tspec syntax
-- [tspec-run](../tspec-run/SKILL.md) - Execute tests
