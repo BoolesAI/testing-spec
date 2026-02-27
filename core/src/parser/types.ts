@@ -31,6 +31,7 @@ export interface RelatedCodeReference {
 export interface TSpec {
   version: string;
   description: string;
+  protocol?: string;
   metadata: TSpecMetadata;
   assertions: Assertion[];
   http?: HttpRequest;

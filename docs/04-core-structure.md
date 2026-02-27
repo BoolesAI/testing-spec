@@ -7,6 +7,7 @@ Every `.tcase` file follows a consistent top-level schema. This section describe
 ```yaml
 version: "1.0"                  # Required - DSL version
 description: "..."              # Required - Test description
+protocol: "..."                 # Optional - Explicit protocol type (any string)
 
 metadata:                       # Required - AI and collaboration metadata
 environment:                    # Optional - Runtime environment
@@ -35,6 +36,16 @@ Natural language description of the test's purpose. Should be concise but descri
 ```yaml
 description: "Verify user login with valid credentials returns JWT token"
 ```
+
+### `protocol` (optional)
+
+Explicitly declare the protocol type. Used for protocol detection. Accepts any string value to support custom protocols.
+
+```yaml
+protocol: "http"
+```
+
+**Common values:** `http`, `grpc`, `graphql`, `websocket`, `web`, or any custom protocol name.
 
 ### `metadata`
 
@@ -150,14 +161,15 @@ While YAML doesn't require specific ordering, the following order improves reada
 
 1. `version` - Specification version first
 2. `description` - Human-readable purpose
-3. `metadata` - AI and collaboration context
-4. `extends` - Template inheritance (if any)
-5. `environment` - Runtime configuration
-6. `variables` - Static variables
-7. `data` - Data sources
-8. `lifecycle` - Setup/teardown hooks
-9. `{protocol}` - Request definition
-10. `assertions` - Validation rules
+3. `protocol` - Explicit protocol declaration (if any)
+4. `metadata` - AI and collaboration context
+5. `extends` - Template inheritance (if any)
+6. `environment` - Runtime configuration
+7. `variables` - Static variables
+8. `data` - Data sources
+9. `lifecycle` - Setup/teardown hooks
+10. `{protocol}` - Request definition
+11. `assertions` - Validation rules
 
 ## Complete Example
 

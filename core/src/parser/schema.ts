@@ -39,6 +39,13 @@ export function validateTspec(spec: TSpec, options: SchemaValidationOptions = {}
     errors.push('Missing protocol block (http, grpc, graphql, or websocket)');
   }
 
+  // Protocol field validation (if present)
+  if ('protocol' in spec && spec.protocol !== undefined) {
+    if (typeof spec.protocol !== 'string') {
+      errors.push('protocol field must be a string');
+    }
+  }
+
   // Metadata validation (all fields are optional, only validate types when present)
   if (spec.metadata) {
     if (spec.metadata.test_category && !VALID_CATEGORIES.includes(spec.metadata.test_category)) {

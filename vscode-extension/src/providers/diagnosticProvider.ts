@@ -78,6 +78,7 @@ function validateRelatedCodeFormat(input: string): { valid: boolean; error?: str
 interface TSpecDocument {
   version?: string;
   description?: string;
+  protocol?: string;
   metadata?: {
     prompt: string;
     related_code: string[];
@@ -261,6 +262,13 @@ export class TSpecDiagnosticProvider {
       );
       diagnostic.source = 'tspec';
       diagnostics.push(diagnostic);
+    }
+
+    // Protocol field validation (if present)
+    if (spec.protocol !== undefined) {
+      if (typeof spec.protocol !== 'string') {
+        this.addDiagnostic(document, 'protocol', 'protocol field must be a string', vscode.DiagnosticSeverity.Error, diagnostics);
+      }
     }
 
     // Metadata validation

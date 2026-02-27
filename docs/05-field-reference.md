@@ -2,6 +2,28 @@
 
 Detailed reference for all TSpec fields.
 
+## `protocol`
+
+**Optional**. Explicitly declare the protocol type for this test case.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `protocol` | string | No | Explicit protocol declaration |
+
+When specified, takes precedence over auto-detection from protocol blocks. Accepts any string value to support custom protocols.
+
+**Common values:** `http`, `grpc`, `graphql`, `websocket`, `web`, or any custom protocol name.
+
+```yaml
+protocol: "http"
+```
+
+### Protocol Detection
+
+TSpec determines the protocol from the explicit `protocol` field only. The field is required for protocol detection.
+
+---
+
 ## `metadata`
 
 **Optional**. Contains AI generation context and test categorization.

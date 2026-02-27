@@ -38,6 +38,7 @@ describe('parser/index', () => {
       const yaml = `
 version: "1.0"
 description: Test login
+protocol: http
 metadata:
   prompt: "test prompt"
   related_code: []
@@ -73,6 +74,7 @@ assertions:
       const yaml = `
 version: "1.0"
 description: Test with variables
+protocol: http
 metadata:
   prompt: "test"
   related_code: []
@@ -99,6 +101,7 @@ assertions:
       const yaml = `
 version: "1.0"
 description: Test
+protocol: http
 metadata:
   prompt: "test"
   related_code: []
@@ -122,6 +125,7 @@ assertions:
       const yaml = `
 version: "1.0"
 description: Test with lifecycle
+protocol: http
 metadata:
   prompt: "test"
   related_code: []

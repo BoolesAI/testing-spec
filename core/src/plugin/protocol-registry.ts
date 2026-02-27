@@ -140,10 +140,8 @@ export function isValidProtocol(protocol: unknown): protocol is string {
  * Get protocol type from test case structure
  */
 export function detectProtocolFromSpec(spec: Record<string, unknown>): string | null {
-  for (const protocol of ProtocolRegistry.getAll()) {
-    if (protocol in spec) {
-      return protocol;
-    }
+  if ('protocol' in spec && typeof spec.protocol === 'string') {
+    return spec.protocol.toLowerCase().trim();
   }
   return null;
 }
