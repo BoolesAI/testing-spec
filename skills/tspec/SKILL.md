@@ -1,13 +1,13 @@
 ---
 name: tspec
-description: Comprehensive TSpec testing toolkit for .tcase and .tsuite files. List protocols, validate syntax, parse test structure, run tests, generate test cases from code changes, and analyze test coverage. Use for API testing, test generation, coverage analysis, and test lifecycle management. Keywords: tspec, test case, test suite, api testing, test validation, test generation, test coverage, run tests, parse tests, list protocols, tspec run, tspec validate, tspec parse, tspec list, tspec gen, tspec coverage, http tests, grpc tests, tsuite, related code, smoke test, regression test, test automation
+description: Comprehensive TSpec testing toolkit for .tcase and .tsuite files. List protocols, validate syntax, parse test structure, run tests, generate test cases from code changes, and analyze test coverage. Supports explicit protocol declaration via the `protocol` field and auto-detection from protocol blocks (http, grpc, graphql, websocket, web). Use for API testing, test generation, coverage analysis, and test lifecycle management. Keywords: tspec, test case, test suite, api testing, test validation, test generation, test coverage, run tests, parse tests, list protocols, tspec run, tspec validate, tspec parse, tspec list, tspec gen, tspec coverage, http tests, grpc tests, tsuite, related code, smoke test, regression test, test automation
 ---
 
 # TSpec - Comprehensive Testing Toolkit
 
 ## Overview
 
-TSpec is a YAML-based DSL for API test specification designed for Developer + AI collaboration. This unified skill covers the full testing lifecycle: listing available protocols, validating test file syntax, parsing test structure, executing tests, generating test cases from code changes, and analyzing test coverage.
+TSpec is a YAML-based DSL for API test specification designed for Developer + AI collaboration. Supports explicit protocol declaration via the `protocol` field and auto-detection from protocol blocks (http, grpc, graphql, websocket, web). This unified skill covers the full testing lifecycle: listing available protocols, validating test file syntax, parsing test structure, executing tests, generating test cases from code changes, and analyzing test coverage.
 
 Six integrated capabilities are provided:
 

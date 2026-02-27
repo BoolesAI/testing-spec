@@ -83,7 +83,7 @@ export function parseTestCases(filePath: string, options: GenerateOptions = {}):
     const processedSpec = replaceVariables(caseSpec, context);
     
     const protocol = getProtocolType(processedSpec);
-    const request = protocol ? processedSpec[protocol] : undefined;
+    const request = protocol ? processedSpec[protocol] as HttpRequest | GrpcRequest | GraphqlRequest | WebsocketRequest | WebRequest | undefined : undefined;
     
     if (protocol === 'http' && processedSpec.environment && request) {
       const envConfig = processedSpec.environment;
@@ -131,7 +131,7 @@ export function parseTestCasesFromString(content: string, options: GenerateFromS
     
     const processedSpec = replaceVariables(caseSpec, context);
     const protocol = getProtocolType(processedSpec);
-    const request = protocol ? processedSpec[protocol] : undefined;
+    const request = protocol ? processedSpec[protocol] as HttpRequest | GrpcRequest | GraphqlRequest | WebsocketRequest | WebRequest | undefined : undefined;
     
     if (protocol === 'http' && processedSpec.environment && request) {
       (request as HttpRequest)._baseUrl = buildBaseUrl(processedSpec.environment);

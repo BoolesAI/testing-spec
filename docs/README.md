@@ -8,20 +8,20 @@ A multi-protocol testing DSL designed for Developer + AI collaboration.
 
 ## Table of Contents
 
-1. [Introduction](./01-introduction.md)
-2. [Quick Start](./02-quick-start.md)
-3. [File Specification](./03-file-specification.md)
-4. [Core Structure](./04-core-structure.md)
-5. [Field Reference](./05-field-reference.md)
-6. [Variables and Expressions](./06-variables-expressions.md)
-7. [Data-Driven Testing](./07-data-driven-testing.md)
-8. [Assertions](./08-assertions.md)
-9. [Template Inheritance](./09-template-inheritance.md)
-10. [Protocol Reference](./10-protocol-reference.md)
-11. [API Reference](./11-api-reference.md)
-12. [Examples](./12-examples.md)
-13. [Test Suites](./13-test-suites.md)
-14. [Proxy Server](./14-proxy-server.md)
+1. [Introduction](/docs.html#01-introduction)
+2. [Quick Start](/docs.html#02-quick-start)
+3. [File Specification](/docs.html#03-file-specification)
+4. [Core Structure](/docs.html#04-core-structure)
+5. [Field Reference](/docs.html#05-field-reference)
+6. [Variables and Expressions](/docs.html#06-variables-expressions)
+7. [Data-Driven Testing](/docs.html#07-data-driven-testing)
+8. [Assertions](/docs.html#08-assertions)
+9. [Template Inheritance](/docs.html#09-template-inheritance)
+10. [Protocol Reference](/docs.html#10-protocol-reference)
+11. [API Reference](/docs.html#11-api-reference)
+12. [Examples](/docs.html#12-examples)
+13. [Test Suites](/docs.html#13-test-suites)
+14. [Proxy Server](/docs.html#14-proxy-server)
 
 ---
 

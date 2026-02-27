@@ -2,6 +2,48 @@
 
 TSpec supports multiple protocols through dedicated protocol blocks. Each protocol has its own configuration structure.
 
+## Protocol Field
+
+**Optional**. Explicitly declare the protocol type in the top-level `protocol` field.
+
+```yaml
+protocol: "http"
+```
+
+When specified, the `protocol` field is used for protocol detection. It accepts any string value, enabling:
+
+- **Explicit documentation** - Make the protocol clear in the file header
+- **Custom protocols** - Support protocols not yet built into TSpec
+- **Future extensibility** - Add new protocols without code changes
+
+### Example with Explicit Protocol
+
+```yaml
+version: "1.0"
+description: "Test with explicit protocol declaration"
+protocol: http  # Explicit protocol
+
+metadata:
+  prompt: "Test login endpoint"
+  related_code: ["src/auth/login.ts"]
+  test_category: functional
+  risk_level: high
+  tags: ["auth"]
+  priority: high
+  timeout: "10s"
+
+http:
+  method: POST
+  path: /api/login
+
+assertions:
+  - type: json_path
+    expression: "$.status"
+    expected: 200
+```
+
+---
+
 ## HTTP/HTTPS
 
 File extension: `.http.tcase`

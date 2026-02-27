@@ -1,6 +1,6 @@
 {
   "name": "@boolesai/tspec-plugin-web",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Web browser UI testing plugin for TSpec using Puppeteer",
   "type": "module",
   "main": "./dist/index.js",
@@ -34,13 +34,13 @@
     "plugin": true
   },
   "peerDependencies": {
-    "@boolesai/tspec": "^1.2.0"
+    "@boolesai/tspec": "^1.3.2"
   },
   "dependencies": {
     "puppeteer": "^24.15.0"
   },
   "devDependencies": {
-    "@boolesai/tspec": "^1.2.0",
+    "@boolesai/tspec": "^1.3.2",
     "@types/node": "^22.0.0",
     "typescript": "^5.0.0",
     "vite": "^7.0.0",

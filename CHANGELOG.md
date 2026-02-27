@@ -5,9 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.2] - 2026-02-19
+## [1.3.2] - 2026-02-27
 
 ### Added
+
+#### @boolesai/tspec (Core Library)
+
+- **Explicit Protocol Field**: New top-level `protocol` field for explicit protocol declaration
+  - Optional field to explicitly declare the protocol type in test case files
+  - Takes precedence for protocol detection, enabling clearer test specifications
+  - Supports any string value for custom protocol extensibility
+  - Simplifies protocol detection logic by using explicit declaration
 
 #### Skills (MCP Integration)
 
@@ -21,10 +29,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Protocol Detection**: Updated protocol detection to use explicit `protocol` field
+  - `getProtocolType()` now reads from the `protocol` field instead of auto-detecting from protocol blocks
+  - Schema validation updated to validate the new `protocol` field
 - **Documentation Restructuring**: Improved organization and maintainability
   - Removed individual skill directories and examples to reduce duplication
   - Restructured reference documentation files under unified `skills/tspec/` directory
   - Updated main Skills README to reflect unified capability
+  - Added `protocol` field documentation in Field Reference and Protocol Reference docs
+
+#### vscode-tspec (VS Code Extension)
+
+- Updated diagnostic provider to validate the new `protocol` field
+- Enhanced schema data with `protocol` field definition
 
 ## [1.3.1] - 2026-02-05
 

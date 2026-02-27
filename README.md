@@ -153,6 +153,7 @@ console.log(result.summary); // { total: 4, passed: 4, failed: 0, passRate: 100 
 ```yaml
 version: "1.0"
 description: "Verify successful login with valid credentials"
+protocol: "http"
 
 metadata:
   prompt: |

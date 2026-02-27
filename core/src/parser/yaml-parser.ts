@@ -17,11 +17,9 @@ export function parseYamlString(content: string): TSpec {
 }
 
 export function getProtocolType(spec: TSpec): ProtocolType | null {
-  const protocols: ProtocolType[] = ['http', 'grpc', 'graphql', 'websocket'];
-  for (const protocol of protocols) {
-    if (protocol in spec) {
-      return protocol;
-    }
+  if (spec.protocol && typeof spec.protocol === 'string') {
+    const protocol = spec.protocol.toLowerCase().trim() as ProtocolType;
+    return protocol;
   }
   return null;
 }

@@ -11,6 +11,7 @@ export interface SchemaField {
 export const TOP_LEVEL_FIELDS: SchemaField[] = [
   { key: 'version', required: true, type: 'string', description: 'TSpec format version (currently "1.0")' },
   { key: 'description', required: true, type: 'string', description: 'Test case description' },
+  { key: 'protocol', required: false, type: 'string', description: 'Explicit protocol type (http, grpc, graphql, websocket, or custom)' },
   { key: 'metadata', required: true, type: 'object', description: 'Test metadata and classification' },
   { key: 'environment', required: false, type: 'object', description: 'Environment configuration' },
   { key: 'variables', required: false, type: 'object', description: 'Variable definitions' },
