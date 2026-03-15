@@ -18,6 +18,7 @@ export const TOP_LEVEL_FIELDS: SchemaField[] = [
   { key: 'data', required: false, type: 'object', description: 'Data-driven testing configuration' },
   { key: 'extends', required: false, type: 'string', description: 'Template file to extend' },
   { key: 'lifecycle', required: false, type: 'object', description: 'Setup and teardown hooks with scope control' },
+  { key: 'proxy_server', required: false, type: 'object', description: 'Override proxy server configuration for this test' },
   { key: 'http', required: false, type: 'object', description: 'HTTP request configuration' },
   { key: 'grpc', required: false, type: 'object', description: 'gRPC request configuration' },
   { key: 'graphql', required: false, type: 'object', description: 'GraphQL request configuration' },
@@ -107,6 +108,14 @@ export const OUTPUT_CONFIG_FIELDS: SchemaField[] = [
   { key: 'notifications', required: false, type: 'array', description: 'Notification configuration' },
 ];
 
+export const PROXY_SERVER_FIELDS: SchemaField[] = [
+  { key: 'url', required: false, type: 'string', description: 'Proxy server URL (http or https)' },
+  { key: 'timeout', required: false, type: 'number', description: 'Request timeout in milliseconds (default: 30000)' },
+  { key: 'headers', required: false, type: 'object', description: 'Custom HTTP headers (supports ${ENV_VAR} expansion)' },
+  { key: 'enabled', required: false, type: 'boolean', description: 'Enable/disable proxy (default: true)' },
+  { key: 'operations', required: false, type: 'array', description: 'Operations to proxy: run, validate, parse' },
+];
+
 // Suite-specific schema definitions
 export const SUITE_TOP_LEVEL_FIELDS: SchemaField[] = [
   { key: 'suite', required: true, type: 'object', description: 'Suite definition block' },
@@ -125,6 +134,7 @@ export const SUITE_FIELDS: SchemaField[] = [
   { key: 'before_each', required: false, type: 'array', description: 'Hooks to run before each test' },
   { key: 'after_each', required: false, type: 'array', description: 'Hooks to run after each test' },
   { key: 'execution', required: false, type: 'object', description: 'Execution configuration' },
+  { key: 'proxy_server', required: false, type: 'object', description: 'Override proxy server configuration for this suite' },
   { key: 'tests', required: false, type: 'array', description: 'Test file references' },
   { key: 'suites', required: false, type: 'array', description: 'Nested suite references' },
 ];

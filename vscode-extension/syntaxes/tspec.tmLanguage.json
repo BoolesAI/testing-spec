@@ -6,6 +6,7 @@
     { "include": "#comments" },
     { "include": "#variable-interpolation" },
     { "include": "#top-level-keys" },
+    { "include": "#proxy-server-keys" },
     { "include": "#protocol-blocks" },
     { "include": "#metadata-keys" },
     { "include": "#related-code-values" },
@@ -32,9 +33,20 @@
     "top-level-keys": {
       "patterns": [
         {
-          "match": "^(version|description|metadata|environment|variables|data|extends|lifecycle|assertions)(:)",
+          "match": "^(version|description|protocol|metadata|environment|variables|data|extends|lifecycle|proxy_server|assertions)(:)",
           "captures": {
             "1": { "name": "keyword.control.tspec" },
+            "2": { "name": "punctuation.separator.key-value.tspec" }
+          }
+        }
+      ]
+    },
+    "proxy-server-keys": {
+      "patterns": [
+        {
+          "match": "^\\s+(url|timeout|headers|enabled|operations)(:)",
+          "captures": {
+            "1": { "name": "variable.other.proxy-server.tspec" },
             "2": { "name": "punctuation.separator.key-value.tspec" }
           }
         }

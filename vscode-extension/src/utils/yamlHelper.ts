@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 export interface YamlContext {
-  type: 'top-level' | 'metadata' | 'http' | 'grpc' | 'graphql' | 'websocket' | 'environment' | 'assertions' | 'assertion-item' | 'data' | 'lifecycle' | 'lifecycle-action' | 'variables' | 'body' | 'unknown';
+  type: 'top-level' | 'metadata' | 'http' | 'grpc' | 'graphql' | 'websocket' | 'environment' | 'assertions' | 'assertion-item' | 'data' | 'lifecycle' | 'lifecycle-action' | 'variables' | 'body' | 'proxy-server' | 'unknown';
   keyPath: string[];
   isValuePosition: boolean;
   currentKey?: string;
@@ -122,6 +122,7 @@ export class YamlHelper {
         }
         return 'lifecycle';
       case 'variables': return 'variables';
+      case 'proxy_server': return 'proxy-server';
       default: return 'unknown';
     }
   }

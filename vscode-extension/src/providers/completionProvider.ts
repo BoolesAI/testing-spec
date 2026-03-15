@@ -12,6 +12,7 @@ import {
   DATA_FIELDS,
   LIFECYCLE_FIELDS,
   LIFECYCLE_ACTION_FIELDS,
+  PROXY_SERVER_FIELDS,
   VARIABLE_FUNCTIONS,
   createFieldCompletions,
   createEnumCompletions,
@@ -80,6 +81,9 @@ export class TSpecCompletionProvider implements vscode.CompletionItemProvider {
       case 'lifecycle-action':
         return createFieldCompletions(LIFECYCLE_ACTION_FIELDS);
       
+      case 'proxy-server':
+        return createFieldCompletions(PROXY_SERVER_FIELDS);
+      
       case 'body':
         return [
           createCompletionItem('json', vscode.CompletionItemKind.Property, 'JSON body', 'JSON request body', new vscode.SnippetString('json:\n  $0')),
@@ -127,6 +131,11 @@ export class TSpecCompletionProvider implements vscode.CompletionItemProvider {
     // Data format
     if (key === 'format' && contextType === 'data') {
       return createEnumCompletions(['csv', 'json', 'yaml']);
+    }
+    
+    // Proxy server enabled field
+    if (key === 'enabled' && contextType === 'proxy-server') {
+      return createEnumCompletions(['true', 'false']);
     }
     
     return [];

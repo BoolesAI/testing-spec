@@ -43,7 +43,7 @@
     "suite-keys": {
       "patterns": [
         {
-          "match": "^\\s+(name|description|version|extends|depends_on|metadata|environment|variables|lifecycle|before_each|after_each|execution|tests|suites)(:)",
+          "match": "^\\s+(name|description|version|extends|depends_on|metadata|environment|variables|lifecycle|before_each|after_each|execution|proxy_server|tests|suites)(:)",
           "captures": {
             "1": { "name": "keyword.control.suite-property.tsuite" },
             "2": { "name": "punctuation.separator.key-value.tsuite" }

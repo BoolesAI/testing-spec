@@ -6,11 +6,11 @@ This directory contains the unified TSpec skill that provides comprehensive capa
 
 | Skill | Description |
 |-------|-------------|
-| [tspec](./tspec/SKILL.md) | Comprehensive TSpec toolkit: list protocols, validate syntax, parse tests, run tests, generate test cases, and analyze coverage |
+| [tspec](./tspec/SKILL.md) | Comprehensive TSpec toolkit: list protocols, validate syntax, parse tests, run tests, generate test cases, analyze coverage, manage plugins, and MCP server |
 
 ## Capabilities
 
-The **tspec** skill provides six integrated capabilities:
+The **tspec** skill provides nine integrated capabilities:
 
 ### 1. List Protocols (tspec list)
 
@@ -75,6 +75,35 @@ Analyze TSpec test coverage based on `metadata.related_code`. Use this to:
 - Track coverage trends over time
 - Prioritize test creation efforts
 
+### 7. List Plugins (tspec plugin:list)
+
+List installed TSpec plugins and their status. Use this to:
+- View installed plugins and versions
+- Check plugin health status
+- Verify plugin installation
+
+**CLI Command:** `tspec plugin:list` (alias: `tspec plugins`)
+
+### 8. Install Plugins (tspec plugin:install)
+
+Install TSpec plugins from npm or local packages. Use this to:
+- Install plugins from npm registry
+- Install local plugin packages
+- Manage plugin installation globally or locally
+
+**CLI Command:** `tspec plugin:install` (alias: `tspec install`)
+
+### 9. MCP Server (tspec mcp)
+
+Start the Model Context Protocol (MCP) server for AI tool integration. Use this to:
+- Expose TSpec capabilities to AI assistants
+- Enable programmatic test execution
+- Integrate with Claude Desktop and other MCP clients
+
+**CLI Command:** `tspec mcp`
+
+**Available MCP Tools:** `tspec_list`, `tspec_validate`, `tspec_parse`, `tspec_run`
+
 ## Typical Workflow
 
 ```
@@ -134,7 +163,10 @@ skills/
     │   ├── tspec-parse.md
     │   ├── tspec-run.md
     │   ├── tspec-gen.md
-    │   └── tspec-coverage.md
+    │   ├── tspec-coverage.md
+    │   ├── tspec-plugin-list.md
+    │   ├── tspec-plugin-install.md
+    │   └── tspec-mcp.md
     └── examples/
         └── example.md           # Comprehensive examples
 ```

@@ -1,3 +1,5 @@
+import type { ProxyConfig } from '../plugin/config.js';
+
 /**
  * Represents a line range in a source file.
  * For single lines, start equals end.
@@ -44,6 +46,7 @@ export interface TSpec {
   environment?: EnvironmentConfig;
   data?: DataConfig;
   lifecycle?: LifecycleConfig;
+  proxy_server?: ProxyConfig;
 }
 
 export interface TSpecMetadata {
@@ -502,22 +505,24 @@ export interface SuiteDefinition {
   name: string;                    // Required: Suite name
   description?: string;            // Human-readable description
   version?: string;                // Suite version (default: "1.0")
-  
+
   extends?: string;                // Template inheritance
   depends_on?: string[];           // Suite dependencies (file paths)
-  
+
   metadata?: SuiteMetadata;        // AI and categorization metadata
   environment?: EnvironmentConfig; // Shared environment settings
   variables?: Record<string, unknown>; // Suite-level variables
-  
+
   lifecycle?: SuiteLifecycleConfig; // Suite-level setup/teardown
   before_each?: SuiteLifecycleAction[]; // Per-test setup (beforeEach)
   after_each?: SuiteLifecycleAction[];  // Per-test teardown (afterEach)
-  
+
   execution?: ExecutionConfig;     // Execution control
-  
+
   tests?: TestReference[];         // Test file references (file or files glob)
   suites?: SuiteReference[];       // Nested suite references
+
+  proxy_server?: ProxyConfig;      // Override proxy server configuration
 }
 
 /**
