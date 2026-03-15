@@ -434,3 +434,76 @@ lifecycle:
         console.log("Cleaning up test user: " + test_user_id);
         return {};
 ```
+
+---
+
+## `proxy_server`
+
+**Optional**. Override proxy server configuration for this test case or suite.
+
+When specified, these settings take precedence over global proxy configuration defined in `tspec.config.json`. This allows routing specific tests through different proxy servers or disabling proxy for certain tests.
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `url` | string | Yes* | - | Proxy server URL (http or https) |
+| `timeout` | number | No | 30000 | Request timeout in milliseconds |
+| `headers` | object | No | {} | Custom HTTP headers (supports `${ENV_VAR}` expansion) |
+| `enabled` | boolean | No | true | Enable/disable proxy |
+| `operations` | array | No | ["run", "validate", "parse"] | Operations to proxy |
+
+*Required if `proxy_server` is specified and `enabled` is not `false`.
+
+### Configuration Hierarchy
+
+When both global config and DSL-level config exist:
+
+1. DSL-level `url` overrides global `url`
+2. DSL-level `timeout` overrides global `timeout`
+3. DSL-level `headers` are merged with global headers (DSL takes precedence for same keys)
+4. DSL-level `enabled` overrides global `enabled`
+5. DSL-level `operations` overrides global `operations`
+
+### Example: Override Proxy URL
+
+```yaml
+version: "1.0"
+description: "Test using different proxy"
+proxy_server:
+  url: "https://special-proxy.example.com"
+  timeout: 60000
+  headers:
+    Authorization: "Bearer ${TSPEC_PROXY_TOKEN}"
+  operations: ["run"]
+```
+
+### Example: Disable Proxy for Specific Test
+
+```yaml
+version: "1.0"
+description: "Test that bypasses proxy"
+proxy_server:
+  enabled: false
+```
+
+### Suite-Level Proxy
+
+You can also specify `proxy_server` at the suite level to apply to all tests in that suite:
+
+```yaml
+suite:
+  name: "API Test Suite"
+  proxy_server:
+    url: "https://suite-proxy.example.com"
+    timeout: 120000
+  tests:
+    - file: "tests/test1.http.tcase"
+    - file: "tests/test2.http.tcase"
+```
+
+### Precedence Order
+
+1. **Test case `proxy_server`** (highest priority)
+2. **Suite `proxy_server`**
+3. **Global config** (`tspec.config.json`)
+
+See [Proxy Server](./14-proxy-server.md) for complete proxy configuration documentation.

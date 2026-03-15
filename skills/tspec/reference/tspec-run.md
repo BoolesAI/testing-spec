@@ -68,6 +68,7 @@ tspec run <files...> [options]
 | `-q, --quiet` | Only output summary |
 | `--fail-fast` | Stop on first failure |
 | `--config <path>` | Path to tspec.config.json |
+| `--no-auto-install` | Skip automatic plugin installation |
 | `--no-proxy` | Disable proxy for this execution |
 | `--proxy-url <url>` | Override proxy URL for this execution |
 

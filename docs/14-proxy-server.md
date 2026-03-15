@@ -55,11 +55,12 @@ Add the `proxy` section to your `tspec.config.json`:
 
 ### Configuration Hierarchy
 
-1. **Global Config** (`~/.tspec/tspec.config.json`) - Organization-wide settings
-2. **Local Config** (`./tspec.config.json`) - Project-specific overrides
-3. **CLI Flags** - One-time overrides
+1. **DSL-level Config** (`proxy_server` in `.tcase` or `.tsuite`) - Highest priority
+2. **Global Config** (`~/.tspec/tspec.config.json`) - Organization-wide settings
+3. **Local Config** (`./tspec.config.json`) - Project-specific overrides
+4. **CLI Flags** - One-time overrides
 
-Local config takes precedence over global. CLI flags take precedence over both.
+DSL-level config takes precedence over all others. CLI flags take precedence over config files.
 
 ### Environment Variables in Headers
 
@@ -120,6 +121,132 @@ tspec parse tests/*.tcase --no-proxy
 |------|-------------|
 | `--proxy-url <url>` | Override configured proxy URL |
 | `--no-proxy` | Disable proxy for this execution |
+
+## DSL-Level Configuration
+
+You can override proxy settings directly in `.tcase` or `.tsuite` files using the `proxy_server` field. This allows:
+
+- Routing specific tests through different proxy servers
+- Disabling proxy for certain tests
+- Per-suite proxy configuration
+
+### Test Case Level
+
+Override proxy for individual test cases:
+
+```yaml
+# tests/special-proxy.http.tcase
+version: "1.0"
+description: "Test using different proxy"
+
+proxy_server:
+  url: "https://special-proxy.example.com"
+  timeout: 120000
+  headers:
+    Authorization: "Bearer ${SPECIAL_PROXY_TOKEN}"
+  operations: ["run"]
+
+metadata:
+  prompt: "Test with custom proxy"
+  test_category: "functional"
+  risk_level: "high"
+
+http:
+  method: "GET"
+  path: "/api/internal"
+
+assertions:
+  - type: "json_path"
+    expression: "$.status"
+    expected: 200
+```
+
+### Suite Level
+
+Apply proxy settings to all tests in a suite:
+
+```yaml
+# suites/api.http.tsuite
+suite:
+  name: "API Test Suite"
+  description: "Tests routed through suite proxy"
+  
+  proxy_server:
+    url: "https://suite-proxy.example.com"
+    timeout: 60000
+  
+  tests:
+    - file: "tests/test1.http.tcase"
+    - file: "tests/test2.http.tcase"
+```
+
+### Disabling Proxy
+
+Disable proxy for specific tests that should run locally:
+
+```yaml
+version: "1.0"
+description: "Test that bypasses proxy"
+
+proxy_server:
+  enabled: false
+
+metadata:
+  prompt: "Local test without proxy"
+  test_category: "functional"
+  risk_level: "medium"
+
+http:
+  method: "GET"
+  path: "/api/health"
+
+assertions:
+  - type: "json_path"
+    expression: "$.status"
+    expected: 200
+```
+
+### Merge Behavior
+
+When DSL-level and global configs both exist:
+
+| Field | Behavior |
+|-------|----------|
+| `url` | DSL overrides global |
+| `timeout` | DSL overrides global |
+| `headers` | Merged (DSL takes precedence for same keys) |
+| `enabled` | DSL overrides global |
+| `operations` | DSL overrides global |
+
+**Example - Merged Headers:**
+
+Global config:
+```json
+{
+  "proxy": {
+    "url": "https://proxy.example.com",
+    "headers": {
+      "Authorization": "Bearer global-token",
+      "X-Team": "engineering"
+    }
+  }
+}
+```
+
+DSL config:
+```yaml
+proxy_server:
+  headers:
+    Authorization: "Bearer dsl-token"
+    X-Request-ID: "12345"
+```
+
+Effective headers:
+```yaml
+Authorization: "Bearer dsl-token"  # DSL overrides
+X-Team: "engineering"               # From global
+X-Request-ID: "12345"              # From DSL
+```
 
 ## API Specification
 

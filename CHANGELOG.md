@@ -5,6 +5,57 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-03-15
+
+### Added
+
+#### @boolesai/tspec (Core Library)
+
+- **DSL-Level Proxy Configuration**: New `proxy_server` field for test case and suite level proxy override
+  - Override proxy settings directly in `.tcase` and `.tsuite` files
+  - Full `ProxyConfig` support: `url`, `timeout`, `headers`, `enabled`, `operations`
+  - Case-level/suite-level settings take precedence over global configuration
+  - Ability to disable proxy for specific tests with `enabled: false`
+  - Schema validation for proxy configuration fields
+
+#### vscode-tspec (VS Code Extension)
+
+- **Proxy Server Field Support**:
+  - Auto-completion for `proxy_server` field and nested properties
+  - Syntax highlighting for proxy configuration keys
+  - IntelliSense support for `url`, `timeout`, `headers`, `enabled`, `operations` fields
+
+#### Skills (MCP Integration)
+
+- **New Command Documentation**:
+  - `tspec plugin:list` - List installed plugins with health status
+  - `tspec plugin:install` - Install plugins from npm or local packages
+  - `tspec mcp` - Start MCP server for AI tool integration
+- Updated skill documentation with 9 integrated capabilities
+
+### Changed
+
+- **Proxy Configuration Hierarchy**: Updated precedence order for proxy settings
+  1. DSL-level config (`proxy_server` in `.tcase` or `.tsuite`) - highest priority
+  2. CLI flags (`--proxy-url`, `--no-proxy`)
+  3. Local config file (`./tspec.config.json`)
+  4. Global config file (`~/.tspec/tspec.config.json`)
+
+### Fixed
+
+- **Documentation**: Added missing Part 14 (Proxy Server) navigation link in `docs.html` sidebar
+- **CLI Documentation**: Added `--no-auto-install` flag to `tspec run` command documentation
+
+### Documentation
+
+- **Field Reference**: Added `proxy_server` field documentation with examples
+- **Proxy Server Guide**: Added DSL-Level Configuration section with precedence rules
+- **Skills Documentation**: 
+  - Created `tspec-plugin-list.md` reference
+  - Created `tspec-plugin-install.md` reference  
+  - Created `tspec-mcp.md` reference
+  - Updated `SKILL.md` with new commands and proxy configuration
+
 ## [1.3.2] - 2026-02-27
 
 ### Added

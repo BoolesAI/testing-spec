@@ -10,15 +10,78 @@ import type {
   SuiteMetadata,
   SuiteLifecycleAction
 } from './types.js';
+import type { ProxyConfig } from '../plugin/config.js';
 import { validateRelatedCodeFormat } from './related-code.js';
 
 const VALID_CATEGORIES = ['functional', 'integration', 'performance', 'security'] as const;
 const VALID_RISK_LEVELS = ['low', 'medium', 'high', 'critical'] as const;
 const VALID_PRIORITIES = ['low', 'medium', 'high'] as const;
 const PROTOCOL_BLOCKS: ProtocolType[] = ['http', 'grpc', 'graphql', 'websocket'];
+const VALID_PROXY_OPERATIONS = ['run', 'validate', 'parse'] as const;
 
 export interface SchemaValidationOptions {
   strict?: boolean;
+}
+
+/**
+ * Validates proxy_server configuration
+ */
+function validateProxyConfig(proxy: ProxyConfig, path: string, errors: string[]): void {
+  // url validation
+  if (proxy.url !== undefined) {
+    if (typeof proxy.url !== 'string' || proxy.url.trim() === '') {
+      errors.push(`${path}.url must be a non-empty string`);
+    } else {
+      // Basic URL format validation
+      try {
+        const url = new URL(proxy.url);
+        if (!['http:', 'https:'].includes(url.protocol)) {
+          errors.push(`${path}.url must use http or https protocol`);
+        }
+      } catch {
+        errors.push(`${path}.url must be a valid URL`);
+      }
+    }
+  }
+
+  // timeout validation
+  if (proxy.timeout !== undefined) {
+    if (typeof proxy.timeout !== 'number' || proxy.timeout <= 0) {
+      errors.push(`${path}.timeout must be a positive number`);
+    }
+  }
+
+  // headers validation
+  if (proxy.headers !== undefined) {
+    if (typeof proxy.headers !== 'object' || proxy.headers === null) {
+      errors.push(`${path}.headers must be an object`);
+    } else {
+      for (const [key, value] of Object.entries(proxy.headers)) {
+        if (typeof value !== 'string') {
+          errors.push(`${path}.headers.${key} must be a string`);
+        }
+      }
+    }
+  }
+
+  // enabled validation
+  if (proxy.enabled !== undefined && typeof proxy.enabled !== 'boolean') {
+    errors.push(`${path}.enabled must be a boolean`);
+  }
+
+  // operations validation
+  if (proxy.operations !== undefined) {
+    if (!Array.isArray(proxy.operations)) {
+      errors.push(`${path}.operations must be an array`);
+    } else {
+      for (const op of proxy.operations) {
+        if (!VALID_PROXY_OPERATIONS.includes(op as typeof VALID_PROXY_OPERATIONS[number])) {
+          errors.push(`${path}.operations must contain only: ${VALID_PROXY_OPERATIONS.join(', ')}`);
+          break;
+        }
+      }
+    }
+  }
 }
 
 export function validateTspec(spec: TSpec, options: SchemaValidationOptions = {}): ValidationResult {
@@ -144,6 +207,11 @@ export function validateTspec(spec: TSpec, options: SchemaValidationOptions = {}
         errors.push(`data.format must be one of: ${validFormats.join(', ')}`);
       }
     }
+  }
+
+  // Proxy server validation
+  if (spec.proxy_server) {
+    validateProxyConfig(spec.proxy_server, 'proxy_server', errors);
   }
 
   return {
@@ -495,6 +563,11 @@ function validateSuiteDefinition(suite: SuiteDefinition, errors: string[]): void
         validateSuiteReference(ref, index, errors);
       });
     }
+  }
+
+  // Proxy server validation
+  if (suite.proxy_server) {
+    validateProxyConfig(suite.proxy_server, 'suite.proxy_server', errors);
   }
 
   // Warn if no tests or suites defined

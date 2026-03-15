@@ -14,6 +14,7 @@ import type {
   ExecutionConfig, RetryConfig, SuiteLifecycleConfig, SuiteLifecycleAction,
   SuiteResult, SuiteTestResult, HookResult, SuiteStats, SuiteAssertionResult
 } from './types.js';
+import type { ProxyConfig } from '../plugin/config.js';
 import type { VariableContext } from './variables.js';
 import type { DataFormat, DataRow, ParameterizedSpec } from './data-driver.js';
 
@@ -27,6 +28,7 @@ export interface TestCase {
   lifecycle?: TSpec['lifecycle'];
   environment?: EnvironmentConfig;
   variables?: Record<string, unknown>;
+  proxy_server?: ProxyConfig;
   _dataRow?: DataRow;
   _raw: TSpec;
 }
@@ -103,6 +105,7 @@ export function parseTestCases(filePath: string, options: GenerateOptions = {}):
       lifecycle: processedSpec.lifecycle,
       environment: processedSpec.environment,
       variables: processedSpec.variables,
+      proxy_server: processedSpec.proxy_server,
       _dataRow: caseSpec._dataRow,
       _raw: processedSpec
     };
@@ -150,6 +153,7 @@ export function parseTestCasesFromString(content: string, options: GenerateFromS
       lifecycle: processedSpec.lifecycle,
       environment: processedSpec.environment,
       variables: processedSpec.variables,
+      proxy_server: processedSpec.proxy_server,
       _dataRow: caseSpec._dataRow,
       _raw: processedSpec
     };
@@ -246,6 +250,8 @@ export interface ParsedSuite {
   
   execution?: ExecutionConfig;
   depends_on?: string[];
+  
+  proxy_server?: ProxyConfig;
   
   tests: ResolvedTestReference[];
   nestedSuites: ParsedSuite[];
@@ -367,6 +373,9 @@ export function applySuiteTemplateInheritance(suite: TSpecSuite, baseDir: string
           ) as unknown as ExecutionConfig
         : undefined,
       
+      // Proxy server: suite takes precedence over template
+      proxy_server: suite.suite.proxy_server ?? resolvedTemplate.suite.proxy_server,
+      
       // depends_on from suite only (not inherited)
       depends_on: suite.suite.depends_on,
       
@@ -423,5 +432,6 @@ export type {
   ExecutionConfig, RetryConfig, SuiteLifecycleConfig, SuiteLifecycleAction,
   SuiteResult, SuiteTestResult, HookResult, SuiteStats, SuiteAssertionResult
 } from './types.js';
+export type { ProxyConfig } from '../plugin/config.js';
 export type { VariableContext } from './variables.js';
 export type { DataFormat, DataRow, ParameterizedSpec } from './data-driver.js';

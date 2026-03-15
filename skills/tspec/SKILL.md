@@ -1,6 +1,6 @@
 ---
 name: tspec
-description: Comprehensive TSpec testing toolkit for .tcase and .tsuite files. List protocols, validate syntax, parse test structure, run tests, generate test cases from code changes, and analyze test coverage. Supports explicit protocol declaration via the `protocol` field and auto-detection from protocol blocks (http, grpc, graphql, websocket, web). Use for API testing, test generation, coverage analysis, and test lifecycle management. Keywords: tspec, test case, test suite, api testing, test validation, test generation, test coverage, run tests, parse tests, list protocols, tspec run, tspec validate, tspec parse, tspec list, tspec gen, tspec coverage, http tests, grpc tests, tsuite, related code, smoke test, regression test, test automation
+description: Comprehensive TSpec testing toolkit for .tcase and .tsuite files. List protocols, validate syntax, parse test structure, run tests, generate test cases from code changes, and analyze test coverage. Supports explicit protocol declaration via the `protocol` field and auto-detection from protocol blocks (http, grpc, graphql, websocket, web). Use for API testing, test generation, coverage analysis, and test lifecycle management. Keywords: tspec, test case, test suite, api testing, test validation, test generation, test coverage, run tests, parse tests, list protocols, tspec run, tspec validate, tspec parse, tspec list, tspec gen, tspec coverage, http tests, grpc tests, tsuite, related code, smoke test, regression test, test automation, mcp, plugin
 ---
 
 # TSpec - Comprehensive Testing Toolkit
@@ -9,7 +9,7 @@ description: Comprehensive TSpec testing toolkit for .tcase and .tsuite files. L
 
 TSpec is a YAML-based DSL for API test specification designed for Developer + AI collaboration. Supports explicit protocol declaration via the `protocol` field and auto-detection from protocol blocks (http, grpc, graphql, websocket, web). This unified skill covers the full testing lifecycle: listing available protocols, validating test file syntax, parsing test structure, executing tests, generating test cases from code changes, and analyzing test coverage.
 
-Six integrated capabilities are provided:
+Nine integrated capabilities are provided:
 
 | # | Capability | MCP Tool | Reference |
 |---|-----------|----------|-----------|
@@ -19,6 +19,9 @@ Six integrated capabilities are provided:
 | 4 | Run Tests | `tspec_run` | [tspec-run](reference/tspec-run.md) |
 | 5 | Generate Test Cases | - | [tspec-gen](reference/tspec-gen.md) |
 | 6 | Analyze Test Coverage | - | [tspec-coverage](reference/tspec-coverage.md) |
+| 7 | List Plugins | - | [tspec-plugin-list](reference/tspec-plugin-list.md) |
+| 8 | Install Plugins | - | [tspec-plugin-install](reference/tspec-plugin-install.md) |
+| 9 | MCP Server | - | [tspec-mcp](reference/tspec-mcp.md) |
 
 ## Typical Workflow
 
@@ -119,6 +122,48 @@ Analyze test coverage by examining `metadata.related_code` across `.tcase` files
 
 ---
 
+## 7. List Plugins (tspec plugin:list)
+
+List installed TSpec plugins and their status. Plugins extend TSpec with custom protocols, assertions, and lifecycle actions. See [full reference](reference/tspec-plugin-list.md).
+
+**No MCP tool** - CLI command.
+
+```bash
+tspec plugin:list
+tspec plugins          # alias
+tspec plugin:list --health
+```
+
+---
+
+## 8. Install Plugins (tspec plugin:install)
+
+Install TSpec plugins from npm or local packages. See [full reference](reference/tspec-plugin-install.md).
+
+**No MCP tool** - CLI command.
+
+```bash
+tspec plugin:install @tspec/plugin-custom
+tspec install @tspec/plugin-custom    # alias
+tspec plugin:install ./local-plugin --global
+```
+
+---
+
+## 9. MCP Server (tspec mcp)
+
+Start the Model Context Protocol (MCP) server for AI tool integration. Exposes TSpec capabilities to AI assistants like Claude. See [full reference](reference/tspec-mcp.md).
+
+**No MCP tool** - this IS the MCP server command.
+
+```bash
+tspec mcp              # Start MCP server
+```
+
+**Available MCP Tools:** `tspec_list`, `tspec_validate`, `tspec_parse`, `tspec_run`
+
+---
+
 ## Proxy Execution
 
 All execution capabilities (run, validate, parse) support remote proxy execution. Configure proxy in `tspec.config.json`:
@@ -144,6 +189,32 @@ tspec run tests/*.tcase --proxy-url http://localhost:8080
 # Disable proxy
 tspec run tests/*.tcase --no-proxy
 ```
+
+### DSL-Level Proxy Configuration
+
+Override proxy settings directly in `.tcase` or `.tsuite` files:
+
+```yaml
+# .tcase file
+proxy_server:
+  url: "https://special-proxy.example.com"
+  timeout: 60000
+  headers:
+    Authorization: "Bearer ${TSPEC_PROXY_TOKEN}"
+  operations: ["run"]
+```
+
+```yaml
+# .tsuite file
+suite:
+  name: "API Test Suite"
+  proxy_server:
+    url: "https://suite-proxy.example.com"
+  tests:
+    - file: "tests/test1.http.tcase"
+```
+
+**Precedence order:** Test case > Suite > CLI flags > Config file
 
 When proxy is configured, operations are automatically forwarded to the remote server. The output includes a `[Proxy: <url>]` indicator.
 
