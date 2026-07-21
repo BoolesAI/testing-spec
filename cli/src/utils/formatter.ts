@@ -62,6 +62,11 @@ export interface FormattedTestResult {
     passed: boolean;
     type: string;
     message: string;
+    expression?: string;
+    operator?: string;
+    expected?: unknown;
+    actual?: unknown;
+    path?: string;
   }>;
   request?: {
     method: string;

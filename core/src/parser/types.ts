@@ -586,4 +586,7 @@ export interface SuiteAssertionResult {
   message?: string;
   expected?: unknown;
   actual?: unknown;
+  expression?: string;
+  operator?: string;
+  path?: string;
 }

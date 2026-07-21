@@ -613,7 +613,10 @@ async function executeTestFile(
           passed: a.passed,
           message: a.message,
           expected: a.expected,
-          actual: a.actual
+          actual: a.actual,
+          expression: a.expression,
+          operator: a.operator,
+          path: a.path
         })));
       }
       
